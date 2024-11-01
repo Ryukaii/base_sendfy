@@ -84,10 +84,10 @@ def get_integrations():
         return jsonify(integrations)
     except FileNotFoundError:
         logger.error("Integrations file not found")
-        return jsonify({'error': 'Integrations data not found'}), 404
+        return jsonify([])
     except json.JSONDecodeError as e:
         logger.error(f"JSON decode error in integrations file: {str(e)}")
-        return jsonify({'error': 'Invalid integrations data format'}), 500
+        return jsonify([])
     except Exception as e:
         logger.error(f"Error loading integrations: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
@@ -173,6 +173,57 @@ def delete_integration(integration_id):
     except Exception as e:
         logger.error(f"Error deleting integration {integration_id}: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/campaigns', methods=['GET'])
+def get_campaigns():
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        return jsonify(campaigns)
+    except FileNotFoundError:
+        logger.error("Campaigns file not found")
+        return jsonify([])
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return jsonify([])
+
+@app.route('/api/campaigns', methods=['POST'])
+def create_campaign():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        required_fields = ['name', 'integration_id', 'event_type', 'message_template']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+        
+        campaign_id = str(uuid.uuid4())
+        campaign = {
+            'id': campaign_id,
+            'name': data['name'].strip(),
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        try:
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                campaigns = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            campaigns = []
+        
+        campaigns.append(campaign)
+        
+        with open(CAMPAIGNS_FILE, 'w') as f:
+            json.dump(campaigns, f, indent=2)
+        
+        return jsonify(campaign), 201
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return jsonify({'error': 'Failed to create campaign'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
