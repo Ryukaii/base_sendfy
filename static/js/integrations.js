@@ -78,32 +78,27 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
 
 // Delete integration
 async function deleteIntegration(integrationId) {
-    showConfirm(
-        'Are you sure you want to delete this integration? This will also delete all associated campaigns.',
-        async () => {
-            try {
-                const response = await fetch(`/api/integrations/${integrationId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    showMessage(
-                        'Success', 
-                        `Integration deleted successfully! ${data.campaigns_removed} associated campaigns were also removed.`,
-                        'success'
-                    );
-                    loadIntegrations();
-                } else {
-                    const data = await response.json();
-                    showMessage('Error', `Failed to delete integration: ${data.error}`, 'danger');
-                }
-            } catch (error) {
-                console.error('Error deleting integration:', error);
-                showMessage('Error', 'Failed to delete integration. Please try again.', 'danger');
-            }
+    try {
+        const response = await fetch(`/api/integrations/${integrationId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            showMessage(
+                'Success', 
+                `Integration deleted successfully! ${data.campaigns_removed} associated campaigns were also removed.`,
+                'success'
+            );
+            loadIntegrations();
+        } else {
+            const data = await response.json();
+            showMessage('Error', `Failed to delete integration: ${data.error}`, 'danger');
         }
-    );
+    } catch (error) {
+        console.error('Error deleting integration:', error);
+        showMessage('Error', 'Failed to delete integration. Please try again.', 'danger');
+    }
 }
 
 // Load integrations when page loads

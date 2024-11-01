@@ -2981,3 +2981,183 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-01 05:07:05,520 - app - INFO - Accessing index page
 2024-11-01 05:07:05,520 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:05] "GET / HTTP/1.1" 200 -
 2024-11-01 05:07:05,530 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:05] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-01 05:07:15,028 - app - INFO - Accessing index page
+2024-11-01 05:07:15,028 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:15] "GET / HTTP/1.1" 200 -
+2024-11-01 05:07:15,368 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:15] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 05:07:30,714 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:30] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 05:07:30,924 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:30] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 05:07:31,113 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:31] "GET /static/js/integrations.js HTTP/1.1" 200 -
+2024-11-01 05:07:31,994 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:31] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 05:07:59,503 - app - INFO - Received webhook request for integration: 6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b
+2024-11-01 05:07:59,503 - app - DEBUG - Webhook data: {
+  "transaction_id": "gQAMYVEg",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "2804:d59:9142:4600:adec:2db6:4da0:24f0",
+  "status": "pending",
+  "order_url": "https://pay.portal-cac-registro.org/order/gQAMYVEg",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/qoR32VRJwqJ3Vj5",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,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",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/52ebb5da-64b8-4aba-8a15-ec8869617df85204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***6304A9A5",
+  "created_at": "2024-11-01T05:05:33.000000Z",
+  "updated_at": "2024-11-01 02:05:37",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Carlos Bispo Pereira dos Santos",
+    "document": "03249818216",
+    "email": "cbispo157.cb@gmail.com",
+    "phone": "69993461832"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 05:07:59,503 - app - DEBUG - Extracted status: pending, transaction_id: gQAMYVEg
+2024-11-01 05:07:59,503 - app - DEBUG - Normalizing status: pending
+2024-11-01 05:07:59,504 - app - DEBUG - Normalized status: pending -> pending
+2024-11-01 05:07:59,504 - app - DEBUG - Customer data: {'name': 'Carlos Bispo Pereira dos Santos', 'document': '03249818216', 'email': 'cbispo157.cb@gmail.com', 'phone': '69993461832'}
+2024-11-01 05:07:59,504 - app - DEBUG - Formatting phone number: 69993461832
+2024-11-01 05:07:59,504 - app - DEBUG - After removing non-numeric characters: 69993461832
+2024-11-01 05:07:59,504 - app - DEBUG - Added country code: 5569993461832
+2024-11-01 05:07:59,504 - app - DEBUG - Final formatted number: +5569993461832
+2024-11-01 05:07:59,504 - app - DEBUG - Formatted phone: +5569993461832
+2024-11-01 05:07:59,504 - app - DEBUG - Extracted customer name - full: Carlos Bispo Pereira dos Santos, first: Carlos
+2024-11-01 05:07:59,505 - app - DEBUG - Formatted total price: 96.20
+2024-11-01 05:07:59,505 - app - DEBUG - Looking for campaigns with integration_id=6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b and status=pending
+2024-11-01 05:07:59,505 - app - DEBUG - Found 0 matching campaigns
+2024-11-01 05:07:59,505 - app - INFO - No matching campaigns found for integration 6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b and status pending
+2024-11-01 05:07:59,505 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:59] "POST /webhook/6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b HTTP/1.1" 200 -
+2024-11-01 05:07:59,827 - app - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 05:07:59,827 - app - DEBUG - Webhook data: {
+  "transaction_id": "gQAMYVEg",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "2804:d59:9142:4600:adec:2db6:4da0:24f0",
+  "status": "pending",
+  "order_url": "https://pay.portal-cac-registro.org/order/gQAMYVEg",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/qoR32VRJwqJ3Vj5",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,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",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/52ebb5da-64b8-4aba-8a15-ec8869617df85204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***6304A9A5",
+  "created_at": "2024-11-01T05:05:33.000000Z",
+  "updated_at": "2024-11-01 02:05:37",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Carlos Bispo Pereira dos Santos",
+    "document": "03249818216",
+    "email": "cbispo157.cb@gmail.com",
+    "phone": "69993461832"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 05:07:59,828 - app - DEBUG - Extracted status: pending, transaction_id: gQAMYVEg
+2024-11-01 05:07:59,828 - app - DEBUG - Normalizing status: pending
+2024-11-01 05:07:59,828 - app - DEBUG - Normalized status: pending -> pending
+2024-11-01 05:07:59,828 - app - DEBUG - Customer data: {'name': 'Carlos Bispo Pereira dos Santos', 'document': '03249818216', 'email': 'cbispo157.cb@gmail.com', 'phone': '69993461832'}
+2024-11-01 05:07:59,828 - app - DEBUG - Formatting phone number: 69993461832
+2024-11-01 05:07:59,828 - app - DEBUG - After removing non-numeric characters: 69993461832
+2024-11-01 05:07:59,828 - app - DEBUG - Added country code: 5569993461832
+2024-11-01 05:07:59,828 - app - DEBUG - Final formatted number: +5569993461832
+2024-11-01 05:07:59,828 - app - DEBUG - Formatted phone: +5569993461832
+2024-11-01 05:07:59,828 - app - DEBUG - Extracted customer name - full: Carlos Bispo Pereira dos Santos, first: Carlos
+2024-11-01 05:07:59,828 - app - DEBUG - Formatted total price: 96.20
+2024-11-01 05:07:59,829 - app - DEBUG - Looking for campaigns with integration_id=06b42000-7771-4b22-b765-993fe881a270 and status=pending
+2024-11-01 05:07:59,829 - app - DEBUG - Normalizing status: pending
+2024-11-01 05:07:59,829 - app - DEBUG - Normalized status: pending -> pending
+2024-11-01 05:07:59,829 - app - DEBUG - Found 1 matching campaigns
+2024-11-01 05:07:59,829 - app - DEBUG - Processing campaign: Test Campaign (ID: test-campaign-1)
+2024-11-01 05:07:59,829 - app - DEBUG - Formatting message template: Olá {customer_name}, seu pedido no valor de R$ {total_price} está pendente.
+2024-11-01 05:07:59,829 - app - DEBUG - Template variables: {'customer_name': 'Carlos', 'customer_full_name': 'Carlos Bispo Pereira dos Santos', 'customer_phone': '+5569993461832', 'customer_email': 'cbispo157.cb@gmail.com', 'total_price': '96.20', 'transaction_id': 'gQAMYVEg', 'pix_code': '00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/52ebb5da-64b8-4aba-8a15-ec8869617df85204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***6304A9A5', 'store_name': 'Cadastro de CACs', 'order_url': 'https://pay.portal-cac-registro.org/order/gQAMYVEg', 'checkout_url': 'https://pay.portal-cac-registro.org/recovery/qoR32VRJwqJ3Vj5'}
+2024-11-01 05:07:59,829 - app - DEBUG - Template after dot notation replacement: Olá {customer_name}, seu pedido no valor de R$ {total_price} está pendente.
+2024-11-01 05:07:59,829 - app - DEBUG - Formatted total_price: 96.20 -> 96.20
+2024-11-01 05:07:59,829 - app - DEBUG - Final formatted message: Olá Carlos, seu pedido no valor de R$ 96.20 está pendente.
+2024-11-01 05:07:59,829 - app - DEBUG - Generated message: Olá Carlos, seu pedido no valor de R$ 96.20 está pendente.
+2024-11-01 05:07:59,834 - app - INFO - Queued SMS task 2576b7d6-4d1e-4f53-9150-f231c78b5ba5 for campaign test-campaign-1
+2024-11-01 05:07:59,835 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:07:59] "POST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1" 200 -
+2024-11-01 05:09:40,900 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:09:40] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 05:09:40,909 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:09:40] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-01 05:09:40,915 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:09:40] "GET /static/js/integrations.js HTTP/1.1" 200 -
+2024-11-01 05:09:41,018 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 05:09:41] "GET /api/integrations HTTP/1.1" 200 -
