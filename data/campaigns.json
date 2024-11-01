@@ -4,7 +4,15 @@
     "name": "Test Campaign",
     "integration_id": "06b42000-7771-4b22-b765-993fe881a270",
     "event_type": "pending",
-    "message_template": "Olá {customer_name}, seu pedido no valor de R$ {total_price} está pendente.",
+    "message_template": "Ol\u00e1 {customer_name}, seu pedido no valor de R$ {total_price} est\u00e1 pendente.",
     "created_at": "2024-11-01 02:30:00"
+  },
+  {
+    "id": "19601db0-fb1d-4224-ac8b-da5847012d47",
+    "name": "TRABI",
+    "integration_id": "13484777-2d29-4864-a03c-d5b8be617eac",
+    "event_type": "pending",
+    "message_template": "TRABI TRABI",
+    "created_at": "2024-11-01 02:41:04"
   }
 ]

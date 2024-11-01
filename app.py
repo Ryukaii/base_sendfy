@@ -10,7 +10,11 @@ from collections import Counter
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('debug.log')
+    ]
 )
 logger = logging.getLogger(__name__)
 
@@ -38,20 +42,24 @@ for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, SMS_HISTORY_FILE]:
 
 def format_phone_number(phone):
     try:
+        logger.debug(f"Formatting phone number: {phone}")
         numbers = re.sub(r'\D', '', phone)
+        logger.debug(f"After removing non-numeric characters: {numbers}")
         
         if len(numbers) < 10 or len(numbers) > 13:
-            raise ValueError("Invalid phone number length")
+            raise ValueError(f"Invalid phone number length: {len(numbers)} digits")
         
         if not numbers.startswith('55'):
             numbers = '55' + numbers
+            logger.debug(f"Added country code: {numbers}")
         
         if len(numbers) < 12:
-            raise ValueError("Missing area code (DDD)")
+            raise ValueError(f"Missing area code (DDD): {numbers}")
         
         if not numbers.startswith('+'):
             numbers = '+' + numbers
             
+        logger.debug(f"Final formatted number: {numbers}")
         return numbers
     except Exception as e:
         logger.error(f"Error formatting phone number {phone}: {str(e)}")
@@ -61,22 +69,35 @@ def normalize_status(status):
     if not status:
         return None
     try:
+        logger.debug(f"Normalizing status: {status}")
         status = str(status).lower().strip()
         status_map = {
             'pending': 'pending',
             'pendente': 'pending',
             'venda pendente': 'pending',
             'aguardando': 'pending',
+            'aguardando pagamento': 'pending',
+            'waiting': 'pending',
+            'waiting_payment': 'pending',
             'approved': 'approved',
             'aprovado': 'approved',
             'venda aprovada': 'approved',
             'completed': 'approved',
             'concluido': 'approved',
             'pago': 'approved',
+            'paid': 'approved',
+            'payment_confirmed': 'approved',
+            'pagamento_confirmado': 'approved',
             'abandoned_cart': 'abandoned',
-            'carrinho_abandonado': 'abandoned'
+            'carrinho_abandonado': 'abandoned',
+            'canceled': 'canceled',
+            'cancelado': 'canceled',
+            'refused': 'canceled',
+            'recusado': 'canceled'
         }
-        return status_map.get(status)
+        normalized = status_map.get(status)
+        logger.debug(f"Normalized status: {status} -> {normalized}")
+        return normalized
     except Exception as e:
         logger.error(f"Error normalizing status {status}: {str(e)}")
         return None
@@ -104,16 +125,23 @@ def format_price(price_str):
 
 def format_message(template, **kwargs):
     try:
+        logger.debug(f"Formatting message template: {template}")
+        logger.debug(f"Template variables: {kwargs}")
+        
         template = re.sub(r'\{(\w+)\.(\w+)\}', r'{\1_\2}', template)
+        logger.debug(f"Template after dot notation replacement: {template}")
         
         for key, value in kwargs.items():
             if isinstance(value, (int, float)) or (isinstance(value, str) and re.match(r'^[\d,.]+$', value)):
                 try:
                     kwargs[key] = format_price(value)
+                    logger.debug(f"Formatted {key}: {value} -> {kwargs[key]}")
                 except (ValueError, TypeError):
                     pass
         
-        return template.format(**kwargs)
+        result = template.format(**kwargs)
+        logger.debug(f"Final formatted message: {result}")
+        return result
     except KeyError as e:
         logger.error(f"Missing template variable: {str(e)}")
         return template
@@ -147,8 +175,10 @@ def webhook_handler(integration_id):
         
         status = webhook_data.get('status')
         transaction_id = webhook_data.get('transaction_id')
+        logger.debug(f"Extracted status: {status}, transaction_id: {transaction_id}")
         
         if not all([status, transaction_id]):
+            logger.error("Missing required fields")
             return jsonify({
                 'success': False,
                 'message': 'Missing required fields: status or transaction_id'
@@ -156,13 +186,17 @@ def webhook_handler(integration_id):
         
         normalized_status = normalize_status(status)
         if normalized_status is None:
+            logger.error(f"Invalid status value: {status}")
             return jsonify({
                 'success': False,
                 'message': f'Invalid status value: {status}'
             }), 400
         
         customer = webhook_data.get('customer', {})
+        logger.debug(f"Customer data: {customer}")
+        
         if not customer or not customer.get('phone'):
+            logger.error("Missing customer data or phone")
             return jsonify({
                 'success': False,
                 'message': 'Missing customer data or phone'
@@ -170,7 +204,9 @@ def webhook_handler(integration_id):
         
         try:
             formatted_phone = format_phone_number(customer['phone'])
+            logger.debug(f"Formatted phone: {formatted_phone}")
         except ValueError as e:
+            logger.error(f"Invalid phone number: {str(e)}")
             return jsonify({
                 'success': False,
                 'message': f'Invalid phone number: {str(e)}'
@@ -179,21 +215,25 @@ def webhook_handler(integration_id):
         full_name = customer.get('name', '')
         name_parts = full_name.split()
         first_name = name_parts[0] if name_parts else ''
+        logger.debug(f"Extracted customer name - full: {full_name}, first: {first_name}")
         
         total_price = "0.00"
         if webhook_data.get('total_price'):
             total_price = format_price(webhook_data['total_price'])
         elif webhook_data.get('plans') and webhook_data['plans'][0].get('value'):
             total_price = format_price(webhook_data['plans'][0]['value'])
+        logger.debug(f"Formatted total price: {total_price}")
         
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
         
+        logger.debug(f"Looking for campaigns with integration_id={integration_id} and status={normalized_status}")
         matching_campaigns = [
             c for c in campaigns 
             if c['integration_id'] == integration_id 
             and normalize_status(c['event_type']) == normalized_status
         ]
+        logger.debug(f"Found {len(matching_campaigns)} matching campaigns")
         
         if not matching_campaigns:
             logger.info(f"No matching campaigns found for integration {integration_id} and status {normalized_status}")
@@ -206,6 +246,8 @@ def webhook_handler(integration_id):
         processed_campaigns = 0
         for campaign in matching_campaigns:
             try:
+                logger.debug(f"Processing campaign: {campaign['name']} (ID: {campaign['id']})")
+                
                 template_vars = {
                     'customer_name': first_name,
                     'customer_full_name': full_name,
@@ -220,6 +262,7 @@ def webhook_handler(integration_id):
                 }
                 
                 message = format_message(campaign['message_template'], **template_vars)
+                logger.debug(f"Generated message: {message}")
                 
                 task = send_sms_task.delay(
                     phone=formatted_phone,

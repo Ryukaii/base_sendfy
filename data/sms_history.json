@@ -52,5 +52,347 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'eiyiuuhxryzf8jp6cjvyqehuh99d0n', 'status': 'processed', 'created_at': '2024-10-31 23:39:14'}}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:42:16",
+    "phone": "+5521999960819",
+    "message": "Ol\u00e1 Rodrigo, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'kd8lr6fgd8ybavhzs48hj8hn0alk1l', 'status': 'processed', 'created_at': '2024-10-31 23:42:16'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:45:55",
+    "phone": "+5591992338214",
+    "message": "Ol\u00e1 Joel, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'ihasdfa7rl3pl4qteqtl7pxlcii5qq', 'status': 'processed', 'created_at': '2024-10-31 23:45:55'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:46:29",
+    "phone": "+5561982132603",
+    "message": "Ol\u00e1 Marina, seu pedido no valor de R$ 84.90 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '062p7snbpyvtzobbofrq6rwgtg0w45', 'status': 'processed', 'created_at': '2024-10-31 23:46:29'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:46:58",
+    "phone": "+5544984365411",
+    "message": "Ol\u00e1 Bruno, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'w9mpiomrgko3xzzdvfsfralj5e202n', 'status': 'processed', 'created_at': '2024-10-31 23:46:58'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:47:54",
+    "phone": "+5581998568514",
+    "message": "Ol\u00e1 Ernani, seu pedido no valor de R$ 226.44 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'es8oqu4uypzkp0rc8yrkmoyofd9dvt', 'status': 'processed', 'created_at': '2024-10-31 23:47:53'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:50:56",
+    "phone": "+5591992338214",
+    "message": "Ol\u00e1 Joel, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '8pwodcok9bct6s2dn8nsjudzm2bvnl', 'status': 'processed', 'created_at': '2024-10-31 23:50:56'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:53:11",
+    "phone": "+5511940710954",
+    "message": "Ol\u00e1 Cleiton, seu pedido no valor de R$ 175.50 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '6bf3aulfnkwm8oea6mq4lbebvt0ddx', 'status': 'processed', 'created_at': '2024-10-31 23:53:11'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:54:56",
+    "phone": "+5593981172209",
+    "message": "Ol\u00e1 Valderi, seu pedido no valor de R$ 147.14 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'yr8lericw0nr162on95kiryt9aqm0l', 'status': 'processed', 'created_at': '2024-10-31 23:54:56'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:58:52",
+    "phone": "+5581998568514",
+    "message": "Ol\u00e1 Ernani, seu pedido no valor de R$ 296.34 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'xzmcsjdovswets60xfk27hz4qmsl2o', 'status': 'processed', 'created_at': '2024-10-31 23:58:52'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:59:37",
+    "phone": "+5568981148253",
+    "message": "Ol\u00e1 Miqueis, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '4q36xtvvj7v6va257m38hc1dl8huf9', 'status': 'processed', 'created_at': '2024-10-31 23:59:37'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:15:31",
+    "phone": "+5596991627199",
+    "message": "Ol\u00e1 Marlon, seu pedido no valor de R$ 147.14 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'x7iqwckpyohnpeqlodf74djjk5ubwg', 'status': 'processed', 'created_at': '2024-11-01 00:15:30'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:17:13",
+    "phone": "+5511996667625",
+    "message": "Ol\u00e1 Ricardo, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'ovx3rp9y86iwaytufez6zmb2qqmngx', 'status': 'processed', 'created_at': '2024-11-01 00:17:13'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:17:21",
+    "phone": "+5571981097721",
+    "message": "Ol\u00e1 Ailton, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'x57fyq1xnpst6204blu90pqhg3yzn2', 'status': 'processed', 'created_at': '2024-11-01 00:17:20'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:21:23",
+    "phone": "+5531996151724",
+    "message": "Ol\u00e1 Jos\u00e9, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'sezpwgzd5ji6pmfbodbeibf9tw47rf', 'status': 'processed', 'created_at': '2024-11-01 00:21:23'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:28:48",
+    "phone": "+5524998611793",
+    "message": "Ol\u00e1 Claudemir, seu pedido no valor de R$ 226.44 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'f3pb5p4o2cncucxszpcs79m5zxxpxj', 'status': 'processed', 'created_at': '2024-11-01 00:28:48'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:30:48",
+    "phone": "+5567998880635",
+    "message": "Ol\u00e1 Andr\u00e9, seu pedido no valor de R$ 217.04 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'k3ioetmdeqftic90yp5wkq6aocxmrw', 'status': 'processed', 'created_at': '2024-11-01 00:30:48'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:32:25",
+    "phone": "+5511997411084",
+    "message": "Ol\u00e1 Alexandre, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 't7puuddqaxufmz3y55qrvea4bvoo4i', 'status': 'processed', 'created_at': '2024-11-01 00:32:25'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:36:32",
+    "phone": "+5571988701716",
+    "message": "Ol\u00e1 Anderson, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '2frts2w9lm0o8ir2kxlk04yldz1j20', 'status': 'processed', 'created_at': '2024-11-01 00:36:32'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:37:05",
+    "phone": "+5535998349749",
+    "message": "Ol\u00e1 Marcos, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '7intbqgmjpx3up2f0hxrewl9ecpa6o', 'status': 'processed', 'created_at': '2024-11-01 00:37:05'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:44:19",
+    "phone": "+5571997189060",
+    "message": "Ol\u00e1 Marcos, seu pedido no valor de R$ 347.28 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'oyev57khlwluhlgwwohogmwi4gt7pl', 'status': 'processed', 'created_at': '2024-11-01 00:44:19'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:51:41",
+    "phone": "+5532984788067",
+    "message": "Ol\u00e1 Wellerson, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'vfb2nvbqjips3z6uws4eairkn78gco', 'status': 'processed', 'created_at': '2024-11-01 00:51:41'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 03:54:57",
+    "phone": "+5511988025412",
+    "message": "Ol\u00e1 Francisco, seu pedido no valor de R$ 175.50 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'dhlklhh7spxjwylk4eunifsyqg74r9', 'status': 'processed', 'created_at': '2024-11-01 00:54:57'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:00:21",
+    "phone": "+5573999281223",
+    "message": "Ol\u00e1 Jos\u00e9, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '7b911h5mwip183syd6d7151iihtq56', 'status': 'processed', 'created_at': '2024-11-01 01:00:21'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:08:07",
+    "phone": "+5599992106054",
+    "message": "Ol\u00e1 FERNANDO, seu pedido no valor de R$ 217.04 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '8gf5xl9m80yudhhutzq9hreztjpyif', 'status': 'processed', 'created_at': '2024-11-01 01:08:07'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:11:00",
+    "phone": "+5521970654991",
+    "message": "Ol\u00e1 Wallace, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'lkgm76gcyi07wi6j690ngyy8rjkkei', 'status': 'processed', 'created_at': '2024-11-01 01:11:00'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:19:09",
+    "phone": "+5592991467356",
+    "message": "Ol\u00e1 Max, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '4rsonr4o8tdq1bir8v5kahfw4entzh', 'status': 'processed', 'created_at': '2024-11-01 01:19:08'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:27:57",
+    "phone": "+5562982443441",
+    "message": "Ol\u00e1 Joedson, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'uqhhua11h14dw2k58ic3yvsnabsw85', 'status': 'processed', 'created_at': '2024-11-01 01:27:57'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:29:54",
+    "phone": "+5592994872396",
+    "message": "Ol\u00e1 Erisvaldo, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 's8addh06bo0oa9in5h4kqzddct8o42', 'status': 'processed', 'created_at': '2024-11-01 01:29:54'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:29:56",
+    "phone": "+5508464646949",
+    "message": "Ol\u00e1 Ficou, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "failed",
+    "api_response": "422 Client Error:  for url: https://api.apisms.me/v2/send.php",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:30:58",
+    "phone": "+5508464646949",
+    "message": "Ol\u00e1 Ficou, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "failed",
+    "api_response": "422 Client Error:  for url: https://api.apisms.me/v2/send.php",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:32:59",
+    "phone": "+5508464646949",
+    "message": "Ol\u00e1 Ficou, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "failed",
+    "api_response": "422 Client Error:  for url: https://api.apisms.me/v2/send.php",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:33:22",
+    "phone": "+5521969035183",
+    "message": "Ol\u00e1 Jos\u00e9, seu pedido no valor de R$ 147.14 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'wghbdnn8ll6f0621ren5iinl4116i7', 'status': 'processed', 'created_at': '2024-11-01 01:33:22'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:37:00",
+    "phone": "+5508464646949",
+    "message": "Ol\u00e1 Ficou, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "failed",
+    "api_response": "422 Client Error:  for url: https://api.apisms.me/v2/send.php",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:37:49",
+    "phone": "+5517999783992",
+    "message": "Ol\u00e1 Eduardo, seu pedido no valor de R$ 217.04 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'dnrny53unq6d2qiasgiqixbsrcou7r', 'status': 'processed', 'created_at': '2024-11-01 01:37:49'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:40:58",
+    "phone": "+5567991147644",
+    "message": "Ol\u00e1 Audo, seu pedido no valor de R$ 147.14 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '7t9ivc8m9gb6hbuqrff9ks8unqkgs2', 'status': 'processed', 'created_at': '2024-11-01 01:40:58'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:50:27",
+    "phone": "+5568999484205",
+    "message": "Ol\u00e1 FABLICIO, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'p44nf3iloborqvbkq8lv5gq5idg8en', 'status': 'processed', 'created_at': '2024-11-01 01:50:27'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:54:31",
+    "phone": "+5511984103265",
+    "message": "Ol\u00e1 Osvaldo, seu pedido no valor de R$ 166.10 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'gjpvidpozyre18lvdeac6410vjz0mu', 'status': 'processed', 'created_at': '2024-11-01 01:54:31'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 04:57:11",
+    "phone": "+5511999999999",
+    "message": "Ol\u00e1 John, seu pedido no valor de R$ 199.99 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'b00mxxqa5vgh2khjqje2tqa0j5mzia', 'status': 'processed', 'created_at': '2024-11-01 01:57:11'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]

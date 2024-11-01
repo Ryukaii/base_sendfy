@@ -1,0 +1,47 @@
+2024-11-01 04:57:09,943 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.196.126:5000
+2024-11-01 04:57:09,943 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-11-01 04:57:10,162 - app - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 04:57:10,162 - app - DEBUG - Webhook data: {
+  "transaction_id": "test123",
+  "status": "pending",
+  "total_price": "199.99",
+  "customer": {
+    "name": "John Test",
+    "phone": "(11) 99999-9999",
+    "email": "test@example.com"
+  }
+}
+2024-11-01 04:57:10,163 - app - DEBUG - Extracted status: pending, transaction_id: test123
+2024-11-01 04:57:10,163 - app - DEBUG - Normalizing status: pending
+2024-11-01 04:57:10,163 - app - DEBUG - Normalized status: pending -> pending
+2024-11-01 04:57:10,163 - app - DEBUG - Customer data: {'name': 'John Test', 'phone': '(11) 99999-9999', 'email': 'test@example.com'}
+2024-11-01 04:57:10,163 - app - DEBUG - Formatting phone number: (11) 99999-9999
+2024-11-01 04:57:10,163 - app - DEBUG - After removing non-numeric characters: 11999999999
+2024-11-01 04:57:10,163 - app - DEBUG - Added country code: 5511999999999
+2024-11-01 04:57:10,163 - app - DEBUG - Final formatted number: +5511999999999
+2024-11-01 04:57:10,163 - app - DEBUG - Formatted phone: +5511999999999
+2024-11-01 04:57:10,163 - app - DEBUG - Extracted customer name - full: John Test, first: John
+2024-11-01 04:57:10,164 - app - DEBUG - Formatted total price: 199.99
+2024-11-01 04:57:10,164 - app - DEBUG - Looking for campaigns with integration_id=06b42000-7771-4b22-b765-993fe881a270 and status=pending
+2024-11-01 04:57:10,164 - app - DEBUG - Normalizing status: pending
+2024-11-01 04:57:10,164 - app - DEBUG - Normalized status: pending -> pending
+2024-11-01 04:57:10,164 - app - DEBUG - Found 1 matching campaigns
+2024-11-01 04:57:10,164 - app - DEBUG - Processing campaign: Test Campaign (ID: test-campaign-1)
+2024-11-01 04:57:10,164 - app - DEBUG - Formatting message template: Olá {customer_name}, seu pedido no valor de R$ {total_price} está pendente.
+2024-11-01 04:57:10,164 - app - DEBUG - Template variables: {'customer_name': 'John', 'customer_full_name': 'John Test', 'customer_phone': '+5511999999999', 'customer_email': 'test@example.com', 'total_price': '199.99', 'transaction_id': 'test123', 'pix_code': '', 'store_name': '', 'order_url': '', 'checkout_url': ''}
+2024-11-01 04:57:10,164 - app - DEBUG - Template after dot notation replacement: Olá {customer_name}, seu pedido no valor de R$ {total_price} está pendente.
+2024-11-01 04:57:10,164 - app - DEBUG - Formatted total_price: 199.99 -> 199.99
+2024-11-01 04:57:10,165 - app - DEBUG - Final formatted message: Olá John, seu pedido no valor de R$ 199.99 está pendente.
+2024-11-01 04:57:10,165 - app - DEBUG - Generated message: Olá John, seu pedido no valor de R$ 199.99 está pendente.
+2024-11-01 04:57:10,168 - celery.utils.functional - DEBUG - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-01 04:57:10,230 - app - INFO - Queued SMS task 8dc07340-f762-445a-8cf8-a9219ba9ded4 for campaign test-campaign-1
+2024-11-01 04:57:10,231 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2024 04:57:10] "POST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1" 200 -
+2024-11-01 04:57:10,422 - app - INFO - Accessing index page
+2024-11-01 04:57:10,426 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 04:57:10] "GET / HTTP/1.1" 200 -
+2024-11-01 04:57:10,709 - werkzeug - INFO - 172.31.196.126 - - [01/Nov/2024 04:57:10] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
