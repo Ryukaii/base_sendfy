@@ -49,6 +49,23 @@ async function loadCampaigns() {
             const integration = integrationsResponse.find(i => i.id === campaign.integration_id);
             const div = document.createElement('div');
             div.className = 'card mb-3';
+            
+            const messagesHtml = campaign.messages.map((msg, index) => `
+                <div class="card mb-2 bg-dark">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">Mensagem #${index + 1}</h6>
+                            <span class="badge ${msg.is_active ? 'bg-success' : 'bg-danger'}">
+                                ${msg.is_active ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </div>
+                        <p class="mb-2"><strong>Atraso:</strong> ${msg.delay_minutes} minutos</p>
+                        <p class="mb-0"><strong>Mensagem:</strong></p>
+                        <code class="d-block p-2 bg-dark rounded mt-2">${msg.template}</code>
+                    </div>
+                </div>
+            `).join('');
+            
             div.innerHTML = `
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
@@ -57,8 +74,10 @@ async function loadCampaigns() {
                             <p class="card-text">
                                 <strong>Integração:</strong> ${integration ? integration.name : 'Desconhecida'}<br>
                                 <strong>Tipo de Evento:</strong> ${campaign.event_type}<br>
-                                <strong>Modelo de Mensagem:</strong><br>
-                                <code class="d-block p-2 bg-dark rounded mt-2">${campaign.message_template}</code>
+                                <strong>Mensagens:</strong>
+                                <div class="mt-3">
+                                    ${messagesHtml}
+                                </div>
                             </p>
                             <p class="card-text"><small class="text-muted">Criada em: ${campaign.created_at}</small></p>
                         </div>
@@ -89,6 +108,50 @@ async function loadCampaigns() {
     }
 }
 
+// Add message to form
+function addMessageToForm(template = '', delay = 0, isActive = true) {
+    const container = document.getElementById('messagesContainer');
+    const messageTemplate = document.getElementById('messageTemplate');
+    const messageElement = messageTemplate.content.cloneNode(true);
+    
+    const messageCount = container.children.length + 1;
+    messageElement.querySelector('.message-number').textContent = messageCount;
+    messageElement.querySelector('.message-template').value = template;
+    messageElement.querySelector('.message-delay').value = delay;
+    messageElement.querySelector('.message-active').checked = isActive;
+    
+    // Set up remove button
+    messageElement.querySelector('.remove-message').addEventListener('click', function(e) {
+        const card = e.target.closest('.message-card');
+        card.remove();
+        // Update message numbers
+        container.querySelectorAll('.message-number').forEach((span, index) => {
+            span.textContent = index + 1;
+        });
+    });
+    
+    container.appendChild(messageElement);
+}
+
+// Add message button handler
+document.getElementById('addMessageBtn').addEventListener('click', () => {
+    addMessageToForm();
+});
+
+// Get messages data from form
+function getMessagesFromForm() {
+    const messages = [];
+    document.querySelectorAll('.message-card').forEach((card, index) => {
+        messages.push({
+            id: `msg${index + 1}`,
+            template: card.querySelector('.message-template').value,
+            delay_minutes: parseInt(card.querySelector('.message-delay').value) || 0,
+            is_active: card.querySelector('.message-active').checked
+        });
+    });
+    return messages;
+}
+
 // Manipular criação/atualização de campanha
 document.getElementById('campaignForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -105,7 +168,7 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         name: document.getElementById('campaignName').value,
         integration_id: document.getElementById('integrationId').value,
         event_type: document.getElementById('eventType').value,
-        message_template: document.getElementById('messageTemplate').value
+        messages: getMessagesFromForm()
     };
     
     const campaignId = e.target.dataset.campaignId;
@@ -175,6 +238,8 @@ function resetForm() {
     delete form.dataset.campaignId;
     document.getElementById('integrationId').disabled = false;
     document.querySelector('button[type="submit"]').textContent = 'Criar Campanha';
+    document.getElementById('messagesContainer').innerHTML = '';
+    addMessageToForm(); // Add one empty message by default
     
     // Remover mensagens de erro existentes
     const errorDivs = form.querySelectorAll('.alert-danger');
@@ -201,7 +266,12 @@ async function editCampaign(campaignId) {
         document.getElementById('integrationId').value = campaign.integration_id;
         document.getElementById('integrationId').disabled = true;
         document.getElementById('eventType').value = campaign.event_type;
-        document.getElementById('messageTemplate').value = campaign.message_template;
+        
+        // Clear and add messages
+        document.getElementById('messagesContainer').innerHTML = '';
+        campaign.messages.forEach(msg => {
+            addMessageToForm(msg.template, msg.delay_minutes, msg.is_active);
+        });
         
         document.querySelector('button[type="submit"]').innerHTML = `
             <i class="fas fa-save me-1"></i>
@@ -259,9 +329,10 @@ async function deleteCampaign(campaignId) {
     }
 }
 
-// Carregar dados quando a página carregar
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
     loadCampaigns();
+    addMessageToForm(); // Add one empty message by default
     
     // Adicionar manipulador do botão cancelar
     const cancelButton = document.createElement('button');

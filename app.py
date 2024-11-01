@@ -260,21 +260,33 @@ def webhook_handler(integration_id):
                     'order_url': webhook_data.get('order_url', ''),
                     'checkout_url': webhook_data.get('checkout_url', '')
                 }
-                
-                message = format_message(campaign['message_template'], **template_vars)
-                logger.debug(f"Generated message: {message}")
-                
-                task = send_sms_task.delay(
-                    phone=formatted_phone,
-                    message=message,
-                    operator="claro",
-                    campaign_id=campaign['id'],
-                    event_type=normalized_status
-                )
-                
-                tasks.append(task.id)
+
+                # Process each active message in the campaign
+                for message in campaign.get('messages', []):
+                    if not message.get('is_active', True):
+                        continue
+
+                    formatted_message = format_message(message['template'], **template_vars)
+                    logger.debug(f"Generated message: {formatted_message}")
+                    
+                    delay_minutes = message.get('delay_minutes', 0)
+                    logger.debug(f"Message delay: {delay_minutes} minutes")
+
+                    task = send_sms_task.apply_async(
+                        args=[
+                            formatted_phone,
+                            formatted_message,
+                            "claro",
+                            campaign['id'],
+                            normalized_status
+                        ],
+                        countdown=delay_minutes * 60  # Convert minutes to seconds
+                    )
+                    
+                    tasks.append(task.id)
+                    logger.info(f"Queued SMS task {task.id} for campaign {campaign['id']} with {delay_minutes} minutes delay")
+
                 processed_campaigns += 1
-                logger.info(f"Queued SMS task {task.id} for campaign {campaign['id']}")
                 
             except Exception as e:
                 logger.error(f"Error processing campaign {campaign['id']}: {str(e)}")
@@ -423,8 +435,6 @@ def analytics():
             for event_type, count in event_counts.items()
         ]
         
-        recent_activity = sorted(history, key=lambda x: x['timestamp'], reverse=True)[:10]
-        
         return render_template('analytics.html',
                              total_messages=total_messages,
                              success_rate=success_rate,
@@ -432,28 +442,32 @@ def analytics():
                              campaign_messages=campaign_messages,
                              messages_by_status=messages_by_status,
                              messages_by_event=messages_by_event,
-                             recent_activity=recent_activity)
+                             recent_activity=history[-10:])
     except Exception as e:
-        logger.error(f"Error generating analytics: {str(e)}")
+        logger.error(f"Error generating analytics data: {str(e)}")
         return render_template('error.html', error="Failed to load page"), 500
 
 @app.route('/api/send-sms', methods=['POST'])
 def send_sms():
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'No data provided'}), 400
+        
         phone = data.get('phone')
         message = data.get('message')
-        operator = data.get('operator')
+        operator = data.get('operator', 'claro')
         
-        if not all([phone, message, operator]):
-            return jsonify({
-                'success': False,
-                'message': 'Missing required fields'
-            }), 400
+        if not all([phone, message]):
+            return jsonify({'success': False, 'message': 'Phone and message are required'}), 400
         
-        phone = format_phone_number(phone)
+        try:
+            formatted_phone = format_phone_number(phone)
+        except ValueError as e:
+            return jsonify({'success': False, 'message': str(e)}), 400
+        
         task = send_sms_task.delay(
-            phone=phone,
+            phone=formatted_phone,
             message=message,
             operator=operator,
             campaign_id=None,
@@ -462,126 +476,72 @@ def send_sms():
         
         return jsonify({
             'success': True,
-            'message': 'SMS queued successfully',
+            'message': 'SMS task queued successfully',
             'task_id': task.id
         })
+        
     except Exception as e:
         logger.error(f"Error sending SMS: {str(e)}")
         return jsonify({
             'success': False,
-            'message': str(e)
+            'message': f'Error sending SMS: {str(e)}'
         }), 500
 
-@app.route('/api/integrations', methods=['GET'])
-def get_integrations():
+@app.route('/api/campaigns', methods=['GET', 'POST', 'PUT'])
+def api_campaigns():
     try:
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            integrations = json.load(f)
-        return jsonify(integrations)
-    except Exception as e:
-        logger.error(f"Error loading integrations: {str(e)}")
-        return jsonify([])
-
-@app.route('/api/integrations', methods=['POST'])
-def create_integration():
-    try:
-        data = request.get_json()
-        if not data or 'name' not in data:
-            return jsonify({'error': 'Name is required'}), 400
-
-        integration_id = str(uuid.uuid4())
-        integration = {
-            'id': integration_id,
-            'name': data['name'],
-            'webhook_url': f'/webhook/{integration_id}',
-            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-
-        try:
-            with open(INTEGRATIONS_FILE, 'r') as f:
-                integrations = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            integrations = []
-
-        integrations.append(integration)
-
-        with open(INTEGRATIONS_FILE, 'w') as f:
-            json.dump(integrations, f, indent=2)
-
-        return jsonify(integration), 201
-    except Exception as e:
-        logger.error(f"Error creating integration: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
-def delete_integration(integration_id):
-    try:
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            integrations = json.load(f)
-
-        updated_integrations = [i for i in integrations if i['id'] != integration_id]
-
-        if len(updated_integrations) == len(integrations):
-            return jsonify({'error': 'Integration not found'}), 404
-
-        with open(INTEGRATIONS_FILE, 'w') as f:
-            json.dump(updated_integrations, f, indent=2)
-
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            campaigns = json.load(f)
-
-        updated_campaigns = [c for c in campaigns if c['integration_id'] != integration_id]
-
-        with open(CAMPAIGNS_FILE, 'w') as f:
-            json.dump(updated_campaigns, f, indent=2)
-
-        return jsonify({'message': 'Integration deleted successfully'})
-    except Exception as e:
-        logger.error(f"Error deleting integration: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/campaigns', methods=['GET'])
-def get_campaigns():
-    try:
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            campaigns = json.load(f)
-        return jsonify(campaigns)
-    except Exception as e:
-        logger.error(f"Error loading campaigns: {str(e)}")
-        return jsonify([])
-
-@app.route('/api/campaigns', methods=['POST'])
-def create_campaign():
-    try:
-        data = request.get_json()
-        required_fields = ['name', 'integration_id', 'event_type', 'message_template']
-        
-        if not data or not all(field in data for field in required_fields):
-            return jsonify({'error': 'Missing required fields'}), 400
-
-        campaign = {
-            'id': str(uuid.uuid4()),
-            'name': data['name'],
-            'integration_id': data['integration_id'],
-            'event_type': data['event_type'],
-            'message_template': data['message_template'],
-            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-
-        try:
+        if request.method == 'GET':
             with open(CAMPAIGNS_FILE, 'r') as f:
                 campaigns = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            campaigns = []
-
-        campaigns.append(campaign)
-
-        with open(CAMPAIGNS_FILE, 'w') as f:
-            json.dump(campaigns, f, indent=2)
-
-        return jsonify(campaign), 201
+            return jsonify(campaigns)
+            
+        elif request.method in ['POST', 'PUT']:
+            data = request.get_json()
+            if not data:
+                return jsonify({'error': 'No data provided'}), 400
+                
+            required_fields = ['name', 'messages']
+            if request.method == 'POST':
+                required_fields.extend(['integration_id', 'event_type'])
+                
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+            
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                campaigns = json.load(f)
+            
+            if request.method == 'POST':
+                campaign_id = str(uuid.uuid4())
+                new_campaign = {
+                    'id': campaign_id,
+                    'name': data['name'],
+                    'integration_id': data['integration_id'],
+                    'event_type': data['event_type'],
+                    'messages': data['messages'],
+                    'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                campaigns.append(new_campaign)
+                
+            else:  # PUT
+                campaign_id = request.path.split('/')[-1]
+                campaign_index = next((i for i, c in enumerate(campaigns) if c['id'] == campaign_id), None)
+                if campaign_index is None:
+                    return jsonify({'error': 'Campaign not found'}), 404
+                
+                campaigns[campaign_index].update({
+                    'name': data['name'],
+                    'event_type': data.get('event_type', campaigns[campaign_index]['event_type']),
+                    'messages': data['messages']
+                })
+            
+            with open(CAMPAIGNS_FILE, 'w') as f:
+                json.dump(campaigns, f, indent=2)
+            
+            return jsonify({'success': True, 'campaign_id': campaign_id})
+            
     except Exception as e:
-        logger.error(f"Error creating campaign: {str(e)}")
+        logger.error(f"Error in campaigns API: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
@@ -589,45 +549,85 @@ def delete_campaign(campaign_id):
     try:
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
-
-        updated_campaigns = [c for c in campaigns if c['id'] != campaign_id]
-
-        if len(updated_campaigns) == len(campaigns):
+        
+        campaign_index = next((i for i, c in enumerate(campaigns) if c['id'] == campaign_id), None)
+        if campaign_index is None:
             return jsonify({'error': 'Campaign not found'}), 404
-
+            
+        del campaigns[campaign_index]
+        
         with open(CAMPAIGNS_FILE, 'w') as f:
-            json.dump(updated_campaigns, f, indent=2)
-
-        return jsonify({'message': 'Campaign deleted successfully'})
+            json.dump(campaigns, f, indent=2)
+            
+        return jsonify({'success': True})
+        
     except Exception as e:
         logger.error(f"Error deleting campaign: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/campaigns/<campaign_id>', methods=['PUT'])
-def update_campaign(campaign_id):
+@app.route('/api/integrations', methods=['GET', 'POST'])
+def api_integrations():
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
+        if request.method == 'GET':
+            with open(INTEGRATIONS_FILE, 'r') as f:
+                integrations = json.load(f)
+            return jsonify(integrations)
+            
+        elif request.method == 'POST':
+            data = request.get_json()
+            if not data or not data.get('name'):
+                return jsonify({'error': 'Integration name is required'}), 400
+                
+            with open(INTEGRATIONS_FILE, 'r') as f:
+                integrations = json.load(f)
+            
+            integration_id = str(uuid.uuid4())
+            new_integration = {
+                'id': integration_id,
+                'name': data['name'],
+                'webhook_url': f'/webhook/{integration_id}',
+                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            
+            integrations.append(new_integration)
+            
+            with open(INTEGRATIONS_FILE, 'w') as f:
+                json.dump(integrations, f, indent=2)
+            
+            return jsonify({'success': True, 'integration': new_integration})
+            
+    except Exception as e:
+        logger.error(f"Error in integrations API: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
-
-        campaign_index = next((i for i, c in enumerate(campaigns) if c['id'] == campaign_id), None)
-        if campaign_index is None:
-            return jsonify({'error': 'Campaign not found'}), 404
-
-        for field in ['name', 'event_type', 'message_template']:
-            if field in data:
-                campaigns[campaign_index][field] = data[field]
-
+        
+        integration_index = next((i for i, integration in enumerate(integrations) if integration['id'] == integration_id), None)
+        if integration_index is None:
+            return jsonify({'error': 'Integration not found'}), 404
+            
+        # Remove integration
+        del integrations[integration_index]
+        
+        # Remove associated campaigns
+        campaigns = [c for c in campaigns if c['integration_id'] != integration_id]
+        
+        with open(INTEGRATIONS_FILE, 'w') as f:
+            json.dump(integrations, f, indent=2)
         with open(CAMPAIGNS_FILE, 'w') as f:
             json.dump(campaigns, f, indent=2)
-
-        return jsonify(campaigns[campaign_index])
+            
+        return jsonify({'success': True})
+        
     except Exception as e:
-        logger.error(f"Error updating campaign: {str(e)}")
+        logger.error(f"Error deleting integration: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
