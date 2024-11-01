@@ -10,18 +10,16 @@ async function loadCampaigns() {
     `;
     
     const list = document.getElementById('campaignsList');
-    if (!list) return;
-
     list.innerHTML = '';
     list.appendChild(loadingDiv);
     
     try {
         const [campaignsResponse, integrationsResponse] = await Promise.all([
-            fetch(`${window.BASE_URL}/api/campaigns`).then(res => {
+            fetch('/api/campaigns').then(res => {
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 return res.json();
             }),
-            fetch(`${window.BASE_URL}/api/integrations`).then(res => {
+            fetch('/api/integrations').then(res => {
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 return res.json();
             })
@@ -29,12 +27,10 @@ async function loadCampaigns() {
         
         // Preencher dropdown de integrações
         const integrationSelect = document.getElementById('integrationId');
-        if (integrationSelect) {
-            integrationSelect.innerHTML = `<option value="">Selecione uma Integração</option>` + 
-                integrationsResponse.map(integration => 
-                    `<option value="${integration.id}">${integration.name}</option>`
-                ).join('');
-        }
+        integrationSelect.innerHTML = `<option value="">Selecione uma Integração</option>` + 
+            integrationsResponse.map(integration => 
+                `<option value="${integration.id}">${integration.name}</option>`
+            ).join('');
         
         // Exibir campanhas
         list.innerHTML = '';
@@ -112,91 +108,229 @@ async function loadCampaigns() {
     }
 }
 
-// Rest of your existing functions...
+// Add message to form
+function addMessageToForm(template = '', delay = 0, isActive = true) {
+    const container = document.getElementById('messagesContainer');
+    const messageTemplate = document.getElementById('messageTemplate');
+    const messageElement = messageTemplate.content.cloneNode(true);
+    
+    const messageCount = container.children.length + 1;
+    messageElement.querySelector('.message-number').textContent = messageCount;
+    messageElement.querySelector('.message-template').value = template;
+    messageElement.querySelector('.message-delay').value = delay;
+    messageElement.querySelector('.message-active').checked = isActive;
+    
+    // Set up remove button
+    messageElement.querySelector('.remove-message').addEventListener('click', function(e) {
+        const card = e.target.closest('.message-card');
+        card.remove();
+        // Update message numbers
+        container.querySelectorAll('.message-number').forEach((span, index) => {
+            span.textContent = index + 1;
+        });
+    });
+    
+    container.appendChild(messageElement);
+}
+
+// Add message button handler
+document.getElementById('addMessageBtn').addEventListener('click', () => {
+    addMessageToForm();
+});
+
+// Get messages data from form
+function getMessagesFromForm() {
+    const messages = [];
+    document.querySelectorAll('.message-card').forEach((card, index) => {
+        messages.push({
+            id: `msg${index + 1}`,
+            template: card.querySelector('.message-template').value,
+            delay_minutes: parseInt(card.querySelector('.message-delay').value) || 0,
+            is_active: card.querySelector('.message-active').checked
+        });
+    });
+    return messages;
+}
+
+// Manipular criação/atualização de campanha
+document.getElementById('campaignForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = `
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Salvando...
+    `;
+    
+    const formData = {
+        name: document.getElementById('campaignName').value,
+        integration_id: document.getElementById('integrationId').value,
+        event_type: document.getElementById('eventType').value,
+        messages: getMessagesFromForm()
+    };
+    
+    const campaignId = e.target.dataset.campaignId;
+    let url = '/api/campaigns';
+    let method = 'POST';
+    
+    if (campaignId) {
+        url += `/${campaignId}`;
+        method = 'PUT';
+        delete formData.integration_id;
+    }
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Erro ao salvar campanha');
+        }
+        
+        const toastDiv = document.createElement('div');
+        toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
+        toastDiv.style.zIndex = '5';
+        toastDiv.innerHTML = `
+            <div class="toast align-items-center text-bg-success border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Campanha ${campaignId ? 'atualizada' : 'criada'} com sucesso!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toastDiv);
+        const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'));
+        toast.show();
+        
+        resetForm();
+        loadCampaigns();
+    } catch (error) {
+        console.error('Erro ao salvar campanha:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ${error.message}
+        `;
+        e.target.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 5000);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    }
+});
+
+// Resetar formulário para modo de criação
+function resetForm() {
+    const form = document.getElementById('campaignForm');
+    form.reset();
+    delete form.dataset.campaignId;
+    document.getElementById('integrationId').disabled = false;
+    document.querySelector('button[type="submit"]').textContent = 'Criar Campanha';
+    document.getElementById('messagesContainer').innerHTML = '';
+    addMessageToForm(); // Add one empty message by default
+    
+    // Remover mensagens de erro existentes
+    const errorDivs = form.querySelectorAll('.alert-danger');
+    errorDivs.forEach(div => div.remove());
+}
+
+// Carregar dados da campanha para edição
+async function editCampaign(campaignId) {
+    try {
+        const response = await fetch('/api/campaigns');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const campaigns = await response.json();
+        const campaign = campaigns.find(c => c.id === campaignId);
+        
+        if (!campaign) {
+            throw new Error('Campanha não encontrada');
+        }
+        
+        const form = document.getElementById('campaignForm');
+        form.dataset.campaignId = campaignId;
+        
+        document.getElementById('campaignName').value = campaign.name;
+        document.getElementById('integrationId').value = campaign.integration_id;
+        document.getElementById('integrationId').disabled = true;
+        document.getElementById('eventType').value = campaign.event_type;
+        
+        // Clear and add messages
+        document.getElementById('messagesContainer').innerHTML = '';
+        campaign.messages.forEach(msg => {
+            addMessageToForm(msg.template, msg.delay_minutes, msg.is_active);
+        });
+        
+        document.querySelector('button[type="submit"]').innerHTML = `
+            <i class="fas fa-save me-1"></i>
+            Atualizar Campanha
+        `;
+        
+        form.scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        console.error('Erro ao carregar campanha para edição:', error);
+        alert(`Erro ao carregar dados da campanha: ${error.message}`);
+    }
+}
+
+// Excluir campanha
+async function deleteCampaign(campaignId) {
+    if (!confirm('Tem certeza que deseja excluir esta campanha?')) {
+        return;
+    }
+    
+    const campaignCard = document.querySelector(`[onclick="deleteCampaign('${campaignId}')"]`).closest('.card');
+    const originalContent = campaignCard.innerHTML;
+    
+    campaignCard.innerHTML = `
+        <div class="card-body text-center">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">Excluindo...</span>
+            </div>
+            <p class="mt-2">Excluindo campanha...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`/api/campaigns/${campaignId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Erro ao excluir campanha');
+        }
+        
+        campaignCard.style.transition = 'all 0.3s ease-out';
+        campaignCard.style.opacity = '0';
+        campaignCard.style.transform = 'translateX(100%)';
+        
+        setTimeout(() => {
+            campaignCard.remove();
+            resetForm();
+            loadCampaigns();
+        }, 300);
+    } catch (error) {
+        console.error('Erro ao excluir campanha:', error);
+        campaignCard.innerHTML = originalContent;
+        alert(`Erro ao excluir campanha: ${error.message}`);
+    }
+}
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    const campaignForm = document.getElementById('campaignForm');
-    if (campaignForm) {
-        campaignForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitButton = e.target.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
-            submitButton.disabled = true;
-            submitButton.innerHTML = `
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Salvando...
-            `;
-            
-            const formData = {
-                name: document.getElementById('campaignName').value,
-                integration_id: document.getElementById('integrationId').value,
-                event_type: document.getElementById('eventType').value,
-                messages: getMessagesFromForm()
-            };
-            
-            const campaignId = e.target.dataset.campaignId;
-            let url = `${window.BASE_URL}/api/campaigns`;
-            let method = 'POST';
-            
-            if (campaignId) {
-                url += `/${campaignId}`;
-                method = 'PUT';
-                delete formData.integration_id;
-            }
-            
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Erro ao salvar campanha');
-                }
-                
-                const toastDiv = document.createElement('div');
-                toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
-                toastDiv.style.zIndex = '5';
-                toastDiv.innerHTML = `
-                    <div class="toast align-items-center text-bg-success border-0" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                <i class="fas fa-check-circle me-2"></i>
-                                Campanha ${campaignId ? 'atualizada' : 'criada'} com sucesso!
-                            </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(toastDiv);
-                const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'));
-                toast.show();
-                
-                resetForm();
-                loadCampaigns();
-            } catch (error) {
-                console.error('Erro ao salvar campanha:', error);
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger mt-3';
-                errorDiv.innerHTML = `
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    ${error.message}
-                `;
-                e.target.appendChild(errorDiv);
-                setTimeout(() => errorDiv.remove(), 5000);
-            } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
-            }
-        });
-    }
-
     loadCampaigns();
     addMessageToForm(); // Add one empty message by default
     
@@ -208,8 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelButton.onclick = resetForm;
     
     const submitButton = document.querySelector('button[type="submit"]');
-    if (submitButton) {
-        submitButton.innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
-        submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
-    }
+    submitButton.innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
+    submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
 });

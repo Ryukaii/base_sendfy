@@ -11,7 +11,7 @@ async function loadIntegrations() {
     `;
     
     try {
-        const response = await fetch(`${window.BASE_URL}/api/integrations`);
+        const response = await fetch('/api/integrations');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const integrations = await response.json();
@@ -38,8 +38,8 @@ async function loadIntegrations() {
                             <p class="card-text">
                                 <strong>URL do Webhook:</strong> 
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control bg-dark" value="${window.BASE_URL}${integration.webhook_url}" readonly>
-                                    <button class="btn btn-outline-secondary" onclick="copyToClipboard('${window.BASE_URL}${integration.webhook_url}')">
+                                    <input type="text" class="form-control bg-dark" value="${window.location.origin}${integration.webhook_url}" readonly>
+                                    <button class="btn btn-outline-secondary" onclick="copyToClipboard('${window.location.origin}${integration.webhook_url}')">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -97,79 +97,66 @@ async function copyToClipboard(text) {
 }
 
 // Manipular criação de integração
-document.addEventListener('DOMContentLoaded', () => {
-    const integrationForm = document.getElementById('integrationForm');
-    if (integrationForm) {
-        integrationForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitButton = e.target.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
-            submitButton.disabled = true;
-            submitButton.innerHTML = `
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Criando...
-            `;
-            
-            const name = document.getElementById('integrationName').value;
-            
-            try {
-                const response = await fetch(`${window.BASE_URL}/api/integrations`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name })
-                });
-                
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Erro ao criar integração');
-                }
-                
-                const toastDiv = document.createElement('div');
-                toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
-                toastDiv.style.zIndex = '5';
-                toastDiv.innerHTML = `
-                    <div class="toast align-items-center text-bg-success border-0" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                <i class="fas fa-check-circle me-2"></i>
-                                Integração criada com sucesso!
-                            </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(toastDiv);
-                const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'));
-                toast.show();
-                
-                e.target.reset();
-                loadIntegrations();
-            } catch (error) {
-                console.error('Erro ao criar integração:', error);
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger mt-3';
-                errorDiv.innerHTML = `
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    ${error.message}
-                `;
-                e.target.appendChild(errorDiv);
-                setTimeout(() => errorDiv.remove(), 5000);
-            } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
-            }
-        });
-    }
-
-    loadIntegrations();
+document.getElementById('integrationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    // Melhorar o botão de submit se existir
-    const submitButton = document.querySelector('button[type="submit"]');
-    if (submitButton) {
-        submitButton.innerHTML = '<i class="fas fa-plus me-1"></i> Criar Integração';
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = `
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Criando...
+    `;
+    
+    const name = document.getElementById('integrationName').value;
+    
+    try {
+        const response = await fetch('/api/integrations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name })
+        });
+        
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Erro ao criar integração');
+        }
+        
+        const toastDiv = document.createElement('div');
+        toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
+        toastDiv.style.zIndex = '5';
+        toastDiv.innerHTML = `
+            <div class="toast align-items-center text-bg-success border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Integração criada com sucesso!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toastDiv);
+        const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'));
+        toast.show();
+        
+        e.target.reset();
+        loadIntegrations();
+    } catch (error) {
+        console.error('Erro ao criar integração:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ${error.message}
+        `;
+        e.target.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 5000);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
     }
 });
 
@@ -192,7 +179,7 @@ async function deleteIntegration(integrationId) {
     `;
     
     try {
-        const response = await fetch(`${window.BASE_URL}/api/integrations/${integrationId}`, {
+        const response = await fetch(`/api/integrations/${integrationId}`, {
             method: 'DELETE'
         });
         
@@ -215,3 +202,12 @@ async function deleteIntegration(integrationId) {
         alert(`Erro ao excluir integração: ${error.message}`);
     }
 }
+
+// Carregar integrações quando a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+    loadIntegrations();
+    
+    // Melhorar o botão de submit
+    const submitButton = document.querySelector('button[type="submit"]');
+    submitButton.innerHTML = '<i class="fas fa-plus me-1"></i> Criar Integração';
+});
