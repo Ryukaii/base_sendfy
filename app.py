@@ -44,20 +44,20 @@ def format_phone_number(phone):
 def normalize_status(status):
     if not status:
         return None
-        
+    status = str(status).lower().strip()
     status_map = {
         'pending': 'pending',
-        'PENDING': 'pending',
-        'Venda Pendente': 'pending',
+        'pendente': 'pending',
+        'venda pendente': 'pending',
+        'aguardando': 'pending',
         'approved': 'approved',
-        'APPROVED': 'approved',
-        'Venda Aprovada': 'approved'
+        'aprovado': 'approved',
+        'venda aprovada': 'approved',
+        'completed': 'approved',
+        'concluido': 'approved',
+        'pago': 'approved'
     }
-    
-    status_str = str(status).strip()
-    normalized = status_map.get(status_str)
-    logger.debug(f"Normalizing status: {status_str} -> {normalized}")
-    return normalized
+    return status_map.get(status)
 
 @app.route('/')
 def index():
@@ -339,11 +339,11 @@ def webhook_handler(integration_id):
             'message': 'Invalid integration ID'
         }), 400
     
-    logger.debug(f"Processing webhook for integration_id: {integration_id}")
+    logger.debug(f"Integration ID: {integration_id}")
     
     try:
         webhook_data = request.get_data()
-        logger.debug(f"Raw webhook data: {webhook_data}")
+        logger.debug(f"Raw webhook data: {webhook_data.decode('utf-8')}")
         webhook_data = request.get_json()
         logger.debug(f"Parsed webhook data: {json.dumps(webhook_data, indent=2)}")
     except Exception as e:
@@ -352,6 +352,8 @@ def webhook_handler(integration_id):
     
     try:
         status = webhook_data.get('status')
+        logger.debug(f"Original status: {status}")
+        
         if not status:
             logger.error("Missing status in webhook data")
             return jsonify({
@@ -360,16 +362,18 @@ def webhook_handler(integration_id):
             }), 400
             
         normalized_status = normalize_status(status)
+        logger.debug(f"Normalized status: {normalized_status}")
+        
         if not normalized_status:
             logger.error(f"Invalid status value: {status}")
             return jsonify({
                 'success': False,
                 'message': f'Invalid status value: {status}'
             }), 400
-            
-        logger.debug(f"Status normalized from '{status}' to '{normalized_status}'")
         
         customer = webhook_data.get('customer', {})
+        logger.debug(f"Customer data: {json.dumps(customer, indent=2)}")
+        
         if not customer:
             logger.error("Missing customer data in webhook")
             return jsonify({
@@ -378,6 +382,8 @@ def webhook_handler(integration_id):
             }), 400
             
         total_price = webhook_data.get('total_price')
+        logger.debug(f"Total price: {total_price}")
+        
         if not total_price:
             logger.error("Missing total_price in webhook data")
             return jsonify({
@@ -387,6 +393,9 @@ def webhook_handler(integration_id):
         
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
+        
+        logger.debug(f"Searching for campaigns with integration_id={integration_id} and status={normalized_status}")
+        logger.debug(f"All available campaigns: {json.dumps(campaigns, indent=2)}")
         
         matching_campaigns = [c for c in campaigns 
                           if c['integration_id'] == integration_id 
@@ -410,9 +419,10 @@ def webhook_handler(integration_id):
                     total_price=total_price
                 )
                 
-                logger.debug(f"Preparing SMS for campaign {campaign['id']}")
-                logger.debug(f"Phone: {phone}")
-                logger.debug(f"Message template: {message}")
+                logger.debug("Template variables:")
+                logger.debug(f"- customer: {json.dumps(customer, indent=2)}")
+                logger.debug(f"- total_price: {total_price}")
+                logger.debug(f"Final message after template: {message}")
                 
                 task = send_sms_task.delay(
                     phone=phone,
