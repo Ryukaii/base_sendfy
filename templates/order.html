@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body class="bg-gray-50 font-['Poppins',sans-serif] flex flex-col min-h-screen">
+    <header class="bg-gradient-to-r from-green-600 to-green-500 shadow-lg py-2">
+        <div class="container mx-auto px-4 flex flex-col items-center justify-center space-y-1">
+            <div class="text-2xl font-bold text-white mb-1 drop-shadow-lg" id="countdown">09:00</div>
+            <div class="flex items-center bg-white px-3 py-1 shadow-md hover:shadow-lg transition-all duration-300">
+                <img src="https://cdn.icon-icons.com/icons2/294/PNG/256/Clock_31089.png" class="w-4 h-4 mr-2" alt="Clock icon"/>
+                <span class="text-green-800 font-medium text-sm">Aguardando Pagamento</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto hover:shadow-2xl transition-all duration-300">
+            <div class="flex justify-center mb-6">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SendFy Logo" class="h-16 hover:scale-105 transition-transform duration-300"/>
+            </div>
+
+            <div class="space-y-4">
+                <div class="text-left">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-1">Pagamento via PIX</h2>
+                    <p class="text-gray-600">
+                        Nome: <span class="font-semibold text-green-700">{{ transaction.customer.name }}</span>
+                    </p>
+                    {% if transaction.address %}
+                    <p class="text-gray-600">
+                        Endereço: <span class="font-semibold text-green-700">
+                            {{ transaction.address.street }}, {{ transaction.address.number }}
+                            {% if transaction.address.district %} - {{ transaction.address.district }}{% endif %}
+                        </span>
+                    </p>
+                    {% endif %}
+                    {% if transaction.products %}
+                    <p class="text-gray-600">
+                        Produto: <span class="font-semibold text-green-700">{{ transaction.products[0].name }}</span>
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="bg-green-50 p-4 rounded-lg hover:shadow-md transition-all duration-300">
+                    <div class="flex flex-col items-center justify-center mb-4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/9413/9413653.png" alt="Ícone de segurança" class="h-12 mb-2"/>
+                        <span class="text-green-700 font-bold text-sm text-center">Pagamento 100% Seguro e Verificado pelo Banco Central</span>
+                    </div>
+                    <p class="text-sm text-green-800 font-medium mb-2 text-center">
+                        Copie o código Pix abaixo:
+                    </p>
+                    <textarea class="w-full h-20 p-3 bg-white rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700 font-mono text-sm shadow-inner" id="pixCode" readonly>{{ transaction.pix_code }}</textarea>
+                    <p class="text-xs text-green-600 mt-2 text-center">
+                        <i class="fas fa-lock mr-1"></i>
+                        Transação protegida e autenticada pelo BACEN
+                    </p>
+                </div>
+
+                <button class="w-full bg-green-600 hover:bg-green-700 transform transition-all duration-200 ease-in-out hover:scale-[1.02] text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 shadow-md hover:shadow-lg" onclick="copiarPixCode()">
+                    <i class="fas fa-copy"></i>
+                    <span>Copiar Código PIX</span>
+                </button>
+
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 space-y-4 shadow-sm">
+                    <h3 class="text-lg font-semibold text-green-800 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Como pagar com PIX:
+                    </h3>
+                    <div class="space-y-3 w-full">
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-green-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">1</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Copie o código PIX</p>
+                                <p class="text-gray-500 text-xs">Clique no botão acima para copiar automaticamente</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-green-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">2</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Abra seu banco</p>
+                                <p class="text-gray-500 text-xs">Acesse o aplicativo do seu banco preferido</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-green-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">3</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Selecione PIX Copia e Cola</p>
+                                <p class="text-gray-500 text-xs">Encontre a opção PIX > Pix Copia e Cola</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-green-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">4</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Confirme o pagamento</p>
+                                <p class="text-gray-500 text-xs">Cole o código e confirme a transação</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast">
+        <div class="flex items-center justify-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            Código PIX copiado com sucesso!
+        </div>
+    </div>
+</body>
+{% endblock %}
+
+{% block head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+    * {
+        border-radius: 4px !important;
+        font-family: 'Poppins', sans-serif;
+    }
+    .toast {
+        visibility: hidden;
+        min-width: 200px;
+        margin-left: -100px;
+        background-color: #059669;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 12px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .toast.show {
+        visibility: visible;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 20px; opacity: 1;}
+    }
+    @keyframes fadeout {
+        from {bottom: 20px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+    }
+    .step-animation {
+        transition: all 0.3s ease;
+    }
+    .step-animation:hover {
+        transform: translateX(5px);
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function startTimer(duration, display) {
+        let timer = duration, minutes, seconds;
+        const interval = setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                clearInterval(interval);
+                display.textContent = "00:00";
+            }
+        }, 1000);
+    }
+
+    window.onload = function () {
+        const nineMinutes = 60 * 9;
+        const display = document.querySelector('#countdown');
+        startTimer(nineMinutes, display);
+    };
+
+    function copiarPixCode() {
+        var pixCode = document.getElementById("pixCode");
+        pixCode.select();
+        
+        try {
+            navigator.clipboard.writeText(pixCode.value).then(function() {
+                mostrarToast();
+            }).catch(function() {
+                document.execCommand('copy');
+                mostrarToast();
+            });
+        } catch (err) {
+            document.execCommand('copy');
+            mostrarToast();
+        }
+        
+        window.getSelection().removeAllRanges();
+    }
+
+    function mostrarToast() {
+        var toast = document.getElementById("toast");
+        toast.className = "toast show";
+        setTimeout(function(){ 
+            toast.className = toast.className.replace("show", ""); 
+        }, 3000);
+    }
+</script>
+{% endblock %}

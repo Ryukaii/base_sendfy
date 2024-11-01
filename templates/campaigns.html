@@ -26,9 +26,19 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Modelo de Mensagem</label>
-                <textarea class="form-control" id="messageTemplate" rows="3" required 
-                          placeholder="Variáveis disponíveis: {customer.name}, {total_price}"></textarea>
-                <small class="text-muted">Exemplo: Olá {customer.name}, seu pedido no valor de R$ {total_price} foi confirmado!</small>
+                <textarea class="form-control" id="messageTemplate" rows="3" required></textarea>
+                <small class="text-muted">
+                    Variáveis disponíveis:<br>
+                    - {customer_name}: Primeiro nome do cliente<br>
+                    - {customer_full_name}: Nome completo do cliente<br>
+                    - {total_price}: Valor total do pedido<br>
+                    - {store_name}: Nome da loja<br>
+                    - {transaction_id}: ID da transação<br>
+                    - {order_url}: Link do pedido<br>
+                    - {checkout_url}: Link do checkout<br>
+                    - {link_pix}: Link para pagamento via PIX<br><br>
+                    Exemplo: "Olá {customer_name}, seu pedido no valor de R$ {total_price} está pendente. Acesse {link_pix} para pagar via PIX."
+                </small>
             </div>
             <button type="submit" class="btn btn-primary">Criar Campanha</button>
         </form>
