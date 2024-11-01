@@ -72,6 +72,75 @@ def index():
         logger.error(f"Error rendering index template: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
 
+@app.route('/campaign-performance')
+def campaign_performance():
+    logger.info("Accessing campaign performance page")
+    try:
+        # Load campaigns and SMS history
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            sms_history = json.load(f)
+        
+        # Calculate campaign metrics
+        campaign_metrics = []
+        total_messages = 0
+        active_campaigns = 0
+        
+        for campaign in campaigns:
+            # Filter messages for this campaign
+            campaign_messages = [msg for msg in sms_history if msg.get('campaign_id') == campaign['id']]
+            messages_count = len(campaign_messages)
+            success_count = sum(1 for msg in campaign_messages if msg['status'] == 'success')
+            
+            # Calculate success rate
+            success_rate = round((success_count / messages_count * 100) if messages_count > 0 else 0, 1)
+            
+            # Get last message timestamp
+            last_message = max([msg['timestamp'] for msg in campaign_messages]) if campaign_messages else 'No messages'
+            
+            # Check if campaign is active (had messages in the last 24 hours)
+            if campaign_messages:
+                latest_msg_time = datetime.datetime.strptime(last_message, "%Y-%m-%d %H:%M:%S")
+                if (datetime.datetime.now() - latest_msg_time).days < 1:
+                    active_campaigns += 1
+            
+            total_messages += messages_count
+            
+            campaign_metrics.append({
+                'name': campaign['name'],
+                'event_type': campaign['event_type'],
+                'messages_sent': messages_count,
+                'success_rate': success_rate,
+                'last_message': last_message
+            })
+        
+        # Get recent activity (last 10 messages from campaigns)
+        campaign_messages = [msg for msg in sms_history if msg.get('campaign_id')]
+        recent_activity = []
+        
+        for msg in sorted(campaign_messages, key=lambda x: x['timestamp'], reverse=True)[:10]:
+            # Find campaign name
+            campaign_name = next((c['name'] for c in campaigns if c['id'] == msg['campaign_id']), 'Unknown')
+            
+            recent_activity.append({
+                'timestamp': msg['timestamp'],
+                'campaign_name': campaign_name,
+                'phone': msg['phone'],
+                'status': msg['status'],
+                'message': msg['message']
+            })
+        
+        return render_template('campaign_performance.html',
+                             total_campaigns=len(campaigns),
+                             active_campaigns=active_campaigns,
+                             total_messages=total_messages,
+                             campaigns=campaign_metrics,
+                             recent_activity=recent_activity)
+    except Exception as e:
+        logger.error(f"Error generating campaign performance data: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
 @app.route('/analytics')
 def analytics():
     logger.info("Accessing analytics page")

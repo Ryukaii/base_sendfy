@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Overview Cards -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Campaigns</h5>
+                    <h2 class="card-text">{{ total_campaigns }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Active Campaigns</h5>
+                    <h2 class="card-text">{{ active_campaigns }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Messages Sent</h5>
+                    <h2 class="card-text">{{ total_messages }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Performance Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Campaign Performance</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Campaign Name</th>
+                            <th>Event Type</th>
+                            <th>Messages Sent</th>
+                            <th>Success Rate</th>
+                            <th>Last Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in campaigns %}
+                        <tr>
+                            <td>{{ campaign.name }}</td>
+                            <td>{{ campaign.event_type }}</td>
+                            <td>{{ campaign.messages_sent }}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar {% if campaign.success_rate >= 90 %}bg-success{% elif campaign.success_rate >= 70 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ campaign.success_rate }}%">
+                                        {{ campaign.success_rate }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ campaign.last_message }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Recent Campaign Activity</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Campaign</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in recent_activity %}
+                        <tr>
+                            <td>{{ activity.timestamp }}</td>
+                            <td>{{ activity.campaign_name }}</td>
+                            <td>{{ activity.phone }}</td>
+                            <td>
+                                <span class="badge {% if activity.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ activity.status }}
+                                </span>
+                            </td>
+                            <td>{{ activity.message }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
