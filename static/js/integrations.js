@@ -32,7 +32,7 @@ async function loadIntegrations() {
         });
     } catch (error) {
         console.error('Error loading integrations:', error);
-        alert('Failed to load integrations. Please try again.');
+        alert('Error loading integrations. Please try again.');
     }
 }
 
@@ -43,7 +43,6 @@ async function copyToClipboard(text) {
         alert('Webhook URL copied to clipboard!');
     } catch (err) {
         console.error('Failed to copy text: ', err);
-        alert('Failed to copy webhook URL');
     }
 }
 
@@ -57,56 +56,46 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
         const response = await fetch('/api/integrations', {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({ name })
         });
-        
-        const data = await response.json();
         
         if (response.ok) {
             alert('Integration created successfully!');
             e.target.reset();
             loadIntegrations();
         } else {
-            throw new Error(data.error || 'Failed to create integration');
+            const data = await response.json();
+            alert(`Error creating integration: ${data.error}`);
         }
     } catch (error) {
         console.error('Error creating integration:', error);
-        alert(error.message || 'Failed to create integration. Please try again.');
+        alert('Error creating integration. Please try again.');
     }
 });
 
 // Delete integration
 async function deleteIntegration(integrationId) {
+    if (!confirm('Are you sure you want to delete this integration? This will also delete all associated campaigns.')) {
+        return;
+    }
+    
     try {
         const response = await fetch(`/api/integrations/${integrationId}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+            method: 'DELETE'
         });
         
-        // Try to parse response as JSON
-        let data;
-        try {
-            data = await response.json();
-        } catch (e) {
-            console.error('Error parsing response:', e);
-            throw new Error('Invalid server response');
-        }
-        
         if (response.ok) {
-            // Refresh the page only after successful deletion
-            window.location.reload();
+            alert('Integration deleted successfully!');
+            loadIntegrations();
         } else {
-            throw new Error(data.error || 'Failed to delete integration');
+            const data = await response.json();
+            alert(`Error deleting integration: ${data.error}`);
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert(error.message || 'Failed to delete integration. Please try again.');
+        console.error('Error deleting integration:', error);
+        alert('Error deleting integration. Please try again.');
     }
 }
 
