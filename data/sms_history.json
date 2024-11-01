@@ -475,5 +475,23 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'zpb5rd4txp2zjmx66z9uyjm4yhc1nd', 'status': 'processed', 'created_at': '2024-11-01 06:25:17'}}",
     "campaign_id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
     "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-01 09:30:13",
+    "phone": "+5532999981532",
+    "message": "Ol\u00e1 Philippe, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'xcqewbc500forg8z1zxxr1m1oumro9', 'status': 'processed', 'created_at': '2024-11-01 06:30:13'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 09:31:48",
+    "phone": "+5532999981532",
+    "message": "VENDA PENDENTE, PAGUE O PIX",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'ohfgzf2dneu293ou3xw99vjpb0yq2s', 'status': 'processed', 'created_at': '2024-11-01 06:31:48'}}",
+    "campaign_id": "15eb78b8-c5c5-4111-8366-2f3a843bed94",
+    "event_type": "pending"
   }
 ]

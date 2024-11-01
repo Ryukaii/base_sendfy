@@ -3,11 +3,11 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <!-- Overview Cards -->
+        <!-- Cartões de Visão Geral -->
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Total Campaigns</h5>
+                    <h5 class="card-title">Total de Campanhas</h5>
                     <h2 class="card-text">{{ total_campaigns }}</h2>
                 </div>
             </div>
@@ -15,7 +15,7 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Active Campaigns</h5>
+                    <h5 class="card-title">Campanhas Ativas</h5>
                     <h2 class="card-text">{{ active_campaigns }}</h2>
                 </div>
             </div>
@@ -23,28 +23,28 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Total Messages Sent</h5>
+                    <h5 class="card-title">Total de Mensagens</h5>
                     <h2 class="card-text">{{ total_messages }}</h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Campaign Performance Table -->
+    <!-- Tabela de Desempenho das Campanhas -->
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Campaign Performance</h5>
+            <h5 class="mb-0">Desempenho das Campanhas</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Campaign Name</th>
-                            <th>Event Type</th>
-                            <th>Messages Sent</th>
-                            <th>Success Rate</th>
-                            <th>Last Message</th>
+                            <th>Nome da Campanha</th>
+                            <th>Tipo de Evento</th>
+                            <th>Mensagens Enviadas</th>
+                            <th>Taxa de Sucesso</th>
+                            <th>Última Mensagem</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,21 +71,21 @@
         </div>
     </div>
 
-    <!-- Recent Activity -->
+    <!-- Atividade Recente -->
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">Recent Campaign Activity</h5>
+            <h5 class="mb-0">Atividade Recente das Campanhas</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Date/Time</th>
-                            <th>Campaign</th>
-                            <th>Phone</th>
+                            <th>Data/Hora</th>
+                            <th>Campanha</th>
+                            <th>Telefone</th>
                             <th>Status</th>
-                            <th>Message</th>
+                            <th>Mensagem</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -96,7 +96,7 @@
                             <td>{{ activity.phone }}</td>
                             <td>
                                 <span class="badge {% if activity.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
-                                    {{ activity.status }}
+                                    {{ 'Sucesso' if activity.status == 'success' else 'Falha' }}
                                 </span>
                             </td>
                             <td>{{ activity.message }}</td>
