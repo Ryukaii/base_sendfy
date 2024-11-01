@@ -10,8 +10,6 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--bs-body-bg);
-            color: var(--bs-body-color);
         }
         .pix-container {
             max-width: 800px;
@@ -32,13 +30,14 @@
             gap: 0.5rem;
         }
         .pix-code {
-            background: var(--bs-body-bg);
+            background: var(--bs-dark);
             border: 1px solid var(--bs-border-color);
             padding: 1rem;
             border-radius: 4px;
             font-family: monospace;
             width: 100%;
             min-height: 100px;
+            color: var(--bs-light);
         }
         .step {
             display: flex;
@@ -48,6 +47,11 @@
             border: 1px solid var(--bs-border-color);
             border-radius: 4px;
             margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        .step:hover {
+            background: var(--bs-dark);
+            transform: translateX(5px);
         }
         .step-number {
             background: var(--bs-primary);
@@ -60,17 +64,11 @@
             border-radius: 50%;
             flex-shrink: 0;
         }
-        .toast {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            z-index: 1000;
-        }
     </style>
 </head>
 <body>
     <div class="container pix-container">
-        <div class="card shadow-sm">
+        <div class="card shadow">
             <div class="card-header text-center py-4">
                 <div class="countdown mb-2" id="countdown">09:00</div>
                 <div class="status-badge">
@@ -141,15 +139,21 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="copyToast">
-        <div class="toast-body">
-            <i class="fas fa-check-circle me-2"></i>
-            Código PIX copiado com sucesso!
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" id="copyToast">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Código PIX copiado com sucesso!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function startTimer(duration, display) {
             let timer = duration, minutes, seconds;
@@ -175,16 +179,20 @@
             startTimer(nineMinutes, display);
         };
 
-        function copyPixCode() {
+        async function copyPixCode() {
             const pixCode = document.getElementById("pixCode");
             pixCode.select();
             
             try {
-                navigator.clipboard.writeText(pixCode.value);
+                await navigator.clipboard.writeText(pixCode.value);
                 const toast = new bootstrap.Toast(document.getElementById('copyToast'));
                 toast.show();
             } catch (err) {
                 console.error('Failed to copy:', err);
+                // Fallback for browsers that don't support clipboard API
+                document.execCommand('copy');
+                const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+                toast.show();
             }
             
             window.getSelection().removeAllRanges();
