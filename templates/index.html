@@ -3,20 +3,23 @@
 {% block content %}
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-10 text-center">
-            <h1 class="display-4 mb-4">Bem-vindo à Plataforma SMS</h1>
-            <p class="lead mb-5">Uma solução completa de integração SMS para seu e-commerce</p>
+        <div class="col-lg-10 text-center">
+            <h1 class="display-4 mb-4">Plataforma de Integração SMS</h1>
+            <p class="lead mb-5">Automatize suas comunicações via SMS com sua loja virtual de forma simples e eficiente</p>
             
             <div class="row g-4 mt-4">
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body d-flex flex-column">
-                            <div class="text-center mb-3">
+                            <div class="text-center mb-4">
                                 <i class="fas fa-paper-plane fa-3x text-primary"></i>
                             </div>
                             <h5 class="card-title">Envio de SMS</h5>
                             <p class="card-text flex-grow-1">Envie mensagens SMS personalizadas para seus clientes de forma rápida e eficiente.</p>
-                            <a href="/sms" class="btn btn-outline-primary mt-3">Enviar SMS</a>
+                            <a href="/sms" class="btn btn-outline-primary mt-3">
+                                <i class="fas fa-arrow-right me-2"></i>
+                                Enviar SMS
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -24,12 +27,15 @@
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body d-flex flex-column">
-                            <div class="text-center mb-3">
+                            <div class="text-center mb-4">
                                 <i class="fas fa-plug fa-3x text-primary"></i>
                             </div>
                             <h5 class="card-title">Integrações</h5>
                             <p class="card-text flex-grow-1">Configure webhooks para automatizar o envio de SMS baseado em eventos do seu e-commerce.</p>
-                            <a href="/integrations" class="btn btn-outline-primary mt-3">Gerenciar Integrações</a>
+                            <a href="/integrations" class="btn btn-outline-primary mt-3">
+                                <i class="fas fa-cog me-2"></i>
+                                Configurar Integrações
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -37,24 +43,30 @@
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body d-flex flex-column">
-                            <div class="text-center mb-3">
-                                <i class="fas fa-chart-line fa-3x text-primary"></i>
+                            <div class="text-center mb-4">
+                                <i class="fas fa-bullhorn fa-3x text-primary"></i>
                             </div>
                             <h5 class="card-title">Campanhas</h5>
                             <p class="card-text flex-grow-1">Crie e gerencie campanhas automatizadas para diferentes eventos do seu negócio.</p>
-                            <a href="/campaigns" class="btn btn-outline-primary mt-3">Ver Campanhas</a>
+                            <a href="/campaigns" class="btn btn-outline-primary mt-3">
+                                <i class="fas fa-plus me-2"></i>
+                                Criar Campanha
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="row mt-5">
-                <div class="col-md-8 mx-auto">
-                    <div class="card border-0 bg-primary bg-opacity-10">
-                        <div class="card-body">
-                            <h3 class="card-title">Comece Agora</h3>
-                            <p class="card-text">Configure sua primeira integração em minutos e comece a automatizar suas comunicações via SMS.</p>
-                            <a href="/integrations" class="btn btn-primary">Criar Primeira Integração</a>
+                <div class="col-lg-8 mx-auto">
+                    <div class="card border-0 bg-primary bg-opacity-10 p-2">
+                        <div class="card-body text-center">
+                            <h3 class="mb-3">Comece Agora</h3>
+                            <p class="mb-4">Configure sua primeira integração em minutos e automatize suas comunicações via SMS.</p>
+                            <a href="/integrations" class="btn btn-primary btn-lg">
+                                <i class="fas fa-rocket me-2"></i>
+                                Iniciar Integração
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -62,8 +74,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
 {% endblock %}

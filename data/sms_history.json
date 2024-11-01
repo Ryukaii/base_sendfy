@@ -421,5 +421,59 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'bz4am4sfmwdo9d5d033ns4448k4e8f', 'status': 'processed', 'created_at': '2024-11-01 06:08:10'}}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 09:19:04",
+    "phone": "+5597991688513",
+    "message": "Ol\u00e1 Raimundo, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'mny12dnswzrkdibtz64p65904mu4te', 'status': 'processed', 'created_at': '2024-11-01 06:19:04'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 09:19:05",
+    "phone": "+5561982132603",
+    "message": "teste teste",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '0sluo5uquu1nfanhllscdqin8jb3vm', 'status': 'processed', 'created_at': '2024-11-01 06:19:05'}}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 09:21:10",
+    "phone": "+5551999546643",
+    "message": "Ol\u00e1 Sandoval, seu pedido no valor de R$ 166.10 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '0yki457l2jvph0xbqubjd91jhyf7dd', 'status': 'processed', 'created_at': '2024-11-01 06:21:10'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 09:24:22",
+    "phone": "+5561982132603",
+    "message": "VENDA PENDENTE, PAGUE O PIX",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'n15qlck71o14mj9h98f6mfn8x4uxv2', 'status': 'processed', 'created_at': '2024-11-01 06:24:22'}}",
+    "campaign_id": "15eb78b8-c5c5-4111-8366-2f3a843bed94",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 09:25:17",
+    "phone": "+5561982132603",
+    "message": "CADASTRO APROVADO, PARABENS!",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'xacbiaf33wkyurqxdtp7tam3127d1d', 'status': 'processed', 'created_at': '2024-11-01 06:25:17'}}",
+    "campaign_id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
+    "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-01 09:25:17",
+    "phone": "+5561982132603",
+    "message": "CADASTRO APROVADO, PARABENS!",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'zpb5rd4txp2zjmx66z9uyjm4yhc1nd', 'status': 'processed', 'created_at': '2024-11-01 06:25:17'}}",
+    "campaign_id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
+    "event_type": "approved"
   }
 ]
