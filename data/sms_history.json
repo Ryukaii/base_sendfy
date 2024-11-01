@@ -421,5 +421,14 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'bagdq0t81e5if2e8zamntad3ehrf8s', 'status': 'processed', 'created_at': '2024-11-01 05:56:56'}}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 09:07:44",
+    "phone": "+5508464646949",
+    "message": "Ol\u00e1 Ficou, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "failed",
+    "api_response": "422 Client Error:  for url: https://api.apisms.me/v2/send.php",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]
