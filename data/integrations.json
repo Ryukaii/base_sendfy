@@ -30,15 +30,9 @@
     "created_at": "2024-11-01 02:10:58"
   },
   {
-    "id": "476388b4-8557-4a85-86fc-401af6e1b235",
-    "name": "NOVO",
-    "webhook_url": "/webhook/476388b4-8557-4a85-86fc-401af6e1b235",
-    "created_at": "2024-11-01 05:19:40"
-  },
-  {
-    "id": "88231312-9eaf-4d52-8f12-d62759f35c54",
-    "name": "NEW",
-    "webhook_url": "/webhook/88231312-9eaf-4d52-8f12-d62759f35c54",
-    "created_at": "2024-11-01 05:19:59"
+    "id": "13484777-2d29-4864-a03c-d5b8be617eac",
+    "name": "TRABI",
+    "webhook_url": "/webhook/0b991340-8741-44ce-a741-c5a5ab1bc9f3",
+    "created_at": "2024-11-01 02:40:14"
   }
 ]

@@ -4,18 +4,8 @@ async function loadIntegrations() {
         const response = await fetch('/api/integrations');
         const integrations = await response.json();
         
-        if (!Array.isArray(integrations)) {
-            console.error('Invalid integrations data:', integrations);
-            throw new Error('Invalid integrations data received');
-        }
-        
         const list = document.getElementById('integrationsList');
         list.innerHTML = '';
-        
-        if (integrations.length === 0) {
-            list.innerHTML = '<div class="alert alert-info">No integrations found. Create one to get started!</div>';
-            return;
-        }
         
         integrations.forEach(integration => {
             const div = document.createElement('div');
@@ -42,8 +32,7 @@ async function loadIntegrations() {
         });
     } catch (error) {
         console.error('Error loading integrations:', error);
-        const list = document.getElementById('integrationsList');
-        list.innerHTML = '<div class="alert alert-danger">Failed to load integrations. Please try again.</div>';
+        alert('Failed to load integrations. Please try again.');
     }
 }
 
@@ -51,10 +40,10 @@ async function loadIntegrations() {
 async function copyToClipboard(text) {
     try {
         await navigator.clipboard.writeText(text);
-        showMessage('Success', 'Webhook URL copied to clipboard!', 'success');
+        alert('Webhook URL copied to clipboard!');
     } catch (err) {
         console.error('Failed to copy text: ', err);
-        showMessage('Error', 'Failed to copy webhook URL', 'danger');
+        alert('Failed to copy webhook URL');
     }
 }
 
@@ -77,7 +66,7 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
         const data = await response.json();
         
         if (response.ok) {
-            showMessage('Success', 'Integration created successfully!', 'success');
+            alert('Integration created successfully!');
             e.target.reset();
             loadIntegrations();
         } else {
@@ -85,7 +74,7 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
         }
     } catch (error) {
         console.error('Error creating integration:', error);
-        showMessage('Error', error.message || 'Failed to create integration. Please try again.', 'danger');
+        alert(error.message || 'Failed to create integration. Please try again.');
     }
 });
 
@@ -117,7 +106,7 @@ async function deleteIntegration(integrationId) {
         }
     } catch (error) {
         console.error('Error:', error);
-        showMessage('Error', error.message || 'Failed to delete integration. Please try again.', 'danger');
+        alert(error.message || 'Failed to delete integration. Please try again.');
     }
 }
 
