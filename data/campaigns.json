@@ -14,13 +14,5 @@
     "event_type": "pending",
     "message_template": "TRABI TRABI",
     "created_at": "2024-11-01 02:41:04"
-  },
-  {
-    "id": "db35490f-d01d-4248-a7ec-9ab2ed00e3e2",
-    "name": "DIEGO",
-    "integration_id": "29f688a4-2b04-4def-9a4d-41ecc0dab87f",
-    "event_type": "pending",
-    "message_template": "ESSE E UM BAITA TESTE DIEGOO",
-    "created_at": "2024-11-01 08:54:23"
   }
 ]
