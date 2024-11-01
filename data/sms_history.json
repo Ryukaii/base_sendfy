@@ -16,5 +16,41 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '0pgvy3qhepnv530lr5tvrf9c4js9st', 'status': 'processed', 'created_at': '2024-10-31 23:32:35'}}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:33:40",
+    "phone": "+5561982132603",
+    "message": "teste",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'zcu0fjn1dpiq4qhy4j6no55smqnrtw', 'status': 'processed', 'created_at': '2024-10-31 23:33:40'}}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 02:33:40",
+    "phone": "+5561982132603",
+    "message": "teste",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'e3pz0ksk6zihqmunfnyzmkcpw6nzls', 'status': 'processed', 'created_at': '2024-10-31 23:33:40'}}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 02:37:33",
+    "phone": "+5522996189380",
+    "message": "Ol\u00e1 Jeferson, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'zl5mj83ut3713kg4xkshrozp5jqe7t', 'status': 'processed', 'created_at': '2024-10-31 23:37:33'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 02:39:15",
+    "phone": "+5524994405665",
+    "message": "Ol\u00e1 Levi, seu pedido no valor de R$ 236.00 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'eiyiuuhxryzf8jp6cjvyqehuh99d0n', 'status': 'processed', 'created_at': '2024-10-31 23:39:14'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]

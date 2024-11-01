@@ -15,13 +15,26 @@ SMS_API_ENDPOINT = "https://api.apisms.me/v2/send.php"
 SMS_API_TOKEN = os.environ.get('SMS_API_TOKEN')
 
 def format_phone_number(phone):
+    """Format Brazilian phone number to international format"""
     # Remove all non-numeric characters
     numbers = re.sub(r'\D', '', phone)
-    # Ensure it starts with country code
+    
+    # Ensure it's a valid Brazilian number
+    if len(numbers) < 10 or len(numbers) > 13:
+        raise ValueError("Invalid phone number length")
+    
+    # If number doesn't start with country code, add it
     if not numbers.startswith('55'):
         numbers = '55' + numbers
+    
+    # If DDD is missing (assuming it's an 8-digit number), raise error
+    if len(numbers) < 12:
+        raise ValueError("Missing area code (DDD)")
+    
+    # Add plus sign for international format
     if not numbers.startswith('+'):
         numbers = '+' + numbers
+        
     return numbers
 
 def log_sms_attempt(campaign_id, phone, message, status, api_response, event_type):
@@ -50,7 +63,21 @@ def log_sms_attempt(campaign_id, phone, message, status, api_response, event_typ
 def send_sms_task(self, phone, message, operator="claro", campaign_id=None, event_type="manual"):
     try:
         # Format phone number
-        formatted_phone = format_phone_number(phone)
+        try:
+            formatted_phone = format_phone_number(phone)
+        except ValueError as e:
+            log_sms_attempt(
+                campaign_id=campaign_id,
+                phone=phone,
+                message=message,
+                status='failed',
+                api_response=f"Phone number formatting error: {str(e)}",
+                event_type=event_type
+            )
+            return {
+                'success': False,
+                'message': f'Invalid phone number: {str(e)}'
+            }
         
         # Prepare request payload
         sms_data = {

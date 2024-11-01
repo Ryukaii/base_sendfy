@@ -33,25 +33,31 @@ def initialize_json_file(filepath, initial_data=None):
         logger.error(f"Error initializing JSON file {filepath}: {str(e)}")
         raise
 
-# Initialize files
 for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, SMS_HISTORY_FILE]:
     initialize_json_file(file_path)
 
 def format_phone_number(phone):
-    """Format phone number to international format"""
     try:
         numbers = re.sub(r'\D', '', phone)
+        
+        if len(numbers) < 10 or len(numbers) > 13:
+            raise ValueError("Invalid phone number length")
+        
         if not numbers.startswith('55'):
             numbers = '55' + numbers
+        
+        if len(numbers) < 12:
+            raise ValueError("Missing area code (DDD)")
+        
         if not numbers.startswith('+'):
             numbers = '+' + numbers
+            
         return numbers
     except Exception as e:
         logger.error(f"Error formatting phone number {phone}: {str(e)}")
-        raise ValueError("Invalid phone number format")
+        raise ValueError(f"Invalid phone number format: {str(e)}")
 
 def normalize_status(status):
-    """Normalize status values"""
     if not status:
         return None
     try:
@@ -76,20 +82,37 @@ def normalize_status(status):
         return None
 
 def format_price(price_str):
-    """Format price string to decimal format"""
     try:
         if isinstance(price_str, (int, float)):
             return "{:.2f}".format(float(price_str))
-        price = re.sub(r'[^\d.]', '', str(price_str))
-        return "{:.2f}".format(float(price))
+        
+        price = re.sub(r'[^\d,.]', '', str(price_str))
+        
+        if ',' in price and '.' not in price:
+            price = price.replace(',', '.')
+        elif ',' in price and '.' in price:
+            price = price.replace('.', '').replace(',', '.')
+        
+        value = float(price)
+        if value < 0:
+            raise ValueError("Price cannot be negative")
+            
+        return "{:.2f}".format(value)
     except (ValueError, TypeError) as e:
         logger.warning(f"Error formatting price {price_str}: {str(e)}")
         return "0.00"
 
 def format_message(template, **kwargs):
-    """Format message template with variables"""
     try:
         template = re.sub(r'\{(\w+)\.(\w+)\}', r'{\1_\2}', template)
+        
+        for key, value in kwargs.items():
+            if isinstance(value, (int, float)) or (isinstance(value, str) and re.match(r'^[\d,.]+$', value)):
+                try:
+                    kwargs[key] = format_price(value)
+                except (ValueError, TypeError):
+                    pass
+        
         return template.format(**kwargs)
     except KeyError as e:
         logger.error(f"Missing template variable: {str(e)}")
@@ -145,6 +168,14 @@ def webhook_handler(integration_id):
                 'message': 'Missing customer data or phone'
             }), 400
         
+        try:
+            formatted_phone = format_phone_number(customer['phone'])
+        except ValueError as e:
+            return jsonify({
+                'success': False,
+                'message': f'Invalid phone number: {str(e)}'
+            }), 400
+        
         full_name = customer.get('name', '')
         name_parts = full_name.split()
         first_name = name_parts[0] if name_parts else ''
@@ -175,12 +206,10 @@ def webhook_handler(integration_id):
         processed_campaigns = 0
         for campaign in matching_campaigns:
             try:
-                phone = format_phone_number(customer['phone'])
-                
                 template_vars = {
                     'customer_name': first_name,
                     'customer_full_name': full_name,
-                    'customer_phone': customer['phone'],
+                    'customer_phone': formatted_phone,
                     'customer_email': customer.get('email', ''),
                     'total_price': total_price,
                     'transaction_id': transaction_id,
@@ -193,7 +222,7 @@ def webhook_handler(integration_id):
                 message = format_message(campaign['message_template'], **template_vars)
                 
                 task = send_sms_task.delay(
-                    phone=phone,
+                    phone=formatted_phone,
                     message=message,
                     operator="claro",
                     campaign_id=campaign['id'],
