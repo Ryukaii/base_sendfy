@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>SMS History</h2>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>Phone</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Event Type</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in sms_history %}
+                    <tr>
+                        <td>{{ entry.timestamp }}</td>
+                        <td>{{ entry.phone }}</td>
+                        <td>{{ entry.message }}</td>
+                        <td>
+                            <span class="badge {% if entry.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ entry.status }}
+                            </span>
+                        </td>
+                        <td>{{ entry.event_type }}</td>
+                        <td>{{ entry.api_response }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
