@@ -673,5 +673,23 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138010628', 'number': '5587991360266', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:26:07",
+    "phone": "5519981140002",
+    "message": "Ol\u00e1 Thiago, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138012452', 'number': '5519981140002', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:27:49",
+    "phone": "5581987869144",
+    "message": "Ol\u00e1 Elton, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138013079', 'number': '5581987869144', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto">
+        <div class="flex justify-center mb-6">
+            <img alt="PIX Logo" class="h-16" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg/1200px-Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg.png"/>
+        </div>
+
+        <div class="space-y-4">
+            <div class="text-left">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-1">Pagamento via PIX</h2>
+                <p class="text-gray-600">
+                    Nome: <span class="font-semibold text-primary">{{ customer_name }}</span>
+                </p>
+                {% if address %}
+                <p class="text-gray-600">
+                    Endereço: <span class="font-semibold text-primary">{{ address }}</span>
+                </p>
+                {% endif %}
+                <p class="text-gray-600">
+                    Valor: <span class="font-semibold text-primary">R$ {{ total_price }}</span>
+                </p>
+                <p class="text-gray-600">
+                    Produto: <span class="font-semibold text-primary">{{ product_name }}</span>
+                </p>
+            </div>
+
+            <div class="bg-light p-4 rounded-lg">
+                <div class="flex flex-col items-center justify-center mb-4">
+                    <i class="fas fa-shield-alt fa-3x text-success mb-2"></i>
+                    <span class="text-success font-bold text-sm text-center">Pagamento 100% Seguro e Verificado pelo Banco Central</span>
+                </div>
+                <p class="text-sm text-success font-medium mb-2 text-center">
+                    Copie o código Pix abaixo:
+                </p>
+                <textarea class="form-control bg-white" id="pixCode" rows="3" readonly>{{ pix_code }}</textarea>
+                <p class="text-xs text-success mt-2 text-center">
+                    <i class="fas fa-lock me-1"></i>
+                    Transação protegida e autenticada pelo BACEN
+                </p>
+            </div>
+
+            <button class="btn btn-success w-100" onclick="copiarPixCode()">
+                <i class="fas fa-copy me-2"></i>
+                Copiar Código PIX
+            </button>
+
+            <div class="alert alert-info mt-4" role="alert">
+                <h4 class="alert-heading mb-2">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Como pagar com PIX:
+                </h4>
+                <div class="ps-3">
+                    <p class="mb-2">1. Copie o código PIX acima</p>
+                    <p class="mb-2">2. Abra o aplicativo do seu banco</p>
+                    <p class="mb-2">3. Escolha a opção PIX > Copia e Cola</p>
+                    <p class="mb-0">4. Cole o código e confirme o pagamento</p>
+                </div>
+            </div>
+
+            <div id="countdown" class="text-center mt-4">
+                <h3 class="text-primary">Tempo restante para pagamento</h3>
+                <div class="display-4 font-weight-bold" id="timer">09:00</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px;">
+    <div class="toast-header">
+        <i class="fas fa-check-circle text-success me-2"></i>
+        <strong class="me-auto">Sucesso</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        Código PIX copiado com sucesso!
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function startTimer(duration, display) {
+    let timer = duration, minutes, seconds;
+    const interval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(interval);
+            display.textContent = "Tempo expirado";
+            window.location.href = "/payment/expired/" + transactionId;
+        }
+    }, 1000);
+}
+
+function copiarPixCode() {
+    const pixCode = document.getElementById("pixCode");
+    pixCode.select();
+    
+    try {
+        navigator.clipboard.writeText(pixCode.value).then(function() {
+            const toast = new bootstrap.Toast(document.querySelector('.toast'));
+            toast.show();
+        });
+    } catch (err) {
+        document.execCommand('copy');
+        const toast = new bootstrap.Toast(document.querySelector('.toast'));
+        toast.show();
+    }
+    
+    window.getSelection().removeAllRanges();
+}
+
+window.onload = function () {
+    const nineMinutes = 60 * 9;
+    const display = document.querySelector('#timer');
+    startTimer(nineMinutes, display);
+};
+</script>
+{% endblock %}
