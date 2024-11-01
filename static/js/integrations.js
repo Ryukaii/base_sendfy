@@ -32,7 +32,7 @@ async function loadIntegrations() {
         });
     } catch (error) {
         console.error('Error loading integrations:', error);
-        showMessage('Error', 'Failed to load integrations. Please try again.', 'danger');
+        alert('Failed to load integrations. Please try again.');
     }
 }
 
@@ -40,10 +40,10 @@ async function loadIntegrations() {
 async function copyToClipboard(text) {
     try {
         await navigator.clipboard.writeText(text);
-        showMessage('Success', 'Webhook URL copied to clipboard!', 'success');
+        alert('Webhook URL copied to clipboard!');
     } catch (err) {
         console.error('Failed to copy text: ', err);
-        showMessage('Error', 'Failed to copy webhook URL', 'danger');
+        alert('Failed to copy webhook URL');
     }
 }
 
@@ -63,16 +63,16 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
         });
         
         if (response.ok) {
-            showMessage('Success', 'Integration created successfully!', 'success');
+            alert('Integration created successfully!');
             e.target.reset();
             loadIntegrations();
         } else {
             const data = await response.json();
-            showMessage('Error', `Failed to create integration: ${data.error}`, 'danger');
+            alert(`Failed to create integration: ${data.error}`);
         }
     } catch (error) {
         console.error('Error creating integration:', error);
-        showMessage('Error', 'Failed to create integration. Please try again.', 'danger');
+        alert('Failed to create integration. Please try again.');
     }
 });
 
@@ -85,19 +85,15 @@ async function deleteIntegration(integrationId) {
         
         if (response.ok) {
             const data = await response.json();
-            showMessage(
-                'Success', 
-                `Integration deleted successfully! ${data.campaigns_removed} associated campaigns were also removed.`,
-                'success'
-            );
+            alert('Integration deleted successfully!');
             loadIntegrations();
         } else {
             const data = await response.json();
-            showMessage('Error', `Failed to delete integration: ${data.error}`, 'danger');
+            alert(`Failed to delete integration: ${data.error}`);
         }
     } catch (error) {
         console.error('Error deleting integration:', error);
-        showMessage('Error', 'Failed to delete integration. Please try again.', 'danger');
+        alert('Failed to delete integration. Please try again.');
     }
 }
 
