@@ -583,5 +583,95 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'wa1e4bo3cgfnjddi4ggzbwr7bdo87o', 'status': 'processed', 'created_at': '2024-11-01 15:04:10'}}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:07:10",
+    "phone": "5591991097246",
+    "message": "VENDA PENDENTE, PAGUE O PIX",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138007154', 'number': '5591991097246', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "15eb78b8-c5c5-4111-8366-2f3a843bed94",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:07:12",
+    "phone": "5561982132603",
+    "message": "teste pagbr.net",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138007157', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 18:11:26",
+    "phone": "5591991097246",
+    "message": "CADASTRO APROVADO, PARABENS!",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138008765', 'number': '5591991097246', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
+    "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-01 18:13:29",
+    "phone": "5527996902021",
+    "message": "Ol\u00e1 Jonas, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138009516', 'number': '5527996902021', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:15:55",
+    "phone": "5527996902021",
+    "message": "VENDA PENDENTE, PAGUE O PIX",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138010088', 'number': '5527996902021', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "15eb78b8-c5c5-4111-8366-2f3a843bed94",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:17:06",
+    "phone": "5527996902021",
+    "message": "CADASTRO APROVADO, PARABENS!",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138010344', 'number': '5527996902021', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
+    "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-01 18:17:06",
+    "phone": "5527996902021",
+    "message": "CADASTRO APROVADO, PARABENS!",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138010345', 'number': '5527996902021', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
+    "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-01 18:17:49",
+    "phone": "5581985406650",
+    "message": "Ol\u00e1 Paulo, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138010381', 'number': '5581985406650', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:20:36",
+    "phone": "5519981140002",
+    "message": "Ol\u00e1 Thiago, seu pedido no valor de R$ 347.28 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138010490', 'number': '5519981140002', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:21:03",
+    "phone": "5587991360266",
+    "message": "Ol\u00e1 Francisco, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3138010628', 'number': '5587991360266', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]
