@@ -66,10 +66,10 @@ def send_sms():
         "user_reply": False
     }
     
-    # Prepare headers with token
+    # Prepare headers with token using Bearer authentication
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': SMS_API_TOKEN
+        'Authorization': f'Bearer {SMS_API_TOKEN}'
     }
     
     try:
@@ -184,10 +184,10 @@ def webhook_handler(integration_id):
             "user_reply": False
         }
         
-        # Prepare headers
+        # Prepare headers with token using Bearer authentication
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': SMS_API_TOKEN
+            'Authorization': f'Bearer {SMS_API_TOKEN}'
         }
         
         # Send SMS
