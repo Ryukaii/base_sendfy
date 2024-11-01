@@ -6,5 +6,21 @@
     "event_type": "pending",
     "message_template": "Ol\u00e1 {customer_name}, seu pedido no valor de R$ {total_price} est\u00e1 pendente.",
     "created_at": "2024-11-01 02:30:00"
+  },
+  {
+    "id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
+    "name": "DIEGO",
+    "integration_id": "5429aebf-9e6c-421a-9ba5-7a12fa493c90",
+    "event_type": "approved",
+    "message_template": "CADASTRO APROVADO, PARABENS!",
+    "created_at": "2024-11-01 09:22:15"
+  },
+  {
+    "id": "15eb78b8-c5c5-4111-8366-2f3a843bed94",
+    "name": "PENDENTE",
+    "integration_id": "5429aebf-9e6c-421a-9ba5-7a12fa493c90",
+    "event_type": "pending",
+    "message_template": "VENDA PENDENTE, PAGUE O PIX",
+    "created_at": "2024-11-01 09:23:55"
   }
 ]
