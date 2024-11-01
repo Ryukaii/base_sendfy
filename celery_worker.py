@@ -11,8 +11,8 @@ celery = Celery('sms_tasks',
                 backend='redis://localhost:6379/0')
 
 # SMS API Configuration
-SMS_API_ENDPOINT = "https://api.apisms.me/v2/send.php"
-SMS_API_TOKEN = os.environ.get('SMS_API_TOKEN')
+SMS_API_ENDPOINT = "https://api.smsdev.com.br/v1/send"
+SMS_API_KEY = os.environ.get('SMSDEV_API_KEY')
 
 def format_phone_number(phone):
     """Format Brazilian phone number to international format"""
@@ -31,10 +31,6 @@ def format_phone_number(phone):
     if len(numbers) < 12:
         raise ValueError("Missing area code (DDD)")
     
-    # Add plus sign for international format
-    if not numbers.startswith('+'):
-        numbers = '+' + numbers
-        
     return numbers
 
 def log_sms_attempt(campaign_id, phone, message, status, api_response, event_type):
@@ -79,26 +75,19 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
                 'message': f'Invalid phone number: {str(e)}'
             }
         
-        # Prepare request payload
+        # Prepare request payload for smsdev.com.br
         sms_data = {
-            "operator": operator,
-            "destination_number": formatted_phone,
-            "message": message,
-            "tag": "SMS Platform",
-            "user_reply": False
-        }
-        
-        # Prepare headers with token
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {SMS_API_TOKEN}'
+            "key": SMS_API_KEY,
+            "type": 9, # Type 9 for text message
+            "number": formatted_phone,
+            "msg": message,
+            "ref": campaign_id or "manual_send"
         }
         
         # Send SMS
         response = requests.post(
             SMS_API_ENDPOINT,
             json=sms_data,
-            headers=headers,
             timeout=10
         )
         response.raise_for_status()
@@ -106,19 +95,23 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
         # Parse response
         api_response = response.json()
         
+        # Check if the message was sent successfully
+        # SMS Dev returns 'situacao': 'OK' for success
+        success = api_response.get('situacao') == 'OK'
+        
         # Log the attempt
         log_sms_attempt(
             campaign_id=campaign_id,
             phone=formatted_phone,
             message=message,
-            status='success' if api_response.get('success', False) else 'failed',
+            status='success' if success else 'failed',
             api_response=str(api_response),
             event_type=event_type
         )
         
         return {
-            'success': api_response.get('success', False),
-            'message': api_response.get('message', 'SMS sent successfully')
+            'success': success,
+            'message': api_response.get('retorno', 'SMS sent successfully') if success else api_response.get('erro', 'Failed to send SMS')
         }
         
     except requests.exceptions.RequestException as e:

@@ -565,5 +565,23 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'sm0f9r1t0pv8u6dhxmi2knknzwyux2', 'status': 'processed', 'created_at': '2024-11-01 07:00:51'}}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 18:03:00",
+    "phone": "+5561982132603",
+    "message": "teste",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '881u7ttr4m8xh8zyh1xaao0o82n394', 'status': 'processed', 'created_at': '2024-11-01 15:03:00'}}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 18:04:10",
+    "phone": "+5591991097246",
+    "message": "Ol\u00e1 Rozenildo, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'wa1e4bo3cgfnjddi4ggzbwr7bdo87o', 'status': 'processed', 'created_at': '2024-11-01 15:04:10'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]
