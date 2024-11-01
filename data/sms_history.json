@@ -394,5 +394,32 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'b00mxxqa5vgh2khjqje2tqa0j5mzia', 'status': 'processed', 'created_at': '2024-11-01 01:57:11'}}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 08:53:45",
+    "phone": "+5508464646949",
+    "message": "Ol\u00e1 Ficou, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "failed",
+    "api_response": "422 Client Error:  for url: https://api.apisms.me/v2/send.php",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 08:55:38",
+    "phone": "+5561982132603",
+    "message": "ESSE E UM BAITA TESTE DIEGOO",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'f978ee4mrutwcu36e1d3dw18lemi0b', 'status': 'processed', 'created_at': '2024-11-01 05:55:38'}}",
+    "campaign_id": "db35490f-d01d-4248-a7ec-9ab2ed00e3e2",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 08:56:57",
+    "phone": "+5581984878258",
+    "message": "Ol\u00e1 Silvio, seu pedido no valor de R$ 245.40 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'bagdq0t81e5if2e8zamntad3ehrf8s', 'status': 'processed', 'created_at': '2024-11-01 05:56:56'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]
