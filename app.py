@@ -47,21 +47,20 @@ def format_phone_number(phone):
     return numbers
 
 def normalize_status(status):
-    """Normalize status value to handle variations"""
     if not status:
         return None
-    # Convert to lowercase and remove whitespace
-    normalized = status.lower().strip()
-    # Map common variations to expected values
+    status = str(status).lower().strip()
     status_map = {
         'pending': 'pending',
         'pend': 'pending',
         'pendente': 'pending',
+        'venda pendente': 'pending',
         'approved': 'approved',
         'aprovado': 'approved',
         'approve': 'approved',
+        'venda aprovada': 'approved'
     }
-    return status_map.get(normalized, normalized)
+    return status_map.get(status, status)
 
 @app.route('/')
 def index():
@@ -207,7 +206,7 @@ def manage_campaigns():
                 'id': str(uuid.uuid4()),
                 'name': data['name'],
                 'integration_id': data['integration_id'],
-                'event_type': normalize_status(data['event_type']),  # Normalize status when creating campaign
+                'event_type': normalize_status(data['event_type']),
                 'message_template': data['message_template'],
                 'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -232,20 +231,22 @@ def webhook_handler(integration_id):
     
     try:
         webhook_data = request.json
-        logger.debug(f"Raw webhook data: {json.dumps(webhook_data, indent=2)}")
+        logger.debug(f"Raw webhook data structure: {json.dumps(webhook_data, indent=2)}")
         
         # Extract and normalize required fields from webhook data
-        status = normalize_status(webhook_data.get('status'))
+        status = webhook_data.get('status')
+        normalized_status = normalize_status(status)
         customer = webhook_data.get('customer', {})
         total_price = webhook_data.get('total_price')
         
         # Log extracted data
-        logger.debug(f"Webhook status (normalized): {status}")
-        logger.debug(f"Customer data: {json.dumps(customer, indent=2)}")
+        logger.debug(f"Event type from webhook: {status}")
+        logger.debug(f"Normalized event type: {normalized_status}")
+        logger.debug(f"Extracted customer data: {json.dumps(customer, indent=2)}")
         logger.debug(f"Total price: {total_price}")
         
-        if not status or not customer or not total_price:
-            logger.warning(f"Missing required fields in webhook data: status={status}, customer={bool(customer)}, total_price={total_price}")
+        if not normalized_status or not customer or not total_price:
+            logger.warning(f"Missing required fields in webhook data: status={normalized_status}, customer={bool(customer)}, total_price={total_price}")
             return jsonify({
                 'success': False,
                 'message': 'Missing required fields in webhook data'
@@ -255,13 +256,13 @@ def webhook_handler(integration_id):
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
         
-        # Log all campaigns for debugging
-        logger.debug(f"All campaigns: {json.dumps(campaigns, indent=2)}")
+        # Log all campaigns
+        logger.debug(f"Found campaigns for integration {integration_id}: {json.dumps(campaigns, indent=2)}")
         
         # Find matching campaigns
         matching_campaigns = [c for c in campaigns 
-                            if c['integration_id'] == integration_id 
-                            and normalize_status(c['event_type']) == status]
+                          if c['integration_id'] == integration_id 
+                          and normalize_status(c['event_type']) == normalized_status]
         
         logger.info(f"Found {len(matching_campaigns)} matching campaigns")
         logger.debug(f"Matching campaigns: {json.dumps(matching_campaigns, indent=2)}")
@@ -284,7 +285,7 @@ def webhook_handler(integration_id):
                     message=message,
                     operator="claro",
                     campaign_id=campaign['id'],
-                    event_type=status
+                    event_type=normalized_status
                 )
                 
                 tasks.append(task.id)
