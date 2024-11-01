@@ -38195,3 +38195,365 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-01 19:54:09,902 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:54:09] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
 2024-11-01 19:54:25,200 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:54:25] "GET / HTTP/1.1" 200 -
 2024-11-01 19:54:25,217 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:54:25] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-01 19:54:37,719 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:54:37] "GET / HTTP/1.1" 200 -
+2024-11-01 19:54:38,636 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:54:38] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 19:54:39,897 - app - INFO - Received webhook request for integration: 476388b4-8557-4a85-86fc-401af6e1b235
+2024-11-01 19:54:39,898 - app - DEBUG - Webhook data: {
+  "checkout_id": "EwR3Ak1R2aMGdKy",
+  "store_name": "COMPLETE SEU REGISTRO",
+  "abandoned_checkout_url": "https://pay.portal-registro-cac.org/recovery/EwR3Ak1R2aMGdKy",
+  "total_price": "162.40",
+  "ip": "2804:389:f2aa:be25:7312:e850:41f2:ba9e",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 16:54:34",
+  "customer": {
+    "name": "Maur\u00edcio Guedes",
+    "document": "",
+    "email": "mauriciomazuim@hotmail.com",
+    "phone": "51998158522"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "nQ7kZ7Jxl0z30eJ",
+      "name": "TAXAS FINAIS",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 16240,
+      "created_at": "2024-10-02 13:05:03",
+      "products": [
+        {
+          "id": "lDW0ZakJW78gN7E",
+          "name": "TAXAS FINAIS",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/zeGqYokYCJxQqJg09iK1HSFTzV0KwYRrb6bX9FoM.png",
+          "created_at": "2024-10-02 12:56:00"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 19:54:39,898 - app - DEBUG - Extracted status: abandoned_cart, transaction_id: None
+2024-11-01 19:54:39,898 - app - ERROR - Missing required fields
+2024-11-01 19:54:39,898 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:54:39] "[31m[1mPOST /webhook/476388b4-8557-4a85-86fc-401af6e1b235 HTTP/1.1[0m" 400 -
+2024-11-01 19:54:40,658 - app - INFO - Received webhook request for integration: 5429aebf-9e6c-421a-9ba5-7a12fa493c90
+2024-11-01 19:54:40,658 - app - DEBUG - Webhook data: {
+  "checkout_id": "EwR3Ak1R2aMGdKy",
+  "store_name": "COMPLETE SEU REGISTRO",
+  "abandoned_checkout_url": "https://pay.portal-registro-cac.org/recovery/EwR3Ak1R2aMGdKy",
+  "total_price": "162.40",
+  "ip": "2804:389:f2aa:be25:7312:e850:41f2:ba9e",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 16:54:34",
+  "customer": {
+    "name": "Maur\u00edcio Guedes",
+    "document": "",
+    "email": "mauriciomazuim@hotmail.com",
+    "phone": "51998158522"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "nQ7kZ7Jxl0z30eJ",
+      "name": "TAXAS FINAIS",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 16240,
+      "created_at": "2024-10-02 13:05:03",
+      "products": [
+        {
+          "id": "lDW0ZakJW78gN7E",
+          "name": "TAXAS FINAIS",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/zeGqYokYCJxQqJg09iK1HSFTzV0KwYRrb6bX9FoM.png",
+          "created_at": "2024-10-02 12:56:00"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 19:54:40,658 - app - DEBUG - Extracted status: abandoned_cart, transaction_id: None
+2024-11-01 19:54:40,658 - app - ERROR - Missing required fields
+2024-11-01 19:54:40,659 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:54:40] "[31m[1mPOST /webhook/5429aebf-9e6c-421a-9ba5-7a12fa493c90 HTTP/1.1[0m" 400 -
+2024-11-01 19:56:46,778 - app - INFO - Received webhook request for integration: 476388b4-8557-4a85-86fc-401af6e1b235
+2024-11-01 19:56:46,778 - app - DEBUG - Webhook data: {
+  "checkout_id": "KovG1nj4qNNgyDE",
+  "store_name": "COMPLETE SEU REGISTRO",
+  "abandoned_checkout_url": "https://pay.portal-registro-cac.org/recovery/KovG1nj4qNNgyDE",
+  "total_price": "162.40",
+  "ip": "2804:a74:415:e800:cc76:ebda:1e54:8de",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 16:56:43",
+  "customer": {
+    "name": "Nome n\u00e3o dispon\u00edvel",
+    "document": "08887947627",
+    "email": "fonsecaedimir7@gmail.com",
+    "phone": "Telefone n\u00e3o dispon\u00edvel"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "nQ7kZ7Jxl0z30eJ",
+      "name": "TAXAS FINAIS",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 16240,
+      "created_at": "2024-10-02 13:05:03",
+      "products": [
+        {
+          "id": "lDW0ZakJW78gN7E",
+          "name": "TAXAS FINAIS",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/zeGqYokYCJxQqJg09iK1HSFTzV0KwYRrb6bX9FoM.png",
+          "created_at": "2024-10-02 12:56:00"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 19:56:46,778 - app - DEBUG - Extracted status: abandoned_cart, transaction_id: None
+2024-11-01 19:56:46,778 - app - ERROR - Missing required fields
+2024-11-01 19:56:46,779 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:56:46] "[31m[1mPOST /webhook/476388b4-8557-4a85-86fc-401af6e1b235 HTTP/1.1[0m" 400 -
+2024-11-01 19:56:47,526 - app - INFO - Received webhook request for integration: 5429aebf-9e6c-421a-9ba5-7a12fa493c90
+2024-11-01 19:56:47,527 - app - DEBUG - Webhook data: {
+  "checkout_id": "KovG1nj4qNNgyDE",
+  "store_name": "COMPLETE SEU REGISTRO",
+  "abandoned_checkout_url": "https://pay.portal-registro-cac.org/recovery/KovG1nj4qNNgyDE",
+  "total_price": "162.40",
+  "ip": "2804:a74:415:e800:cc76:ebda:1e54:8de",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 16:56:43",
+  "customer": {
+    "name": "Nome n\u00e3o dispon\u00edvel",
+    "document": "08887947627",
+    "email": "fonsecaedimir7@gmail.com",
+    "phone": "Telefone n\u00e3o dispon\u00edvel"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "nQ7kZ7Jxl0z30eJ",
+      "name": "TAXAS FINAIS",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 16240,
+      "created_at": "2024-10-02 13:05:03",
+      "products": [
+        {
+          "id": "lDW0ZakJW78gN7E",
+          "name": "TAXAS FINAIS",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/zeGqYokYCJxQqJg09iK1HSFTzV0KwYRrb6bX9FoM.png",
+          "created_at": "2024-10-02 12:56:00"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 19:56:47,527 - app - DEBUG - Extracted status: abandoned_cart, transaction_id: None
+2024-11-01 19:56:47,527 - app - ERROR - Missing required fields
+2024-11-01 19:56:47,527 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:56:47] "[31m[1mPOST /webhook/5429aebf-9e6c-421a-9ba5-7a12fa493c90 HTTP/1.1[0m" 400 -
+2024-11-01 19:59:25,856 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:25] "GET /sms HTTP/1.1" 200 -
+2024-11-01 19:59:26,052 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:26] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 19:59:30,642 - app - INFO - Received webhook request for integration: 476388b4-8557-4a85-86fc-401af6e1b235
+2024-11-01 19:59:30,642 - app - DEBUG - Webhook data: {
+  "checkout_id": "6pVgdoad5K6Gk7B",
+  "store_name": "COMPLETE SEU REGISTRO",
+  "abandoned_checkout_url": "https://pay.portal-registro-cac.org/recovery/6pVgdoad5K6Gk7B",
+  "total_price": "162.40",
+  "ip": "2804:3398:6104:1300:1893:f415:b7eb:950a",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 16:52:36",
+  "customer": {
+    "name": "Joao batista cordeiro",
+    "document": "00515538990",
+    "email": "batista.mt@gmail.com",
+    "phone": "(66) 99221-0048"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "nQ7kZ7Jxl0z30eJ",
+      "name": "TAXAS FINAIS",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 16240,
+      "created_at": "2024-10-02 13:05:03",
+      "products": [
+        {
+          "id": "lDW0ZakJW78gN7E",
+          "name": "TAXAS FINAIS",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/zeGqYokYCJxQqJg09iK1HSFTzV0KwYRrb6bX9FoM.png",
+          "created_at": "2024-10-02 12:56:00"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 19:59:30,642 - app - DEBUG - Extracted status: abandoned_cart, transaction_id: None
+2024-11-01 19:59:30,642 - app - ERROR - Missing required fields
+2024-11-01 19:59:30,643 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:30] "[31m[1mPOST /webhook/476388b4-8557-4a85-86fc-401af6e1b235 HTTP/1.1[0m" 400 -
+2024-11-01 19:59:31,443 - app - INFO - Received webhook request for integration: 5429aebf-9e6c-421a-9ba5-7a12fa493c90
+2024-11-01 19:59:31,443 - app - DEBUG - Webhook data: {
+  "checkout_id": "6pVgdoad5K6Gk7B",
+  "store_name": "COMPLETE SEU REGISTRO",
+  "abandoned_checkout_url": "https://pay.portal-registro-cac.org/recovery/6pVgdoad5K6Gk7B",
+  "total_price": "162.40",
+  "ip": "2804:3398:6104:1300:1893:f415:b7eb:950a",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 16:52:36",
+  "customer": {
+    "name": "Joao batista cordeiro",
+    "document": "00515538990",
+    "email": "batista.mt@gmail.com",
+    "phone": "(66) 99221-0048"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "nQ7kZ7Jxl0z30eJ",
+      "name": "TAXAS FINAIS",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 16240,
+      "created_at": "2024-10-02 13:05:03",
+      "products": [
+        {
+          "id": "lDW0ZakJW78gN7E",
+          "name": "TAXAS FINAIS",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/zeGqYokYCJxQqJg09iK1HSFTzV0KwYRrb6bX9FoM.png",
+          "created_at": "2024-10-02 12:56:00"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 19:59:31,444 - app - DEBUG - Extracted status: abandoned_cart, transaction_id: None
+2024-11-01 19:59:31,444 - app - ERROR - Missing required fields
+2024-11-01 19:59:31,444 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:31] "[31m[1mPOST /webhook/5429aebf-9e6c-421a-9ba5-7a12fa493c90 HTTP/1.1[0m" 400 -
+2024-11-01 19:59:36,624 - __main__ - DEBUG - Formatting phone number: 61982132603
+2024-11-01 19:59:36,625 - __main__ - DEBUG - After removing non-numeric characters: 61982132603
+2024-11-01 19:59:36,625 - __main__ - DEBUG - Added country code: 5561982132603
+2024-11-01 19:59:36,625 - __main__ - DEBUG - Final formatted number: +5561982132603
+2024-11-01 19:59:36,638 - celery.utils.functional - DEBUG - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-01 19:59:36,935 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:36] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-01 19:59:53,346 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:53] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 19:59:53,763 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:53] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 19:59:53,930 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:53] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-01 19:59:54,681 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 19:59:54] "[33mGET /api/integrations HTTP/1.1[0m" 404 -
+2024-11-01 20:00:00,109 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:00:00] "[33mPOST /api/integrations HTTP/1.1[0m" 404 -
+2024-11-01 20:00:28,453 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:00:28] "[33mPOST /api/integrations HTTP/1.1[0m" 404 -
+2024-11-01 20:01:33,972 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:01:33] "GET / HTTP/1.1" 200 -
+2024-11-01 20:01:34,466 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:01:34] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 20:03:42,791 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.68:3000
+2024-11-01 20:03:42,791 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-11-01 20:03:43,767 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:03:43] "GET / HTTP/1.1" 200 -
+2024-11-01 20:03:44,644 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:03:44] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 20:03:54,945 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:03:54] "GET / HTTP/1.1" 200 -
+2024-11-01 20:03:54,958 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:03:54] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-01 20:04:05,812 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:04:05] "GET /sms HTTP/1.1" 200 -
+2024-11-01 20:04:06,005 - werkzeug - INFO - 172.31.196.68 - - [01/Nov/2024 20:04:06] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
