@@ -574,5 +574,50 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'u8o4t04mzoe2fo4q6ne7asl0hbzc97', 'status': 'processed', 'created_at': '2024-11-01 09:40:06'}}",
     "campaign_id": "15eb78b8-c5c5-4111-8366-2f3a843bed94",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 14:48:30",
+    "phone": "+5553991123176",
+    "message": "Ol\u00e1 Eric, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'waehy0ywdt4i4kch0m91g0wjcqkc5t', 'status': 'processed', 'created_at': '2024-11-01 11:48:30'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 14:49:55",
+    "phone": "+5561982132603",
+    "message": "teste",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'ncy9wemn1arkxva4dm2bi14190z4s3', 'status': 'processed', 'created_at': '2024-11-01 11:49:55'}}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 14:51:35",
+    "phone": "+5553991123176",
+    "message": "VENDA PENDENTE, PAGUE O PIX",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '29vcsngk4ird1ueocoh3rhulk23cxg', 'status': 'processed', 'created_at': '2024-11-01 11:51:35'}}",
+    "campaign_id": "15eb78b8-c5c5-4111-8366-2f3a843bed94",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 14:55:59",
+    "phone": "+5553991123176",
+    "message": "CADASTRO APROVADO, PARABENS!",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'exs7yu7iw4en5xfusyjfio5dmh85aj', 'status': 'processed', 'created_at': '2024-11-01 11:55:59'}}",
+    "campaign_id": "1f1e350b-9f06-4a00-a33a-f9fcb1c6d9c7",
+    "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-01 14:56:28",
+    "phone": "+5574981364130",
+    "message": "Ol\u00e1 Uedson, seu pedido no valor de R$ 96.20 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'g4wc0lcq8tzyl09frji69ajfs957pr', 'status': 'processed', 'created_at': '2024-11-01 11:56:28'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]

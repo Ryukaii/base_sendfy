@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Pagamento PIX</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+        }
+        .pix-container {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+        .countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--bs-primary);
+        }
+        .status-badge {
+            background: var(--bs-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .pix-code {
+            background: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            width: 100%;
+            min-height: 100px;
+        }
+        .step {
+            display: flex;
+            gap: 1rem;
+            align-items: start;
+            padding: 1rem;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .step-number {
+            background: var(--bs-primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container pix-container">
+        <div class="card shadow-sm">
+            <div class="card-header text-center py-4">
+                <div class="countdown mb-2" id="countdown">09:00</div>
+                <div class="status-badge">
+                    <i class="fas fa-clock"></i>
+                    <span>Aguardando Pagamento</span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Detalhes do Pedido</h5>
+                        <p><strong>Nome:</strong> {{ customer_name }}</p>
+                        <p><strong>Valor:</strong> R$ {{ total_price }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Produtos</h5>
+                        {% for product in products %}
+                        <p>{{ product.name }} - R$ {{ product.value }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="alert alert-primary">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-qrcode me-2"></i>
+                        Código PIX
+                    </h5>
+                    <textarea class="pix-code" id="pixCode" readonly>{{ pix_code }}</textarea>
+                    <button class="btn btn-primary mt-3 w-100" onclick="copyPixCode()">
+                        <i class="fas fa-copy me-2"></i>
+                        Copiar Código PIX
+                    </button>
+                </div>
+
+                <div class="mt-4">
+                    <h5>Como pagar com PIX:</h5>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div>
+                                <h6>Copie o código PIX</h6>
+                                <small class="text-muted">Clique no botão acima para copiar automaticamente</small>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div>
+                                <h6>Abra seu banco</h6>
+                                <small class="text-muted">Acesse o aplicativo do seu banco preferido</small>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div>
+                                <h6>Selecione PIX Copia e Cola</h6>
+                                <small class="text-muted">Encontre a opção PIX > Pix Copia e Cola</small>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div>
+                                <h6>Confirme o pagamento</h6>
+                                <small class="text-muted">Cole o código e confirme a transação</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="copyToast">
+        <div class="toast-body">
+            <i class="fas fa-check-circle me-2"></i>
+            Código PIX copiado com sucesso!
+        </div>
+    </div>
+
+    <script>
+        function startTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+            const interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    display.textContent = "00:00";
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            const nineMinutes = 60 * 9;
+            const display = document.querySelector('#countdown');
+            startTimer(nineMinutes, display);
+        };
+
+        function copyPixCode() {
+            const pixCode = document.getElementById("pixCode");
+            pixCode.select();
+            
+            try {
+                navigator.clipboard.writeText(pixCode.value);
+                const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+                toast.show();
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+            
+            window.getSelection().removeAllRanges();
+        }
+    </script>
+</body>
+</html>
