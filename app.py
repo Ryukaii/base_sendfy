@@ -8,7 +8,6 @@ from flask import Flask, render_template, request, jsonify
 from celery_worker import send_sms_task
 from collections import Counter
 
-# Configure logging
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -18,15 +17,12 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 
-# File paths
 INTEGRATIONS_FILE = 'data/integrations.json'
 CAMPAIGNS_FILE = 'data/campaigns.json'
 SMS_HISTORY_FILE = 'data/sms_history.json'
 
-# Ensure data directory exists
 os.makedirs('data', exist_ok=True)
 
-# Initialize JSON files if they don't exist
 def initialize_json_file(filepath, initial_data=None):
     if not os.path.exists(filepath):
         with open(filepath, 'w') as f:
@@ -38,9 +34,7 @@ initialize_json_file(CAMPAIGNS_FILE)
 initialize_json_file(SMS_HISTORY_FILE)
 
 def format_phone_number(phone):
-    # Remove all non-numeric characters
     numbers = re.sub(r'\D', '', phone)
-    # Ensure it starts with country code
     if not numbers.startswith('55'):
         numbers = '55' + numbers
     if not numbers.startswith('+'):
@@ -50,18 +44,20 @@ def format_phone_number(phone):
 def normalize_status(status):
     if not status:
         return None
-    status = str(status).lower().strip()
+        
     status_map = {
         'pending': 'pending',
-        'pend': 'pending',
-        'pendente': 'pending',
-        'venda pendente': 'pending',
+        'PENDING': 'pending',
+        'Venda Pendente': 'pending',
         'approved': 'approved',
-        'aprovado': 'approved',
-        'approve': 'approved',
-        'venda aprovada': 'approved'
+        'APPROVED': 'approved',
+        'Venda Aprovada': 'approved'
     }
-    return status_map.get(status, status)
+    
+    status_str = str(status).strip()
+    normalized = status_map.get(status_str)
+    logger.debug(f"Normalizing status: {status_str} -> {normalized}")
+    return normalized
 
 @app.route('/')
 def index():
@@ -76,30 +72,22 @@ def index():
 def campaign_performance():
     logger.info("Accessing campaign performance page")
     try:
-        # Load campaigns and SMS history
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
         with open(SMS_HISTORY_FILE, 'r') as f:
             sms_history = json.load(f)
         
-        # Calculate campaign metrics
         campaign_metrics = []
         total_messages = 0
         active_campaigns = 0
         
         for campaign in campaigns:
-            # Filter messages for this campaign
             campaign_messages = [msg for msg in sms_history if msg.get('campaign_id') == campaign['id']]
             messages_count = len(campaign_messages)
             success_count = sum(1 for msg in campaign_messages if msg['status'] == 'success')
-            
-            # Calculate success rate
             success_rate = round((success_count / messages_count * 100) if messages_count > 0 else 0, 1)
-            
-            # Get last message timestamp
             last_message = max([msg['timestamp'] for msg in campaign_messages]) if campaign_messages else 'No messages'
             
-            # Check if campaign is active (had messages in the last 24 hours)
             if campaign_messages:
                 latest_msg_time = datetime.datetime.strptime(last_message, "%Y-%m-%d %H:%M:%S")
                 if (datetime.datetime.now() - latest_msg_time).days < 1:
@@ -115,14 +103,11 @@ def campaign_performance():
                 'last_message': last_message
             })
         
-        # Get recent activity (last 10 messages from campaigns)
         campaign_messages = [msg for msg in sms_history if msg.get('campaign_id')]
         recent_activity = []
         
         for msg in sorted(campaign_messages, key=lambda x: x['timestamp'], reverse=True)[:10]:
-            # Find campaign name
             campaign_name = next((c['name'] for c in campaigns if c['id'] == msg['campaign_id']), 'Unknown')
-            
             recent_activity.append({
                 'timestamp': msg['timestamp'],
                 'campaign_name': campaign_name,
@@ -145,20 +130,16 @@ def campaign_performance():
 def analytics():
     logger.info("Accessing analytics page")
     try:
-        # Load SMS history
         with open(SMS_HISTORY_FILE, 'r') as f:
             history = json.load(f)
         
-        # Calculate metrics
         total_messages = len(history)
         success_messages = sum(1 for msg in history if msg['status'] == 'success')
         success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
         
-        # Count messages by type
         manual_messages = sum(1 for msg in history if msg['event_type'] == 'manual')
         campaign_messages = sum(1 for msg in history if msg['event_type'] != 'manual')
         
-        # Messages by status
         status_counts = Counter(msg['status'] for msg in history)
         messages_by_status = [
             {
@@ -169,7 +150,6 @@ def analytics():
             for status, count in status_counts.items()
         ]
         
-        # Messages by event type
         event_counts = Counter(msg['event_type'] for msg in history)
         messages_by_event = [
             {
@@ -180,7 +160,6 @@ def analytics():
             for event_type, count in event_counts.items()
         ]
         
-        # Recent activity (last 10 messages)
         recent_activity = sorted(history, key=lambda x: x['timestamp'], reverse=True)[:10]
         
         return render_template('analytics.html',
@@ -253,10 +232,7 @@ def send_sms():
         }), 400
     
     try:
-        # Format phone number
         phone = format_phone_number(phone)
-        
-        # Send SMS using Celery task
         task = send_sms_task.delay(
             phone=phone,
             message=message,
@@ -350,46 +326,80 @@ def manage_campaigns():
 
 @app.route('/webhook/<integration_id>', methods=['POST'])
 def webhook_handler(integration_id):
-    logger.info(f"Received webhook for integration: {integration_id}")
-    logger.debug(f"Integration ID: {integration_id}")
+    logger.info(f"Received webhook request for integration: {integration_id}")
+    logger.debug(f"Request method: {request.method}")
+    logger.debug("Request headers:")
+    for header, value in request.headers.items():
+        logger.debug(f"{header}: {value}")
+    
+    if not integration_id:
+        logger.error("Invalid integration_id: empty or missing")
+        return jsonify({
+            'success': False,
+            'message': 'Invalid integration ID'
+        }), 400
+    
+    logger.debug(f"Processing webhook for integration_id: {integration_id}")
     
     try:
-        webhook_data = request.json
-        logger.debug(f"Raw webhook data structure: {json.dumps(webhook_data, indent=2)}")
-        
-        # Extract and normalize required fields from webhook data
+        webhook_data = request.get_data()
+        logger.debug(f"Raw webhook data: {webhook_data}")
+        webhook_data = request.get_json()
+        logger.debug(f"Parsed webhook data: {json.dumps(webhook_data, indent=2)}")
+    except Exception as e:
+        logger.error(f"Error parsing webhook JSON: {str(e)}")
+        return jsonify({'error': 'Invalid JSON'}), 400
+    
+    try:
         status = webhook_data.get('status')
-        normalized_status = normalize_status(status)
-        customer = webhook_data.get('customer', {})
-        total_price = webhook_data.get('total_price')
-        
-        # Log extracted data
-        logger.debug(f"Event type from webhook: {status}")
-        logger.debug(f"Normalized event type: {normalized_status}")
-        logger.debug(f"Extracted customer data: {json.dumps(customer, indent=2)}")
-        logger.debug(f"Total price: {total_price}")
-        
-        if not normalized_status or not customer or not total_price:
-            logger.warning(f"Missing required fields in webhook data: status={normalized_status}, customer={bool(customer)}, total_price={total_price}")
+        if not status:
+            logger.error("Missing status in webhook data")
             return jsonify({
                 'success': False,
-                'message': 'Missing required fields in webhook data'
+                'message': 'Missing status in webhook data'
+            }), 400
+            
+        normalized_status = normalize_status(status)
+        if not normalized_status:
+            logger.error(f"Invalid status value: {status}")
+            return jsonify({
+                'success': False,
+                'message': f'Invalid status value: {status}'
+            }), 400
+            
+        logger.debug(f"Status normalized from '{status}' to '{normalized_status}'")
+        
+        customer = webhook_data.get('customer', {})
+        if not customer:
+            logger.error("Missing customer data in webhook")
+            return jsonify({
+                'success': False,
+                'message': 'Missing customer data'
+            }), 400
+            
+        total_price = webhook_data.get('total_price')
+        if not total_price:
+            logger.error("Missing total_price in webhook data")
+            return jsonify({
+                'success': False,
+                'message': 'Missing total_price'
             }), 400
         
-        # Load campaigns
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
         
-        # Log all campaigns
-        logger.debug(f"Found campaigns for integration {integration_id}: {json.dumps(campaigns, indent=2)}")
-        
-        # Find matching campaigns
         matching_campaigns = [c for c in campaigns 
                           if c['integration_id'] == integration_id 
                           and normalize_status(c['event_type']) == normalized_status]
         
+        if not matching_campaigns:
+            logger.info(f"No matching campaigns found for integration {integration_id} and status {normalized_status}")
+            return jsonify({
+                'success': True,
+                'message': 'No matching campaigns found'
+            })
+        
         logger.info(f"Found {len(matching_campaigns)} matching campaigns")
-        logger.debug(f"Matching campaigns: {json.dumps(matching_campaigns, indent=2)}")
         
         tasks = []
         for campaign in matching_campaigns:
@@ -400,9 +410,9 @@ def webhook_handler(integration_id):
                     total_price=total_price
                 )
                 
-                logger.debug(f"Preparing to queue SMS for campaign {campaign['id']}")
-                logger.debug(f"Formatted phone: {phone}")
-                logger.debug(f"Formatted message: {message}")
+                logger.debug(f"Preparing SMS for campaign {campaign['id']}")
+                logger.debug(f"Phone: {phone}")
+                logger.debug(f"Message template: {message}")
                 
                 task = send_sms_task.delay(
                     phone=phone,
@@ -413,20 +423,28 @@ def webhook_handler(integration_id):
                 )
                 
                 tasks.append(task.id)
-                logger.info(f"Queued SMS for campaign {campaign['id']}, task ID: {task.id}")
+                logger.info(f"Successfully queued SMS for campaign {campaign['id']}, task ID: {task.id}")
                 
             except KeyError as e:
                 logger.error(f"Error formatting message for campaign {campaign['id']}: Missing key {str(e)}")
+                continue
             except Exception as e:
                 logger.error(f"Error queuing SMS for campaign {campaign['id']}: {str(e)}")
+                continue
         
-        return jsonify({
+        response_data = {
             'success': True,
-            'tasks': tasks
-        })
+            'message': f'Processed {len(tasks)} campaigns',
+            'task_ids': tasks
+        }
+        logger.info(f"Webhook processing completed: {json.dumps(response_data)}")
+        return jsonify(response_data)
+        
     except Exception as e:
-        logger.error(f"Error processing webhook: {str(e)}")
-        return jsonify({'error': 'Internal server error'}), 500
+        logger.error(f"Unexpected error processing webhook: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Internal server error'
+        }), 500
 
-# Add startup logging
 logger.info("Flask application initialized")
