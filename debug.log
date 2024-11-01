@@ -4797,3 +4797,59 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-01 05:18:57,168 - werkzeug - INFO - 172.31.196.26 - - [01/Nov/2024 05:18:57] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
 2024-11-01 05:18:57,174 - werkzeug - INFO - 172.31.196.26 - - [01/Nov/2024 05:18:57] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
 2024-11-01 05:18:57,735 - werkzeug - INFO - 172.31.196.26 - - [01/Nov/2024 05:18:57] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:51:34,628 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.196.117:5000
+2024-11-01 08:51:34,628 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-11-01 08:51:35,561 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:35] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 08:51:36,370 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:36] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:51:36,377 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:36] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:51:36,395 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:36] "GET /static/js/integrations.js HTTP/1.1" 200 -
+2024-11-01 08:51:37,145 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:37] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:51:56,326 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:56] "DELETE /api/integrations/7baba79f-450e-485c-98fe-3feca7d16307 HTTP/1.1" 200 -
+2024-11-01 08:51:56,500 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:56] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 08:51:57,289 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:57] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:51:57,367 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:57] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:51:57,369 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:57] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-01 08:51:58,194 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:58] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:51:59,783 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:59] "DELETE /api/integrations/3f8b9ce9-2e13-4a58-b0c4-377e983846b1 HTTP/1.1" 200 -
+2024-11-01 08:51:59,954 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:51:59] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 08:52:00,150 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:00] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:52:00,150 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:00] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:00,158 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:00] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:01,216 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:01] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:52:02,511 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:02] "DELETE /api/integrations/e88e6acd-4c2e-4ba1-ab3f-c25e25a32be3 HTTP/1.1" 200 -
+2024-11-01 08:52:02,682 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:02] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 08:52:03,377 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:03] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:52:03,385 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:03] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:03,385 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:03] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:04,497 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:04] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:52:05,823 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:05] "DELETE /api/integrations/22534863-3306-4b7e-b73a-ab7bb725ab56 HTTP/1.1" 200 -
+2024-11-01 08:52:05,968 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:05] "[33mPOST /webhook/476388b4-8557-4a85-86fc-401af6e1b235 HTTP/1.1[0m" 404 -
+2024-11-01 08:52:05,998 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:05] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 08:52:06,724 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:06] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:52:06,727 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:06] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:06,801 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:06] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:07,032 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:07] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:52:08,495 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:08] "DELETE /api/integrations/e8a32194-efb1-4458-be4e-ab0b73faf9e3 HTTP/1.1" 200 -
+2024-11-01 08:52:08,670 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:08] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 08:52:08,885 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:08] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:08,885 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:08] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:52:08,892 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:08] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:10,277 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:10] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:52:11,482 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:11] "DELETE /api/integrations/13484777-2d29-4864-a03c-d5b8be617eac HTTP/1.1" 200 -
+2024-11-01 08:52:11,657 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:11] "GET /integrations HTTP/1.1" 200 -
+2024-11-01 08:52:12,340 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:52:12,359 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:12] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:12,359 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:12] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:12,764 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:12] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:52:20,935 - app - INFO - Created new integration: 8242ce41-93f9-4b68-a161-2b614d5be814
+2024-11-01 08:52:20,936 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:20] "[35m[1mPOST /api/integrations HTTP/1.1[0m" 201 -
+2024-11-01 08:52:22,592 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:22] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-01 08:52:25,577 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:25] "GET /campaigns HTTP/1.1" 200 -
+2024-11-01 08:52:26,285 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:26] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 08:52:26,292 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:26] "[36mGET /static/js/modal.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:26,297 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:26] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-01 08:52:26,910 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:26] "[33mGET /api/campaigns HTTP/1.1[0m" 404 -
+2024-11-01 08:52:26,916 - werkzeug - INFO - 172.31.196.117 - - [01/Nov/2024 08:52:26] "GET /api/integrations HTTP/1.1" 200 -
