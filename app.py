@@ -4,7 +4,7 @@ import uuid
 import datetime
 import re
 import logging
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, flash
 from celery_worker import send_sms_task
 from collections import Counter
 
@@ -492,6 +492,61 @@ def webhook_handler(integration_id):
         return jsonify({
             'success': False,
             'message': f'Internal server error: {str(e)}'
+        }), 500
+
+@app.route('/sms')
+def sms():
+    try:
+        return render_template('sms.html')
+    except Exception as e:
+        logger.error(f"Error rendering SMS template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/api/send-sms', methods=['POST'])
+def send_sms():
+    try:
+        data = request.get_json()
+        if not data:
+            raise ValueError("Missing request data")
+        
+        phone = data.get('phone')
+        message = data.get('message')
+        
+        if not all([phone, message]):
+            raise ValueError("Missing required fields: phone or message")
+        
+        if len(message) > 160:
+            raise ValueError("Message exceeds maximum length of 160 characters")
+        
+        try:
+            formatted_phone = format_phone_number(phone)
+        except ValueError as e:
+            raise ValueError(f"Invalid phone number: {str(e)}")
+        
+        task = send_sms_task.delay(
+            phone=formatted_phone,
+            message=message,
+            operator="claro",
+            event_type="manual"
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'SMS sent successfully',
+            'task_id': task.id
+        })
+        
+    except ValueError as e:
+        logger.error(f"Validation error in send_sms: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 400
+    except Exception as e:
+        logger.error(f"Error sending SMS: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Internal server error'
         }), 500
 
 if __name__ == '__main__':

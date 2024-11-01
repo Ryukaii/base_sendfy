@@ -1,34 +1,158 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h2>Enviar SMS</h2>
-    </div>
-    <div class="card-body">
-        <form id="smsForm">
-            <div class="mb-3">
-                <label class="form-label">Número de Telefone</label>
-                <input type="tel" class="form-control" id="phone" required>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Enviar SMS Manual</h2>
+                </div>
+                <div class="card-body">
+                    <form id="smsForm" method="POST">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Número de Telefone</label>
+                            <div class="input-group">
+                                <span class="input-group-text">+55</span>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       placeholder="DDD + Número (apenas números)" required
+                                       pattern="[0-9]{10,11}"
+                                       title="Digite um número de telefone válido (apenas números)">
+                            </div>
+                            <div class="form-text">Exemplo: 11999999999</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Mensagem</label>
+                            <textarea class="form-control" id="message" name="message" rows="4" 
+                                    maxlength="160" required></textarea>
+                            <div class="form-text">
+                                <span id="charCount">160</span> caracteres restantes
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Enviar SMS
+                        </button>
+                    </form>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Operadora</label>
-                <select class="form-select" id="operator" required>
-                    <option value="claro">Claro</option>
-                    <option value="vivo">Vivo</option>
-                    <option value="tim">Tim</option>
-                </select>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>Instruções</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-phone me-2 text-primary"></i>
+                            Digite o número de telefone sem o +55
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            A mensagem deve ter no máximo 160 caracteres
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle me-2 text-primary"></i>
+                            Confira o número antes de enviar
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Mensagem</label>
-                <textarea class="form-control" id="message" rows="3" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Enviar SMS</button>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/js/sms.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messageTextarea = document.getElementById('message');
+    const charCountSpan = document.getElementById('charCount');
+    const phoneInput = document.getElementById('phone');
+    const form = document.getElementById('smsForm');
+
+    messageTextarea.addEventListener('input', function() {
+        const remaining = 160 - this.value.length;
+        charCountSpan.textContent = remaining;
+        
+        if (remaining < 0) {
+            charCountSpan.classList.add('text-danger');
+        } else {
+            charCountSpan.classList.remove('text-danger');
+        }
+    });
+
+    phoneInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Enviando...
+        `;
+
+        fetch('/api/send-sms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                phone: phoneInput.value,
+                message: messageTextarea.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', 'SMS enviado com sucesso!');
+                form.reset();
+            } else {
+                showAlert('danger', `Erro ao enviar SMS: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            showAlert('danger', 'Erro ao enviar SMS. Por favor, tente novamente.');
+            console.error('Erro:', error);
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+        });
+    });
+
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        form.insertBefore(alertDiv, form.firstChild);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+});
+</script>
 {% endblock %}

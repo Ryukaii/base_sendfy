@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "transaction_id": "34b7rW5G",
+    "customer_name": "Joao batista cordeiro",
+    "customer_phone": "+5566992210048",
+    "customer_email": "batista.mt@gmail.com",
+    "address": {
+      "street": "",
+      "number": "",
+      "complement": "",
+      "district": "",
+      "zip_code": "",
+      "city": "",
+      "state": "",
+      "country": ""
+    },
+    "product_name": "TAXAS FINAIS",
+    "total_price": "162.40",
+    "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/cbe463e8-8e91-4b55-a867-cba160e6a5585204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63043B7A",
+    "status": "approved",
+    "created_at": "2024-11-01 19:43:14"
+  }
+]
