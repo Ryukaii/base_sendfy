@@ -6,6 +6,7 @@ import re
 import logging
 from flask import Flask, render_template, request, jsonify
 from celery_worker import send_sms_task
+from collections import Counter
 
 # Configure logging
 logging.basicConfig(
@@ -69,6 +70,60 @@ def index():
         return render_template('index.html')
     except Exception as e:
         logger.error(f"Error rendering index template: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/analytics')
+def analytics():
+    logger.info("Accessing analytics page")
+    try:
+        # Load SMS history
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            history = json.load(f)
+        
+        # Calculate metrics
+        total_messages = len(history)
+        success_messages = sum(1 for msg in history if msg['status'] == 'success')
+        success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
+        
+        # Count messages by type
+        manual_messages = sum(1 for msg in history if msg['event_type'] == 'manual')
+        campaign_messages = sum(1 for msg in history if msg['event_type'] != 'manual')
+        
+        # Messages by status
+        status_counts = Counter(msg['status'] for msg in history)
+        messages_by_status = [
+            {
+                'status': status,
+                'count': count,
+                'percentage': round(count / total_messages * 100, 1)
+            }
+            for status, count in status_counts.items()
+        ]
+        
+        # Messages by event type
+        event_counts = Counter(msg['event_type'] for msg in history)
+        messages_by_event = [
+            {
+                'type': event_type,
+                'count': count,
+                'percentage': round(count / total_messages * 100, 1)
+            }
+            for event_type, count in event_counts.items()
+        ]
+        
+        # Recent activity (last 10 messages)
+        recent_activity = sorted(history, key=lambda x: x['timestamp'], reverse=True)[:10]
+        
+        return render_template('analytics.html',
+                             total_messages=total_messages,
+                             success_rate=success_rate,
+                             manual_messages=manual_messages,
+                             campaign_messages=campaign_messages,
+                             messages_by_status=messages_by_status,
+                             messages_by_event=messages_by_event,
+                             recent_activity=recent_activity)
+    except Exception as e:
+        logger.error(f"Error generating analytics: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/sms')
