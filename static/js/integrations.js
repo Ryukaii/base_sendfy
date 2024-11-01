@@ -80,16 +80,19 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
 async function deleteIntegration(integrationId) {
     try {
         const response = await fetch(`/api/integrations/${integrationId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
         
+        const data = await response.json();
+        
         if (response.ok) {
-            const data = await response.json();
             alert('Integration deleted successfully!');
             loadIntegrations();
         } else {
-            const data = await response.json();
-            alert(`Failed to delete integration: ${data.error}`);
+            alert(data.error || 'Failed to delete integration');
         }
     } catch (error) {
         console.error('Error deleting integration:', error);
