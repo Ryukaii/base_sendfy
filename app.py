@@ -40,6 +40,42 @@ def initialize_json_file(filepath, initial_data=None):
 for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, SMS_HISTORY_FILE]:
     initialize_json_file(file_path)
 
+# Page Routes
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/integrations')
+def integrations_page():
+    return render_template('integrations.html')
+
+@app.route('/campaigns')
+def campaigns_page():
+    return render_template('campaigns.html')
+
+@app.route('/sms')
+def sms_page():
+    return render_template('sms.html')
+
+@app.route('/sms-history')
+def sms_history_page():
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            sms_history = json.load(f)
+        return render_template('sms_history.html', sms_history=sms_history)
+    except Exception as e:
+        logger.error(f"Error loading SMS history: {str(e)}")
+        return render_template('sms_history.html', sms_history=[])
+
+@app.route('/analytics')
+def analytics_page():
+    return render_template('analytics.html')
+
+@app.route('/campaign-performance')
+def campaign_performance_page():
+    return render_template('campaign_performance.html')
+
+# API Routes
 @app.route('/api/integrations', methods=['GET'])
 def get_integrations():
     try:
@@ -105,37 +141,38 @@ def create_integration():
 
 @app.route('/api/integrations/<integration_id>', methods=['DELETE'])
 def delete_integration(integration_id):
-    logger.debug(f"Attempting to delete integration: {integration_id}")
-    
     try:
+        # Ensure we always return JSON
+        if not integration_id:
+            return jsonify({'error': 'Missing integration ID'}), 400
+            
         with open(INTEGRATIONS_FILE, 'r') as f:
             integrations = json.load(f)
             
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
         
-        # Check if integration exists
+        # Find integration
         integration = next((i for i in integrations if i['id'] == integration_id), None)
         if not integration:
-            logger.error(f"Integration not found: {integration_id}")
             return jsonify({'error': 'Integration not found'}), 404
         
         # Remove integration and associated campaigns
         updated_integrations = [i for i in integrations if i['id'] != integration_id]
         updated_campaigns = [c for c in campaigns if c['integration_id'] != integration_id]
         
-        # Write changes atomically
+        # Write changes
         with open(INTEGRATIONS_FILE, 'w') as f:
             json.dump(updated_integrations, f, indent=2)
             
         with open(CAMPAIGNS_FILE, 'w') as f:
             json.dump(updated_campaigns, f, indent=2)
         
-        logger.debug(f"Successfully deleted integration {integration_id}")
-        return jsonify({'message': 'Integration deleted successfully'})
+        return jsonify({'success': True, 'message': 'Integration deleted successfully'})
         
     except Exception as e:
-        logger.error(f"Error deleting integration: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Error deleting integration {integration_id}: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
-# ... [rest of your existing app.py code]
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

@@ -57,22 +57,24 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
         const response = await fetch('/api/integrations', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ name })
         });
+        
+        const data = await response.json();
         
         if (response.ok) {
             alert('Integration created successfully!');
             e.target.reset();
             loadIntegrations();
         } else {
-            const data = await response.json();
-            alert(`Failed to create integration: ${data.error}`);
+            throw new Error(data.error || 'Failed to create integration');
         }
     } catch (error) {
         console.error('Error creating integration:', error);
-        alert('Failed to create integration. Please try again.');
+        alert(error.message || 'Failed to create integration. Please try again.');
     }
 });
 
@@ -80,20 +82,31 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
 async function deleteIntegration(integrationId) {
     try {
         const response = await fetch(`/api/integrations/${integrationId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
         });
         
+        // Try to parse response as JSON
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            console.error('Error parsing response:', e);
+            throw new Error('Invalid server response');
+        }
+        
         if (response.ok) {
-            const result = await response.json();
-            location.reload(); // Reload page after successful deletion
+            // Refresh the page only after successful deletion
+            window.location.reload();
         } else {
-            const error = await response.json();
-            console.error('Server error:', error);
-            alert(error.error || 'Failed to delete integration');
+            throw new Error(data.error || 'Failed to delete integration');
         }
     } catch (error) {
-        console.error('Network error:', error);
-        alert('Network error. Please try again.');
+        console.error('Error:', error);
+        alert(error.message || 'Failed to delete integration. Please try again.');
     }
 }
 
