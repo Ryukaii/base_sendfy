@@ -3,8 +3,16 @@ import os
 import uuid
 import datetime
 import re
+import logging
 from flask import Flask, render_template, request, jsonify
 from celery_worker import send_sms_task
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
@@ -22,6 +30,7 @@ def initialize_json_file(filepath, initial_data=None):
     if not os.path.exists(filepath):
         with open(filepath, 'w') as f:
             json.dump(initial_data if initial_data is not None else [], f)
+        logger.info(f"Initialized JSON file: {filepath}")
 
 initialize_json_file(INTEGRATIONS_FILE)
 initialize_json_file(CAMPAIGNS_FILE)
@@ -39,172 +48,228 @@ def format_phone_number(phone):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    logger.info("Accessing index page")
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        logger.error(f"Error rendering index template: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/sms')
 def sms():
-    return render_template('sms.html')
+    logger.info("Accessing SMS page")
+    try:
+        return render_template('sms.html')
+    except Exception as e:
+        logger.error(f"Error rendering SMS template: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/integrations')
 def integrations():
-    return render_template('integrations.html')
+    logger.info("Accessing integrations page")
+    try:
+        return render_template('integrations.html')
+    except Exception as e:
+        logger.error(f"Error rendering integrations template: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/campaigns')
 def campaigns():
-    return render_template('campaigns.html')
+    logger.info("Accessing campaigns page")
+    try:
+        return render_template('campaigns.html')
+    except Exception as e:
+        logger.error(f"Error rendering campaigns template: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/sms-history')
 def sms_history():
+    logger.info("Accessing SMS history page")
     try:
         with open(SMS_HISTORY_FILE, 'r') as f:
             history = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+        return render_template('sms_history.html', sms_history=history)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logger.error(f"Error loading SMS history data: {str(e)}")
         history = []
-    return render_template('sms_history.html', sms_history=history)
+        return render_template('sms_history.html', sms_history=history)
+    except Exception as e:
+        logger.error(f"Error rendering SMS history template: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/send-sms', methods=['POST'])
 def send_sms():
+    logger.info("Received SMS send request")
     data = request.json
     phone = data.get('phone')
     message = data.get('message')
     operator = data.get('operator')
     
     if not all([phone, message, operator]):
+        logger.warning("Missing required fields in SMS request")
         return jsonify({
             'success': False, 
             'message': 'Missing required fields: phone, message, or operator'
         }), 400
     
-    # Format phone number
-    phone = format_phone_number(phone)
-    
-    # Send SMS using Celery task
-    task = send_sms_task.delay(
-        phone=phone,
-        message=message,
-        operator=operator,
-        campaign_id=None,
-        event_type='manual'
-    )
-    
-    return jsonify({
-        'success': True,
-        'message': 'SMS queued for sending',
-        'task_id': task.id
-    })
+    try:
+        # Format phone number
+        phone = format_phone_number(phone)
+        
+        # Send SMS using Celery task
+        task = send_sms_task.delay(
+            phone=phone,
+            message=message,
+            operator=operator,
+            campaign_id=None,
+            event_type='manual'
+        )
+        
+        logger.info(f"SMS queued successfully with task ID: {task.id}")
+        return jsonify({
+            'success': True,
+            'message': 'SMS queued for sending',
+            'task_id': task.id
+        })
+    except Exception as e:
+        logger.error(f"Error queuing SMS: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Error queuing SMS: {str(e)}'
+        }), 500
 
 @app.route('/api/integrations', methods=['GET', 'POST'])
 def manage_integrations():
+    logger.info(f"Managing integrations - Method: {request.method}")
     if request.method == 'GET':
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            return jsonify(json.load(f))
+        try:
+            with open(INTEGRATIONS_FILE, 'r') as f:
+                return jsonify(json.load(f))
+        except Exception as e:
+            logger.error(f"Error loading integrations: {str(e)}")
+            return jsonify({'error': 'Internal server error'}), 500
     
     if request.method == 'POST':
-        data = request.json
-        integration = {
-            'id': str(uuid.uuid4()),
-            'name': data['name'],
-            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
-            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        
-        with open(INTEGRATIONS_FILE, 'r+') as f:
-            integrations = json.load(f)
-            integrations.append(integration)
-            f.seek(0)
-            json.dump(integrations, f, indent=2)
-            f.truncate()
-        
-        return jsonify(integration)
+        try:
+            data = request.json
+            integration = {
+                'id': str(uuid.uuid4()),
+                'name': data['name'],
+                'webhook_url': f"/webhook/{str(uuid.uuid4())}",
+                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            
+            with open(INTEGRATIONS_FILE, 'r+') as f:
+                integrations = json.load(f)
+                integrations.append(integration)
+                f.seek(0)
+                json.dump(integrations, f, indent=2)
+                f.truncate()
+            
+            logger.info(f"Created new integration: {integration['id']}")
+            return jsonify(integration)
+        except Exception as e:
+            logger.error(f"Error creating integration: {str(e)}")
+            return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/campaigns', methods=['GET', 'POST'])
 def manage_campaigns():
+    logger.info(f"Managing campaigns - Method: {request.method}")
     if request.method == 'GET':
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            return jsonify(json.load(f))
+        try:
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                return jsonify(json.load(f))
+        except Exception as e:
+            logger.error(f"Error loading campaigns: {str(e)}")
+            return jsonify({'error': 'Internal server error'}), 500
     
     if request.method == 'POST':
-        data = request.json
-        campaign = {
-            'id': str(uuid.uuid4()),
-            'name': data['name'],
-            'integration_id': data['integration_id'],
-            'event_type': data['event_type'],
-            'message_template': data['message_template'],
-            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        
-        with open(CAMPAIGNS_FILE, 'r+') as f:
-            campaigns = json.load(f)
-            campaigns.append(campaign)
-            f.seek(0)
-            json.dump(campaigns, f, indent=2)
-            f.truncate()
-        
-        return jsonify(campaign)
+        try:
+            data = request.json
+            campaign = {
+                'id': str(uuid.uuid4()),
+                'name': data['name'],
+                'integration_id': data['integration_id'],
+                'event_type': data['event_type'],
+                'message_template': data['message_template'],
+                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            
+            with open(CAMPAIGNS_FILE, 'r+') as f:
+                campaigns = json.load(f)
+                campaigns.append(campaign)
+                f.seek(0)
+                json.dump(campaigns, f, indent=2)
+                f.truncate()
+            
+            logger.info(f"Created new campaign: {campaign['id']}")
+            return jsonify(campaign)
+        except Exception as e:
+            logger.error(f"Error creating campaign: {str(e)}")
+            return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/webhook/<integration_id>', methods=['POST'])
 def webhook_handler(integration_id):
-    webhook_data = request.json
-    print(f"Received webhook data for integration {integration_id}:")
-    print(json.dumps(webhook_data, indent=2))
-    
-    # Extract required fields from webhook data
-    status = webhook_data.get('status')
-    customer = webhook_data.get('customer', {})
-    total_price = webhook_data.get('total_price')
-    
-    if not status or not customer or not total_price:
-        print(f"Missing required fields in webhook data: status={status}, customer={customer}, total_price={total_price}")
+    logger.info(f"Received webhook for integration: {integration_id}")
+    try:
+        webhook_data = request.json
+        logger.debug(f"Webhook data: {json.dumps(webhook_data, indent=2)}")
+        
+        # Extract required fields from webhook data
+        status = webhook_data.get('status')
+        customer = webhook_data.get('customer', {})
+        total_price = webhook_data.get('total_price')
+        
+        if not status or not customer or not total_price:
+            logger.warning("Missing required fields in webhook data")
+            return jsonify({
+                'success': False,
+                'message': 'Missing required fields in webhook data'
+            }), 400
+        
+        # Load campaigns
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        
+        # Find matching campaigns
+        matching_campaigns = [c for c in campaigns 
+                            if c['integration_id'] == integration_id 
+                            and c['event_type'] == status]
+        
+        logger.info(f"Found {len(matching_campaigns)} matching campaigns")
+        
+        tasks = []
+        for campaign in matching_campaigns:
+            try:
+                phone = format_phone_number(customer['phone'])
+                message = campaign['message_template'].format(
+                    customer=customer,
+                    total_price=total_price
+                )
+                
+                task = send_sms_task.delay(
+                    phone=phone,
+                    message=message,
+                    operator="claro",
+                    campaign_id=campaign['id'],
+                    event_type=status
+                )
+                
+                tasks.append(task.id)
+                logger.info(f"Queued SMS for campaign {campaign['id']}, task ID: {task.id}")
+                
+            except KeyError as e:
+                logger.error(f"Error formatting message for campaign {campaign['id']}: Missing key {str(e)}")
+            except Exception as e:
+                logger.error(f"Error queuing SMS for campaign {campaign['id']}: {str(e)}")
+        
         return jsonify({
-            'success': False,
-            'message': 'Missing required fields in webhook data'
-        }), 400
-    
-    # Load campaigns
-    with open(CAMPAIGNS_FILE, 'r') as f:
-        campaigns = json.load(f)
-    
-    # Find matching campaigns for this integration and status
-    matching_campaigns = [c for c in campaigns 
-                         if c['integration_id'] == integration_id 
-                         and c['event_type'] == status]
-    
-    print(f"Found {len(matching_campaigns)} matching campaigns for status: {status}")
-    
-    tasks = []
-    for campaign in matching_campaigns:
-        try:
-            # Format phone number
-            phone = format_phone_number(customer['phone'])
-            
-            # Format message using webhook data
-            message = campaign['message_template'].format(
-                customer=customer,
-                total_price=total_price
-            )
-            
-            print(f"Queuing SMS for campaign {campaign['id']} to {phone}")
-            
-            # Queue SMS task
-            task = send_sms_task.delay(
-                phone=phone,
-                message=message,
-                operator="claro",  # Default operator
-                campaign_id=campaign['id'],
-                event_type=status
-            )
-            
-            tasks.append(task.id)
-            
-        except KeyError as e:
-            error_msg = f"Error formatting message for campaign {campaign['id']}: Missing key {str(e)}"
-            print(error_msg)
-        except Exception as e:
-            error_msg = f"Error queuing SMS for campaign {campaign['id']}: {str(e)}"
-            print(error_msg)
-    
-    return jsonify({
-        'success': True,
-        'tasks': tasks
-    })
+            'success': True,
+            'tasks': tasks
+        })
+    except Exception as e:
+        logger.error(f"Error processing webhook: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+# Add startup logging
+logger.info("Flask application initialized")

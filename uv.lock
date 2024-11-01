@@ -732,6 +732,7 @@ dependencies = [
     { name = "flask-sqlalchemy" },
     { name = "psycopg2-binary" },
     { name = "redis" },
+    { name = "requests" },
     { name = "twilio" },
 ]
 
@@ -743,6 +744,7 @@ requires-dist = [
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "redis", specifier = ">=5.2.0" },
+    { name = "requests", specifier = ">=2.32.3" },
     { name = "twilio", specifier = ">=9.3.6" },
 ]
 
