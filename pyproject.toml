@@ -12,5 +12,4 @@ dependencies = [
     "redis>=5.2.0",
     "celery>=5.4.0",
     "requests>=2.32.3",
-    "tenacity",
 ]

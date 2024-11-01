@@ -4,12 +4,9 @@ import uuid
 import datetime
 import re
 import logging
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 from celery_worker import send_sms_task
 from collections import Counter
-import redis
-from redis.exceptions import RedisError
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -21,38 +18,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = 6379
-REDIS_DB = 0
-
-app = Flask(__name__, 
-           template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'),
-           static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static'))
+app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
-
-@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
-def get_redis_connection():
-    try:
-        redis_client = redis.Redis(
-            host=REDIS_HOST,
-            port=REDIS_PORT,
-            db=REDIS_DB,
-            socket_timeout=5,
-            socket_connect_timeout=5,
-            socket_keepalive=True,
-            retry_on_timeout=True,
-            health_check_interval=30
-        )
-        redis_client.ping()
-        return redis_client
-    except RedisError as e:
-        logger.error(f"Failed to connect to Redis: {str(e)}")
-        raise
 
 INTEGRATIONS_FILE = 'data/integrations.json'
 CAMPAIGNS_FILE = 'data/campaigns.json'
 SMS_HISTORY_FILE = 'data/sms_history.json'
-TRANSACTIONS_FILE = 'data/transactions.json'
 
 os.makedirs('data', exist_ok=True)
 
@@ -66,8 +37,8 @@ def initialize_json_file(filepath, initial_data=None):
         logger.error(f"Error initializing JSON file {filepath}: {str(e)}")
         raise
 
-for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, SMS_HISTORY_FILE, TRANSACTIONS_FILE]:
-    initialize_json_file(file_path, [] if file_path != TRANSACTIONS_FILE else {})
+for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, SMS_HISTORY_FILE]:
+    initialize_json_file(file_path)
 
 def format_phone_number(phone):
     try:
@@ -80,6 +51,7 @@ def format_phone_number(phone):
         
         if not numbers.startswith('55'):
             numbers = '55' + numbers
+            logger.debug(f"Added country code: {numbers}")
         
         if len(numbers) < 12:
             raise ValueError(f"Missing area code (DDD): {numbers}")
@@ -92,30 +64,6 @@ def format_phone_number(phone):
     except Exception as e:
         logger.error(f"Error formatting phone number {phone}: {str(e)}")
         raise ValueError(f"Invalid phone number format: {str(e)}")
-
-def format_price(price_str):
-    try:
-        if isinstance(price_str, (int, float)):
-            return "{:.2f}".format(float(price_str))
-        
-        if not price_str:
-            return "0.00"
-            
-        price = re.sub(r'[^\d,.]', '', str(price_str))
-        
-        if ',' in price and '.' not in price:
-            price = price.replace(',', '.')
-        elif ',' in price and '.' in price:
-            price = price.replace('.', '').replace(',', '.')
-        
-        value = float(price)
-        if value < 0:
-            raise ValueError("Price cannot be negative")
-            
-        return "{:.2f}".format(value)
-    except (ValueError, TypeError) as e:
-        logger.warning(f"Error formatting price {price_str}: {str(e)}")
-        return "0.00"
 
 def normalize_status(status):
     if not status:
@@ -154,261 +102,190 @@ def normalize_status(status):
         logger.error(f"Error normalizing status {status}: {str(e)}")
         return None
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('error.html', error="Página não encontrada"), 404
+def format_price(price_str):
+    try:
+        if isinstance(price_str, (int, float)):
+            return "{:.2f}".format(float(price_str))
+        
+        price = re.sub(r'[^\d,.]', '', str(price_str))
+        
+        if ',' in price and '.' not in price:
+            price = price.replace(',', '.')
+        elif ',' in price and '.' in price:
+            price = price.replace('.', '').replace(',', '.')
+        
+        value = float(price)
+        if value < 0:
+            raise ValueError("Price cannot be negative")
+            
+        return "{:.2f}".format(value)
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Error formatting price {price_str}: {str(e)}")
+        return "0.00"
 
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('error.html', error="Erro interno do servidor"), 500
-
-@app.errorhandler(RedisError)
-def handle_redis_error(e):
-    logger.error(f"Redis error: {str(e)}")
-    return render_template('error.html', 
-                         error="Erro de conexão com o servidor. Por favor, tente novamente em alguns instantes."), 500
+def format_message(template, **kwargs):
+    try:
+        logger.debug(f"Formatting message template: {template}")
+        logger.debug(f"Template variables: {kwargs}")
+        
+        template = re.sub(r'\{(\w+)\.(\w+)\}', r'{\1_\2}', template)
+        logger.debug(f"Template after dot notation replacement: {template}")
+        
+        for key, value in kwargs.items():
+            if isinstance(value, (int, float)) or (isinstance(value, str) and re.match(r'^[\d,.]+$', value)):
+                try:
+                    kwargs[key] = format_price(value)
+                    logger.debug(f"Formatted {key}: {value} -> {kwargs[key]}")
+                except (ValueError, TypeError):
+                    pass
+        
+        result = template.format(**kwargs)
+        logger.debug(f"Final formatted message: {result}")
+        return result
+    except KeyError as e:
+        logger.error(f"Missing template variable: {str(e)}")
+        return template
+    except Exception as e:
+        logger.error(f"Error formatting template: {str(e)}")
+        return template
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-@app.route('/sms')
-def sms():
-    return render_template('sms.html')
-
-@app.route('/campaigns')
-def campaigns():
-    return render_template('campaigns.html')
-
-@app.route('/integrations')
-def integrations():
-    return render_template('integrations.html')
-
-@app.route('/analytics')
-def analytics():
+    logger.info("Accessing index page")
     try:
-        with open(SMS_HISTORY_FILE, 'r') as f:
-            history = json.load(f)
-        
-        total_messages = len(history)
-        success_messages = sum(1 for msg in history if msg['status'] == 'success')
-        success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
-        
-        manual_messages = sum(1 for msg in history if msg['event_type'] == 'manual')
-        campaign_messages = total_messages - manual_messages
-        
-        messages_by_status = []
-        status_counts = Counter(msg['status'] for msg in history)
-        for status, count in status_counts.items():
-            messages_by_status.append({
-                'status': status,
-                'count': count,
-                'percentage': round(count / total_messages * 100, 1)
-            })
-        
-        messages_by_event = []
-        event_counts = Counter(msg['event_type'] for msg in history)
-        for event_type, count in event_counts.items():
-            messages_by_event.append({
-                'type': event_type,
-                'count': count,
-                'percentage': round(count / total_messages * 100, 1)
-            })
-        
-        recent_activity = sorted(history, key=lambda x: x['timestamp'], reverse=True)[:10]
-        
-        return render_template('analytics.html',
-                             total_messages=total_messages,
-                             success_rate=success_rate,
-                             manual_messages=manual_messages,
-                             campaign_messages=campaign_messages,
-                             messages_by_status=messages_by_status,
-                             messages_by_event=messages_by_event,
-                             recent_activity=recent_activity)
+        return render_template('index.html')
     except Exception as e:
-        logger.error(f"Error loading analytics: {str(e)}")
-        return render_template('error.html', error="Erro ao carregar análises"), 500
-
-@app.route('/sms-history')
-def sms_history():
-    try:
-        with open(SMS_HISTORY_FILE, 'r') as f:
-            history = json.load(f)
-        return render_template('sms_history.html', sms_history=history)
-    except Exception as e:
-        logger.error(f"Error loading SMS history: {str(e)}")
-        return render_template('error.html', error="Erro ao carregar histórico"), 500
-
-@app.route('/campaign-performance')
-def campaign_performance():
-    try:
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            campaigns = json.load(f)
-        with open(SMS_HISTORY_FILE, 'r') as f:
-            history = json.load(f)
-        
-        campaign_stats = []
-        for campaign in campaigns:
-            campaign_messages = [msg for msg in history if msg.get('campaign_id') == campaign['id']]
-            messages_sent = len(campaign_messages)
-            success_messages = sum(1 for msg in campaign_messages if msg['status'] == 'success')
-            success_rate = round((success_messages / messages_sent * 100) if messages_sent > 0 else 0, 1)
-            
-            last_message = max(campaign_messages, key=lambda x: x['timestamp']) if campaign_messages else None
-            
-            campaign_stats.append({
-                'name': campaign['name'],
-                'event_type': campaign['event_type'],
-                'messages_sent': messages_sent,
-                'success_rate': success_rate,
-                'last_message': last_message['timestamp'] if last_message else 'N/A'
-            })
-        
-        total_campaigns = len(campaigns)
-        active_campaigns = sum(1 for c in campaign_stats if c['messages_sent'] > 0)
-        total_messages = sum(c['messages_sent'] for c in campaign_stats)
-        
-        recent_activity = sorted(
-            [msg for msg in history if msg.get('campaign_id')],
-            key=lambda x: x['timestamp'],
-            reverse=True
-        )[:10]
-        
-        return render_template('campaign_performance.html',
-                             campaigns=campaign_stats,
-                             total_campaigns=total_campaigns,
-                             active_campaigns=active_campaigns,
-                             total_messages=total_messages,
-                             recent_activity=recent_activity)
-    except Exception as e:
-        logger.error(f"Error loading campaign performance: {str(e)}")
-        return render_template('error.html', error="Erro ao carregar desempenho das campanhas"), 500
-
-@app.route('/pix/<transaction_id>')
-def pix_payment(transaction_id):
-    try:
-        redis_client = get_redis_connection()
-        transaction_data = redis_client.get(f"transaction:{transaction_id}")
-        
-        if transaction_data:
-            transaction = json.loads(transaction_data)
-        else:
-            with open(TRANSACTIONS_FILE, 'r') as f:
-                transactions = json.load(f)
-                transaction = transactions.get(transaction_id)
-        
-        if not transaction:
-            logger.error(f"Transaction not found: {transaction_id}")
-            return render_template('error.html', error="Transação não encontrada"), 404
-        
-        template_data = {
-            'transaction_id': transaction_id,
-            'customer_name': transaction.get('customer_name', ''),
-            'total_price': transaction.get('total_price', '0.00'),
-            'pix_code': transaction.get('pix_code', ''),
-            'products': transaction.get('products', []),
-            'created_at': transaction.get('created_at', '')
-        }
-        
-        return render_template('pix_payment.html', **template_data)
-    except Exception as e:
-        logger.error(f"Error rendering PIX payment page: {str(e)}")
-        return render_template('error.html', error="Erro ao carregar página de pagamento"), 500
+        logger.error(f"Error rendering index template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
 
 @app.route('/webhook/<integration_id>', methods=['POST'])
 def webhook_handler(integration_id):
     logger.info(f"Received webhook request for integration: {integration_id}")
     
+    if not integration_id:
+        logger.error("Invalid integration_id: empty or missing")
+        return jsonify({'success': False, 'message': 'Invalid integration ID'}), 400
+    
     try:
-        redis_client = get_redis_connection()
-        
         webhook_data = request.get_json()
         if not webhook_data:
             raise ValueError("Empty webhook data")
         
         logger.debug(f"Webhook data: {json.dumps(webhook_data, indent=2)}")
         
+        status = webhook_data.get('status')
         transaction_id = webhook_data.get('transaction_id')
-        customer = webhook_data.get('customer', {})
+        logger.debug(f"Extracted status: {status}, transaction_id: {transaction_id}")
         
-        if not all([transaction_id, customer]):
+        if not all([status, transaction_id]):
             logger.error("Missing required fields")
             return jsonify({
                 'success': False,
-                'message': 'Missing required fields: transaction_id or customer data'
+                'message': 'Missing required fields: status or transaction_id'
+            }), 400
+        
+        normalized_status = normalize_status(status)
+        if normalized_status is None:
+            logger.error(f"Invalid status value: {status}")
+            return jsonify({
+                'success': False,
+                'message': f'Invalid status value: {status}'
+            }), 400
+        
+        customer = webhook_data.get('customer', {})
+        logger.debug(f"Customer data: {customer}")
+        
+        if not customer or not customer.get('phone'):
+            logger.error("Missing customer data or phone")
+            return jsonify({
+                'success': False,
+                'message': 'Missing customer data or phone'
             }), 400
         
         try:
-            transaction_data = {
-                'customer_name': customer.get('name', ''),
-                'total_price': format_price(webhook_data.get('total_price', '0')),
-                'pix_code': webhook_data.get('pix_code', ''),
-                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'products': webhook_data.get('plans', [])
-            }
-            
-            redis_client.setex(
-                f"transaction:{transaction_id}",
-                900,
-                json.dumps(transaction_data)
-            )
-            
-            with open(TRANSACTIONS_FILE, 'r+') as f:
-                transactions = json.load(f)
-                transactions[transaction_id] = transaction_data
-                f.seek(0)
-                json.dump(transactions, f, indent=2)
-                f.truncate()
-            
-        except (RedisError, IOError) as e:
-            logger.error(f"Error storing transaction data: {str(e)}")
+            formatted_phone = format_phone_number(customer['phone'])
+            logger.debug(f"Formatted phone: {formatted_phone}")
+        except ValueError as e:
+            logger.error(f"Invalid phone number: {str(e)}")
+            return jsonify({
+                'success': False,
+                'message': f'Invalid phone number: {str(e)}'
+            }), 400
         
-        payment_url = url_for('pix_payment', transaction_id=transaction_id, _external=True)
+        full_name = customer.get('name', '')
+        name_parts = full_name.split()
+        first_name = name_parts[0] if name_parts else ''
+        logger.debug(f"Extracted customer name - full: {full_name}, first: {first_name}")
         
-        status = webhook_data.get('status')
-        if status:
-            normalized_status = normalize_status(status)
-            if normalized_status:
-                try:
-                    with open(CAMPAIGNS_FILE, 'r') as f:
-                        campaigns = json.load(f)
-                    
-                    matching_campaigns = [
-                        c for c in campaigns 
-                        if c['integration_id'] == integration_id 
-                        and normalize_status(c['event_type']) == normalized_status
-                    ]
-                    
-                    for campaign in matching_campaigns:
-                        try:
-                            phone = format_phone_number(customer['phone'])
-                            message = f"Acesse o link para pagamento: {payment_url}"
-                            
-                            task = send_sms_task.delay(
-                                phone=phone,
-                                message=message,
-                                operator="claro",
-                                campaign_id=campaign['id'],
-                                event_type=normalized_status
-                            )
-                            logger.info(f"Queued SMS task {task.id} for campaign {campaign['id']}")
-                        except Exception as e:
-                            logger.error(f"Error processing campaign {campaign['id']}: {str(e)}")
-                except Exception as e:
-                    logger.error(f"Error processing campaigns: {str(e)}")
+        total_price = "0.00"
+        if webhook_data.get('total_price'):
+            total_price = format_price(webhook_data['total_price'])
+        elif webhook_data.get('plans') and webhook_data['plans'][0].get('value'):
+            total_price = format_price(webhook_data['plans'][0]['value'])
+        logger.debug(f"Formatted total price: {total_price}")
+        
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        
+        logger.debug(f"Looking for campaigns with integration_id={integration_id} and status={normalized_status}")
+        matching_campaigns = [
+            c for c in campaigns 
+            if c['integration_id'] == integration_id 
+            and normalize_status(c['event_type']) == normalized_status
+        ]
+        logger.debug(f"Found {len(matching_campaigns)} matching campaigns")
+        
+        if not matching_campaigns:
+            logger.info(f"No matching campaigns found for integration {integration_id} and status {normalized_status}")
+            return jsonify({
+                'success': True,
+                'message': 'No matching campaigns found'
+            })
+        
+        tasks = []
+        processed_campaigns = 0
+        for campaign in matching_campaigns:
+            try:
+                logger.debug(f"Processing campaign: {campaign['name']} (ID: {campaign['id']})")
+                
+                template_vars = {
+                    'customer_name': first_name,
+                    'customer_full_name': full_name,
+                    'customer_phone': formatted_phone,
+                    'customer_email': customer.get('email', ''),
+                    'total_price': total_price,
+                    'transaction_id': transaction_id,
+                    'pix_code': webhook_data.get('pix_code', ''),
+                    'store_name': webhook_data.get('store_name', ''),
+                    'order_url': webhook_data.get('order_url', ''),
+                    'checkout_url': webhook_data.get('checkout_url', '')
+                }
+                
+                message = format_message(campaign['message_template'], **template_vars)
+                logger.debug(f"Generated message: {message}")
+                
+                task = send_sms_task.delay(
+                    phone=formatted_phone,
+                    message=message,
+                    operator="claro",
+                    campaign_id=campaign['id'],
+                    event_type=normalized_status
+                )
+                
+                tasks.append(task.id)
+                processed_campaigns += 1
+                logger.info(f"Queued SMS task {task.id} for campaign {campaign['id']}")
+                
+            except Exception as e:
+                logger.error(f"Error processing campaign {campaign['id']}: {str(e)}")
+                continue
         
         return jsonify({
             'success': True,
-            'message': 'Webhook processed successfully',
-            'payment_url': payment_url
+            'message': f'Successfully processed {processed_campaigns} campaigns',
+            'tasks': tasks
         })
         
-    except RedisError as e:
-        logger.error(f"Redis error in webhook handler: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': 'Service temporarily unavailable'
-        }), 503
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in webhook data: {str(e)}")
         return jsonify({
@@ -422,24 +299,164 @@ def webhook_handler(integration_id):
             'message': f'Internal server error: {str(e)}'
         }), 500
 
+@app.route('/sms')
+def sms():
+    try:
+        return render_template('sms.html')
+    except Exception as e:
+        logger.error(f"Error rendering SMS template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/integrations')
+def integrations():
+    try:
+        return render_template('integrations.html')
+    except Exception as e:
+        logger.error(f"Error rendering integrations template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/campaigns')
+def campaigns():
+    try:
+        return render_template('campaigns.html')
+    except Exception as e:
+        logger.error(f"Error rendering campaigns template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/campaign-performance')
+def campaign_performance():
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            sms_history = json.load(f)
+        
+        campaign_metrics = []
+        total_messages = 0
+        active_campaigns = 0
+        
+        for campaign in campaigns:
+            campaign_messages = [msg for msg in sms_history if msg.get('campaign_id') == campaign['id']]
+            messages_count = len(campaign_messages)
+            success_count = sum(1 for msg in campaign_messages if msg['status'] == 'success')
+            success_rate = round((success_count / messages_count * 100) if messages_count > 0 else 0, 1)
+            last_message = max([msg['timestamp'] for msg in campaign_messages]) if campaign_messages else 'No messages'
+            
+            if campaign_messages:
+                latest_msg_time = datetime.datetime.strptime(last_message, "%Y-%m-%d %H:%M:%S")
+                if (datetime.datetime.now() - latest_msg_time).days < 1:
+                    active_campaigns += 1
+            
+            total_messages += messages_count
+            
+            campaign_metrics.append({
+                'name': campaign['name'],
+                'event_type': campaign['event_type'],
+                'messages_sent': messages_count,
+                'success_rate': success_rate,
+                'last_message': last_message
+            })
+        
+        campaign_messages = [msg for msg in sms_history if msg.get('campaign_id')]
+        recent_activity = []
+        
+        for msg in sorted(campaign_messages, key=lambda x: x['timestamp'], reverse=True)[:10]:
+            campaign_name = next((c['name'] for c in campaigns if c['id'] == msg['campaign_id']), 'Unknown')
+            recent_activity.append({
+                'timestamp': msg['timestamp'],
+                'campaign_name': campaign_name,
+                'phone': msg['phone'],
+                'status': msg['status'],
+                'message': msg['message']
+            })
+        
+        return render_template('campaign_performance.html',
+                             total_campaigns=len(campaigns),
+                             active_campaigns=active_campaigns,
+                             total_messages=total_messages,
+                             campaigns=campaign_metrics,
+                             recent_activity=recent_activity)
+    except Exception as e:
+        logger.error(f"Error generating campaign performance data: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/sms-history')
+def sms_history():
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            history = json.load(f)
+        return render_template('sms_history.html', sms_history=history)
+    except Exception as e:
+        logger.error(f"Error loading SMS history: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/analytics')
+def analytics():
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            history = json.load(f)
+        
+        total_messages = len(history)
+        success_messages = sum(1 for msg in history if msg['status'] == 'success')
+        success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
+        
+        manual_messages = sum(1 for msg in history if msg['event_type'] == 'manual')
+        campaign_messages = sum(1 for msg in history if msg['event_type'] != 'manual')
+        
+        status_counts = Counter(msg['status'] for msg in history)
+        messages_by_status = [
+            {
+                'status': status,
+                'count': count,
+                'percentage': round(count / total_messages * 100, 1)
+            }
+            for status, count in status_counts.items()
+        ]
+        
+        event_counts = Counter(msg['event_type'] for msg in history)
+        messages_by_event = [
+            {
+                'type': event_type,
+                'count': count,
+                'percentage': round(count / total_messages * 100, 1)
+            }
+            for event_type, count in event_counts.items()
+        ]
+        
+        recent_activity = sorted(history, key=lambda x: x['timestamp'], reverse=True)[:10]
+        
+        return render_template('analytics.html',
+                             total_messages=total_messages,
+                             success_rate=success_rate,
+                             manual_messages=manual_messages,
+                             campaign_messages=campaign_messages,
+                             messages_by_status=messages_by_status,
+                             messages_by_event=messages_by_event,
+                             recent_activity=recent_activity)
+    except Exception as e:
+        logger.error(f"Error generating analytics: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
 @app.route('/api/send-sms', methods=['POST'])
 def send_sms():
     try:
         data = request.get_json()
-        if not data:
-            return jsonify({'success': False, 'message': 'Missing request data'}), 400
-        
         phone = data.get('phone')
         message = data.get('message')
-        operator = data.get('operator', 'claro')
+        operator = data.get('operator')
         
-        if not all([phone, message]):
-            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        if not all([phone, message, operator]):
+            return jsonify({
+                'success': False,
+                'message': 'Missing required fields'
+            }), 400
         
+        phone = format_phone_number(phone)
         task = send_sms_task.delay(
             phone=phone,
             message=message,
             operator=operator,
+            campaign_id=None,
             event_type='manual'
         )
         
@@ -450,13 +467,167 @@ def send_sms():
         })
     except Exception as e:
         logger.error(f"Error sending SMS: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/api/integrations', methods=['GET'])
+def get_integrations():
+    try:
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+        return jsonify(integrations)
+    except Exception as e:
+        logger.error(f"Error loading integrations: {str(e)}")
+        return jsonify([])
+
+@app.route('/api/integrations', methods=['POST'])
+def create_integration():
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data:
+            return jsonify({'error': 'Name is required'}), 400
+
+        integration_id = str(uuid.uuid4())
+        integration = {
+            'id': integration_id,
+            'name': data['name'],
+            'webhook_url': f'/webhook/{integration_id}',
+            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        try:
+            with open(INTEGRATIONS_FILE, 'r') as f:
+                integrations = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            integrations = []
+
+        integrations.append(integration)
+
+        with open(INTEGRATIONS_FILE, 'w') as f:
+            json.dump(integrations, f, indent=2)
+
+        return jsonify(integration), 201
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+
+        updated_integrations = [i for i in integrations if i['id'] != integration_id]
+
+        if len(updated_integrations) == len(integrations):
+            return jsonify({'error': 'Integration not found'}), 404
+
+        with open(INTEGRATIONS_FILE, 'w') as f:
+            json.dump(updated_integrations, f, indent=2)
+
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+
+        updated_campaigns = [c for c in campaigns if c['integration_id'] != integration_id]
+
+        with open(CAMPAIGNS_FILE, 'w') as f:
+            json.dump(updated_campaigns, f, indent=2)
+
+        return jsonify({'message': 'Integration deleted successfully'})
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/campaigns', methods=['GET'])
+def get_campaigns():
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        return jsonify(campaigns)
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return jsonify([])
+
+@app.route('/api/campaigns', methods=['POST'])
+def create_campaign():
+    try:
+        data = request.get_json()
+        required_fields = ['name', 'integration_id', 'event_type', 'message_template']
+        
+        if not data or not all(field in data for field in required_fields):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        try:
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                campaigns = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            campaigns = []
+
+        campaigns.append(campaign)
+
+        with open(CAMPAIGNS_FILE, 'w') as f:
+            json.dump(campaigns, f, indent=2)
+
+        return jsonify(campaign), 201
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+def delete_campaign(campaign_id):
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+
+        updated_campaigns = [c for c in campaigns if c['id'] != campaign_id]
+
+        if len(updated_campaigns) == len(campaigns):
+            return jsonify({'error': 'Campaign not found'}), 404
+
+        with open(CAMPAIGNS_FILE, 'w') as f:
+            json.dump(updated_campaigns, f, indent=2)
+
+        return jsonify({'message': 'Campaign deleted successfully'})
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/campaigns/<campaign_id>', methods=['PUT'])
+def update_campaign(campaign_id):
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+
+        campaign_index = next((i for i, c in enumerate(campaigns) if c['id'] == campaign_id), None)
+        if campaign_index is None:
+            return jsonify({'error': 'Campaign not found'}), 404
+
+        for field in ['name', 'event_type', 'message_template']:
+            if field in data:
+                campaigns[campaign_index][field] = data[field]
+
+        with open(CAMPAIGNS_FILE, 'w') as f:
+            json.dump(campaigns, f, indent=2)
+
+        return jsonify(campaigns[campaign_index])
+    except Exception as e:
+        logger.error(f"Error updating campaign: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    try:
-        redis_client = get_redis_connection()
-        logger.info("Successfully connected to Redis")
-    except Exception as e:
-        logger.error(f"Failed to connect to Redis on startup: {str(e)}")
-    
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)

@@ -15,10 +15,6 @@ author = "agent"
 task = "workflow.run"
 args = "SMS Platform"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Flask Server"
-
 [[workflows.workflow]]
 name = "SMS Platform"
 author = "agent"
@@ -31,26 +27,11 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "bash start.sh"
-waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Flask Server"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python3 app.py"
+args = "./start.sh"
 waitForPort = 5000
 
 [deployment]
-run = ["sh", "-c", "bash start.sh"]
+run = ["sh", "-c", "./start.sh"]
 
 [[ports]]
 localPort = 5000
