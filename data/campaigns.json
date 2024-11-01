@@ -1,34 +1,10 @@
 [
   {
-    "id": "7265927a-33e9-47d9-8a9f-c1982343a3e3",
-    "name": "SMS TESTE",
-    "integration_id": "3f8b9ce9-2e13-4a58-b0c4-377e983846b1",
-    "event_type": "VENDA PENDENTE",
-    "message_template": "ISSO E UM TESTE",
-    "created_at": "2024-11-01 01:33:17.020324"
-  },
-  {
-    "id": "037d6e9a-6cdc-45b9-ad7e-45c718f6d9a8",
-    "name": "CRIA TESTEEEE",
-    "integration_id": "e88e6acd-4c2e-4ba1-ab3f-c25e25a32be3",
+    "id": "test-campaign-1",
+    "name": "Test Campaign",
+    "integration_id": "06b42000-7771-4b22-b765-993fe881a270",
     "event_type": "pending",
-    "message_template": "ESSE E U TESTE NOVO {customer.name}",
-    "created_at": "2024-11-01 01:45:07.758889"
-  },
-  {
-    "id": "08337214-251d-4fd3-9f02-8bcc3c204a14",
-    "name": "ABC",
-    "integration_id": "22534863-3306-4b7e-b73a-ab7bb725ab56",
-    "event_type": "pending",
-    "message_template": "ESSA MENSAGEM E UM TESTE",
-    "created_at": "2024-11-01 01:58:16"
-  },
-  {
-    "id": "915af804-1a6b-40d2-856b-9387b232b3ed",
-    "name": "abc2",
-    "integration_id": "e8a32194-efb1-4458-be4e-ab0b73faf9e3",
-    "event_type": "pending",
-    "message_template": "SE DER CERTO TAMO FEITOOO",
-    "created_at": "2024-11-01 02:12:14"
+    "message_template": "Olá {customer_name}, seu pedido no valor de R$ {total_price} está pendente.",
+    "created_at": "2024-11-01 02:30:00"
   }
 ]

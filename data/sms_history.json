@@ -7,5 +7,14 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 't324z41ml2ahmelaaajkz0atl25rpn', 'status': 'processed', 'created_at': '2024-10-31 22:56:22'}}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-01 02:32:36",
+    "phone": "+5511999999999",
+    "message": "Ol\u00e1 John, seu pedido no valor de R$ 199.99 est\u00e1 pendente.",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '0pgvy3qhepnv530lr5tvrf9c4js9st', 'status': 'processed', 'created_at': '2024-10-31 23:32:35'}}",
+    "campaign_id": "test-campaign-1",
+    "event_type": "pending"
   }
 ]
