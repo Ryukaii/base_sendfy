@@ -105,77 +105,37 @@ def create_integration():
 
 @app.route('/api/integrations/<integration_id>', methods=['DELETE'])
 def delete_integration(integration_id):
-    logger.info(f"Attempting to delete integration: {integration_id}")
+    logger.debug(f"Attempting to delete integration: {integration_id}")
     
     try:
-        # Validate integration ID format
-        try:
-            uuid.UUID(integration_id)
-        except ValueError:
-            logger.error(f"Invalid integration ID format: {integration_id}")
-            return jsonify({'error': 'Invalid integration ID format'}), 400
-
-        # Load integrations file
-        try:
-            with open(INTEGRATIONS_FILE, 'r') as f:
-                integrations = json.load(f)
-        except FileNotFoundError:
-            logger.error("Integrations file not found")
-            return jsonify({'error': 'Integrations data not found'}), 404
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in integrations file: {str(e)}")
-            return jsonify({'error': 'Invalid integrations data format'}), 500
-
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+            
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        
         # Check if integration exists
-        if not any(i['id'] == integration_id for i in integrations):
-            logger.warning(f"Integration not found: {integration_id}")
+        integration = next((i for i in integrations if i['id'] == integration_id), None)
+        if not integration:
+            logger.error(f"Integration not found: {integration_id}")
             return jsonify({'error': 'Integration not found'}), 404
-
-        # Load campaigns file
-        try:
-            with open(CAMPAIGNS_FILE, 'r') as f:
-                campaigns = json.load(f)
-        except FileNotFoundError:
-            logger.error("Campaigns file not found")
-            return jsonify({'error': 'Campaigns data not found'}), 404
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in campaigns file: {str(e)}")
-            return jsonify({'error': 'Invalid campaigns data format'}), 500
-
-        # Start atomic operation
-        try:
-            # Count associated campaigns before removal
-            associated_campaigns = [c for c in campaigns if c['integration_id'] == integration_id]
-            campaigns_count = len(associated_campaigns)
+        
+        # Remove integration and associated campaigns
+        updated_integrations = [i for i in integrations if i['id'] != integration_id]
+        updated_campaigns = [c for c in campaigns if c['integration_id'] != integration_id]
+        
+        # Write changes atomically
+        with open(INTEGRATIONS_FILE, 'w') as f:
+            json.dump(updated_integrations, f, indent=2)
             
-            # Remove associated campaigns
-            updated_campaigns = [c for c in campaigns if c['integration_id'] != integration_id]
-            
-            # Remove integration
-            updated_integrations = [i for i in integrations if i['id'] != integration_id]
-
-            # Write both files atomically
-            with open(CAMPAIGNS_FILE, 'w') as f:
-                json.dump(updated_campaigns, f, indent=2)
-            
-            with open(INTEGRATIONS_FILE, 'w') as f:
-                json.dump(updated_integrations, f, indent=2)
-
-            logger.info(f"Successfully deleted integration {integration_id} and {campaigns_count} associated campaigns")
-            return jsonify({
-                'message': 'Integration deleted successfully',
-                'campaigns_removed': campaigns_count
-            })
-
-        except Exception as e:
-            logger.error(f"Failed to complete deletion transaction: {str(e)}")
-            return jsonify({
-                'error': 'Failed to delete integration and associated campaigns',
-                'details': str(e)
-            }), 500
-
+        with open(CAMPAIGNS_FILE, 'w') as f:
+            json.dump(updated_campaigns, f, indent=2)
+        
+        logger.debug(f"Successfully deleted integration {integration_id}")
+        return jsonify({'message': 'Integration deleted successfully'})
+        
     except Exception as e:
-        logger.error(f"Unexpected error during integration deletion: {str(e)}")
-        return jsonify({'error': 'Internal server error'}), 500
+        logger.error(f"Error deleting integration: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 # ... [rest of your existing app.py code]

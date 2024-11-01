@@ -80,23 +80,20 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
 async function deleteIntegration(integrationId) {
     try {
         const response = await fetch(`/api/integrations/${integrationId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'DELETE'
         });
         
-        const data = await response.json();
-        
         if (response.ok) {
-            alert('Integration deleted successfully!');
-            loadIntegrations();
+            const result = await response.json();
+            location.reload(); // Reload page after successful deletion
         } else {
-            alert(data.error || 'Failed to delete integration');
+            const error = await response.json();
+            console.error('Server error:', error);
+            alert(error.error || 'Failed to delete integration');
         }
     } catch (error) {
-        console.error('Error deleting integration:', error);
-        alert('Failed to delete integration. Please try again.');
+        console.error('Network error:', error);
+        alert('Network error. Please try again.');
     }
 }
 
