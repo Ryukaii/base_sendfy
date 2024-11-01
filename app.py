@@ -41,6 +41,32 @@ def initialize_json_file(filepath, initial_data=None):
 for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, SMS_HISTORY_FILE, TRANSACTIONS_FILE]:
     initialize_json_file(file_path)
 
+def format_message(template, **kwargs):
+    try:
+        logger.debug(f"Formatting message template: {template}")
+        logger.debug(f"Template variables: {kwargs}")
+        
+        template = re.sub(r'\{(\w+)\.(\w+)\}', r'{\1_\2}', template)
+        logger.debug(f"Template after dot notation replacement: {template}")
+        
+        for key, value in kwargs.items():
+            if isinstance(value, (int, float)) or (isinstance(value, str) and re.match(r'^[\d,.]+$', value)):
+                try:
+                    kwargs[key] = format_price(value)
+                    logger.debug(f"Formatted {key}: {value} -> {kwargs[key]}")
+                except (ValueError, TypeError):
+                    pass
+        
+        result = template.format(**kwargs)
+        logger.debug(f"Final formatted message: {result}")
+        return result
+    except KeyError as e:
+        logger.error(f"Missing template variable: {str(e)}")
+        return template
+    except Exception as e:
+        logger.error(f"Error formatting template: {str(e)}")
+        return template
+
 def format_phone_number(phone):
     try:
         logger.debug(f"Formatting phone number: {phone}")
@@ -130,6 +156,136 @@ def index():
         return render_template('index.html')
     except Exception as e:
         logger.error(f"Error rendering index template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/integrations')
+def integrations():
+    try:
+        return render_template('integrations.html')
+    except Exception as e:
+        logger.error(f"Error rendering integrations template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/campaigns')
+def campaigns():
+    try:
+        return render_template('campaigns.html')
+    except Exception as e:
+        logger.error(f"Error rendering campaigns template: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/campaign-performance')
+def campaign_performance():
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            sms_history = json.load(f)
+        
+        campaign_metrics = []
+        total_messages = 0
+        active_campaigns = 0
+        
+        for campaign in campaigns:
+            campaign_messages = [msg for msg in sms_history if msg.get('campaign_id') == campaign['id']]
+            messages_count = len(campaign_messages)
+            success_count = sum(1 for msg in campaign_messages if msg['status'] == 'success')
+            success_rate = round((success_count / messages_count * 100) if messages_count > 0 else 0, 1)
+            last_message = max([msg['timestamp'] for msg in campaign_messages]) if campaign_messages else 'No messages'
+            
+            if campaign_messages:
+                latest_msg_time = datetime.datetime.strptime(last_message, "%Y-%m-%d %H:%M:%S")
+                if (datetime.datetime.now() - latest_msg_time).days < 1:
+                    active_campaigns += 1
+            
+            total_messages += messages_count
+            
+            campaign_metrics.append({
+                'name': campaign['name'],
+                'event_type': campaign['event_type'],
+                'messages_sent': messages_count,
+                'success_rate': success_rate,
+                'last_message': last_message
+            })
+        
+        campaign_messages = [msg for msg in sms_history if msg.get('campaign_id')]
+        recent_activity = []
+        
+        for msg in sorted(campaign_messages, key=lambda x: x['timestamp'], reverse=True)[:10]:
+            campaign_name = next((c['name'] for c in campaigns if c['id'] == msg['campaign_id']), 'Unknown')
+            recent_activity.append({
+                'timestamp': msg['timestamp'],
+                'campaign_name': campaign_name,
+                'phone': msg['phone'],
+                'status': msg['status'],
+                'message': msg['message']
+            })
+        
+        return render_template('campaign_performance.html',
+                             total_campaigns=len(campaigns),
+                             active_campaigns=active_campaigns,
+                             total_messages=total_messages,
+                             campaigns=campaign_metrics,
+                             recent_activity=recent_activity)
+    except Exception as e:
+        logger.error(f"Error generating campaign performance data: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/sms-history')
+def sms_history():
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            history = json.load(f)
+        return render_template('sms_history.html', sms_history=history)
+    except Exception as e:
+        logger.error(f"Error loading SMS history: {str(e)}")
+        return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/analytics')
+def analytics():
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            history = json.load(f)
+        
+        total_messages = len(history)
+        success_messages = sum(1 for msg in history if msg['status'] == 'success')
+        success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
+        
+        manual_messages = sum(1 for msg in history if msg['event_type'] == 'manual')
+        campaign_messages = sum(1 for msg in history if msg['event_type'] != 'manual')
+        
+        status_counts = Counter(msg['status'] for msg in history)
+        messages_by_status = [
+            {
+                'status': status,
+                'count': count,
+                'percentage': round(count / total_messages * 100, 1)
+            }
+            for status, count in status_counts.items()
+        ]
+        
+        event_counts = Counter(msg['event_type'] for msg in history)
+        messages_by_event = [
+            {
+                'type': event_type,
+                'count': count,
+                'percentage': round(count / total_messages * 100, 1)
+            }
+            for event_type, count in event_counts.items()
+        ]
+        
+        recent_activity = sorted(history, key=lambda x: x['timestamp'], reverse=True)[:10]
+        
+        return render_template('analytics.html',
+                             total_messages=total_messages,
+                             success_rate=success_rate,
+                             manual_messages=manual_messages,
+                             campaign_messages=campaign_messages,
+                             messages_by_status=messages_by_status,
+                             messages_by_event=messages_by_event,
+                             recent_activity=recent_activity)
+    except Exception as e:
+        logger.error(f"Error generating analytics: {str(e)}")
         return render_template('error.html', error="Failed to load page"), 500
 
 @app.route('/payment/<transaction_id>')
