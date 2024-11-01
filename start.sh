@@ -2,75 +2,70 @@
 
 echo "Starting SMS Platform services..."
 
+# Function to log messages
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
+
+# Function to check Redis connection
+check_redis() {
+    local max_attempts=$1
+    local attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        if redis-cli ping &>/dev/null; then
+            return 0
+        fi
+        attempt=$((attempt + 1))
+        log "Checking Redis connection... (attempt $attempt/$max_attempts)"
+        sleep 2
+    done
+    return 1
+}
+
 # Start Redis server
-echo "Starting Redis server..."
-if ! redis-server --daemonize yes; then
-    echo "Error: Failed to start Redis server"
+log "Starting Redis server..."
+redis-server --daemonize yes &>/dev/null
+
+# Wait for Redis to be ready
+log "Waiting for Redis to be ready..."
+if check_redis 30; then
+    log "Redis is ready and accepting connections!"
+else
+    log "Error: Redis failed to start"
     exit 1
 fi
 
-# Wait for Redis to be ready with timeout and health check
-echo "Waiting for Redis to be ready..."
-max_attempts=30
-attempt=0
-while ! redis-cli ping &>/dev/null; do
-    if [ $attempt -ge $max_attempts ]; then
-        echo "Error: Redis server failed to respond within timeout"
-        exit 1
-    fi
-    echo "Waiting for Redis... (attempt $((attempt + 1))/$max_attempts)"
-    sleep 1
-    ((attempt++))
-done
-echo "Redis is ready!"
-
-# Start Celery worker with proper logging
-echo "Starting Celery worker..."
+# Start Celery worker
+log "Starting Celery worker..."
 celery -A celery_worker worker --loglevel=info &
 CELERY_PID=$!
 
-# Wait for Celery to initialize with health check
-echo "Waiting for Celery worker to initialize..."
-max_attempts=30
-attempt=0
-while ! celery -A celery_worker inspect ping &>/dev/null; do
-    if [ $attempt -ge $max_attempts ]; then
-        echo "Error: Celery worker failed to initialize within timeout"
-        exit 1
-    fi
-    if ! ps -p $CELERY_PID > /dev/null; then
-        echo "Error: Celery worker process died"
-        exit 1
-    fi
-    echo "Waiting for Celery... (attempt $((attempt + 1))/$max_attempts)"
-    sleep 1
-    ((attempt++))
-done
-echo "Celery worker is ready!"
-
-# Health check function
-health_check() {
-    local service=$1
-    local pid=$2
-    
-    if ! ps -p $pid > /dev/null; then
-        echo "Error: $service process died unexpectedly"
-        exit 1
-    fi
+# Monitor function
+monitor_services() {
+    while true; do
+        if ! redis-cli ping &>/dev/null; then
+            log "Error: Redis connection lost"
+            exit 1
+        fi
+        
+        if ! ps -p $CELERY_PID > /dev/null; then
+            log "Error: Celery worker died"
+            exit 1
+        fi
+        sleep 5
+    done
 }
 
-# Start Flask application with proper template directory resolution
-echo "Starting Flask application..."
+# Start monitoring in background
+monitor_services &
+MONITOR_PID=$!
+
+# Set up environment
 export FLASK_APP=app.py
 export FLASK_ENV=development
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 
-# Monitor services
-(while true; do
-    health_check "Redis" $(pgrep redis-server)
-    health_check "Celery" $CELERY_PID
-    sleep 30
-done) &
-
 # Start Flask application
-exec python app.py
+log "Starting Flask application..."
+python app.py

@@ -7,6 +7,9 @@ import logging
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from celery_worker import send_sms_task
 from collections import Counter
+import redis
+from redis.exceptions import RedisError
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -18,17 +21,39 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
 app = Flask(__name__, 
            template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'),
            static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static'))
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
+
+@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
+def get_redis_connection():
+    try:
+        redis_client = redis.Redis(
+            host=REDIS_HOST,
+            port=REDIS_PORT,
+            db=REDIS_DB,
+            socket_timeout=5,
+            socket_connect_timeout=5,
+            socket_keepalive=True,
+            retry_on_timeout=True,
+            health_check_interval=30
+        )
+        redis_client.ping()
+        return redis_client
+    except RedisError as e:
+        logger.error(f"Failed to connect to Redis: {str(e)}")
+        raise
 
 INTEGRATIONS_FILE = 'data/integrations.json'
 CAMPAIGNS_FILE = 'data/campaigns.json'
 SMS_HISTORY_FILE = 'data/sms_history.json'
 TRANSACTIONS_FILE = 'data/transactions.json'
 
-# Create data directory and initialize files if they don't exist
 os.makedirs('data', exist_ok=True)
 
 def initialize_json_file(filepath, initial_data=None):
@@ -44,9 +69,7 @@ def initialize_json_file(filepath, initial_data=None):
 for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, SMS_HISTORY_FILE, TRANSACTIONS_FILE]:
     initialize_json_file(file_path, [] if file_path != TRANSACTIONS_FILE else {})
 
-# Helper functions (keep existing helper functions)
 def format_phone_number(phone):
-    """Format Brazilian phone number to international format"""
     try:
         logger.debug(f"Formatting phone number: {phone}")
         numbers = re.sub(r'\D', '', phone)
@@ -57,7 +80,6 @@ def format_phone_number(phone):
         
         if not numbers.startswith('55'):
             numbers = '55' + numbers
-            logger.debug(f"Added country code: {numbers}")
         
         if len(numbers) < 12:
             raise ValueError(f"Missing area code (DDD): {numbers}")
@@ -132,7 +154,6 @@ def normalize_status(status):
         logger.error(f"Error normalizing status {status}: {str(e)}")
         return None
 
-# Error handlers
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('error.html', error="Página não encontrada"), 404
@@ -141,7 +162,12 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('error.html', error="Erro interno do servidor"), 500
 
-# Route handlers
+@app.errorhandler(RedisError)
+def handle_redis_error(e):
+    logger.error(f"Redis error: {str(e)}")
+    return render_template('error.html', 
+                         error="Erro de conexão com o servidor. Por favor, tente novamente em alguns instantes."), 500
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -261,10 +287,16 @@ def campaign_performance():
 @app.route('/pix/<transaction_id>')
 def pix_payment(transaction_id):
     try:
-        with open(TRANSACTIONS_FILE, 'r') as f:
-            transactions = json.load(f)
+        redis_client = get_redis_connection()
+        transaction_data = redis_client.get(f"transaction:{transaction_id}")
         
-        transaction = transactions.get(transaction_id)
+        if transaction_data:
+            transaction = json.loads(transaction_data)
+        else:
+            with open(TRANSACTIONS_FILE, 'r') as f:
+                transactions = json.load(f)
+                transaction = transactions.get(transaction_id)
+        
         if not transaction:
             logger.error(f"Transaction not found: {transaction_id}")
             return render_template('error.html', error="Transação não encontrada"), 404
@@ -288,6 +320,8 @@ def webhook_handler(integration_id):
     logger.info(f"Received webhook request for integration: {integration_id}")
     
     try:
+        redis_client = get_redis_connection()
+        
         webhook_data = request.get_json()
         if not webhook_data:
             raise ValueError("Empty webhook data")
@@ -304,24 +338,30 @@ def webhook_handler(integration_id):
                 'message': 'Missing required fields: transaction_id or customer data'
             }), 400
         
-        price = webhook_data.get('total_price', '0')
-        if isinstance(price, (int, float)) and price > 100:
-            price = float(price) / 100
-        
-        transaction = {
-            'customer_name': customer.get('name', ''),
-            'total_price': format_price(price),
-            'pix_code': webhook_data.get('pix_code', ''),
-            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'products': webhook_data.get('plans', [])
-        }
-        
-        with open(TRANSACTIONS_FILE, 'r+') as f:
-            transactions = json.load(f)
-            transactions[transaction_id] = transaction
-            f.seek(0)
-            json.dump(transactions, f, indent=2)
-            f.truncate()
+        try:
+            transaction_data = {
+                'customer_name': customer.get('name', ''),
+                'total_price': format_price(webhook_data.get('total_price', '0')),
+                'pix_code': webhook_data.get('pix_code', ''),
+                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'products': webhook_data.get('plans', [])
+            }
+            
+            redis_client.setex(
+                f"transaction:{transaction_id}",
+                900,
+                json.dumps(transaction_data)
+            )
+            
+            with open(TRANSACTIONS_FILE, 'r+') as f:
+                transactions = json.load(f)
+                transactions[transaction_id] = transaction_data
+                f.seek(0)
+                json.dump(transactions, f, indent=2)
+                f.truncate()
+            
+        except (RedisError, IOError) as e:
+            logger.error(f"Error storing transaction data: {str(e)}")
         
         payment_url = url_for('pix_payment', transaction_id=transaction_id, _external=True)
         
@@ -329,30 +369,33 @@ def webhook_handler(integration_id):
         if status:
             normalized_status = normalize_status(status)
             if normalized_status:
-                with open(CAMPAIGNS_FILE, 'r') as f:
-                    campaigns = json.load(f)
-                
-                matching_campaigns = [
-                    c for c in campaigns 
-                    if c['integration_id'] == integration_id 
-                    and normalize_status(c['event_type']) == normalized_status
-                ]
-                
-                for campaign in matching_campaigns:
-                    try:
-                        phone = format_phone_number(customer['phone'])
-                        message = f"Acesse o link para pagamento: {payment_url}"
-                        
-                        task = send_sms_task.delay(
-                            phone=phone,
-                            message=message,
-                            operator="claro",
-                            campaign_id=campaign['id'],
-                            event_type=normalized_status
-                        )
-                        logger.info(f"Queued SMS task {task.id} for campaign {campaign['id']}")
-                    except Exception as e:
-                        logger.error(f"Error processing campaign {campaign['id']}: {str(e)}")
+                try:
+                    with open(CAMPAIGNS_FILE, 'r') as f:
+                        campaigns = json.load(f)
+                    
+                    matching_campaigns = [
+                        c for c in campaigns 
+                        if c['integration_id'] == integration_id 
+                        and normalize_status(c['event_type']) == normalized_status
+                    ]
+                    
+                    for campaign in matching_campaigns:
+                        try:
+                            phone = format_phone_number(customer['phone'])
+                            message = f"Acesse o link para pagamento: {payment_url}"
+                            
+                            task = send_sms_task.delay(
+                                phone=phone,
+                                message=message,
+                                operator="claro",
+                                campaign_id=campaign['id'],
+                                event_type=normalized_status
+                            )
+                            logger.info(f"Queued SMS task {task.id} for campaign {campaign['id']}")
+                        except Exception as e:
+                            logger.error(f"Error processing campaign {campaign['id']}: {str(e)}")
+                except Exception as e:
+                    logger.error(f"Error processing campaigns: {str(e)}")
         
         return jsonify({
             'success': True,
@@ -360,14 +403,25 @@ def webhook_handler(integration_id):
             'payment_url': payment_url
         })
         
+    except RedisError as e:
+        logger.error(f"Redis error in webhook handler: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Service temporarily unavailable'
+        }), 503
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in webhook data: {str(e)}")
-        return jsonify({'success': False, 'message': 'Invalid JSON data'}), 400
+        return jsonify({
+            'success': False,
+            'message': 'Invalid JSON data'
+        }), 400
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
-        return jsonify({'success': False, 'message': f'Internal server error: {str(e)}'}), 500
+        return jsonify({
+            'success': False,
+            'message': f'Internal server error: {str(e)}'
+        }), 500
 
-# API routes
 @app.route('/api/send-sms', methods=['POST'])
 def send_sms():
     try:
@@ -399,4 +453,10 @@ def send_sms():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 if __name__ == '__main__':
+    try:
+        redis_client = get_redis_connection()
+        logger.info("Successfully connected to Redis")
+    except Exception as e:
+        logger.error(f"Failed to connect to Redis on startup: {str(e)}")
+    
     app.run(host='0.0.0.0', port=5000, debug=True)

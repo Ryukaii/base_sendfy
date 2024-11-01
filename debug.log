@@ -34937,3 +34937,1680 @@ Retry limit exceeded while trying to reconnect to the Celery redis result store 
 2024-11-01 15:10:30,760 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:30] "GET /static/css/custom.css HTTP/1.1" 200 -
 2024-11-01 15:10:31,353 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:31] "[33mGET /api/campaigns HTTP/1.1[0m" 404 -
 2024-11-01 15:10:31,354 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:31] "[33mGET /api/integrations HTTP/1.1[0m" 404 -
+2024-11-01 15:10:41,965 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:41] "GET / HTTP/1.1" 200 -
+2024-11-01 15:10:42,175 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:42] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 15:10:47,348 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:47] "GET /sms HTTP/1.1" 200 -
+2024-11-01 15:10:48,062 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:48] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 15:10:48,083 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:48] "[36mGET /static/js/sms.js HTTP/1.1[0m" 304 -
+2024-11-01 15:10:53,816 - celery.utils.functional - DEBUG - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-01 15:10:53,967 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:10:53,968 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:10:54,969 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:10:55,969 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:10:56,728 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:10:56,728 - __main__ - DEBUG - Webhook data: {
+  "transaction_id": "3EQKL8z3",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "186.235.61.109",
+  "status": "approved",
+  "order_url": "https://pay.portal-cac-registro.org/order/3EQKL8z3",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/L9jZDa7ORA6Gp4q",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,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",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/4e63e560-462e-4c74-81b5-e4cb212ef97b5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63048384",
+  "created_at": "2024-11-01T15:08:33.000000Z",
+  "updated_at": "2024-11-01 12:10:49",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Marcelo Ribeiro dos Santos",
+    "document": "11018646647",
+    "email": "atendimentoreinv.cdsal@gmail.com",
+    "phone": "38998544976"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:10:56,729 - __main__ - DEBUG - Normalizing status: approved
+2024-11-01 15:10:56,730 - __main__ - DEBUG - Normalized status: approved -> approved
+2024-11-01 15:10:56,730 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:10:56,730 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:10:56,730 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:56] "POST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1" 200 -
+2024-11-01 15:10:56,732 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:10:56,732 - __main__ - DEBUG - Webhook data: {
+  "transaction_id": "3EQKL8z3",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "186.235.61.109",
+  "status": "approved",
+  "order_url": "https://pay.portal-cac-registro.org/order/3EQKL8z3",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/L9jZDa7ORA6Gp4q",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAR0AAAEdCAIAAAC+CCQsAAAABnRSTlMA/wD/AP83WBt9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAIQ0lEQVR4nO3dwW7suhFF0dwg///LL3MNGAjcRbFv1praVqttHxCqLhb//PPPP/8CUv/++gbgLyRX0JMr6MkV9OQKenIFPbmCnlxBT66gJ1fQkyvoyRX05Ap6cgU9uYKeXEFPrqAnV9CTK+j9Z+eH//z5U93H2mMIx+N11199danwNtZ23sL6rtYv9MrOO9q5cvjL2bEz+sV6BT25gp5cQU+uoLdVt3gIR3yGtYdXd7VTA9i5jbkSyLG5q3NFjvB118K7sl5BT66gJ1fQkyvolXWLh/AD+PWVX5UxXn11fVc77Rc7PQRhkeOVsO9hroVi7r/uFesV9OQKenIFPbmC3mDd4pidUsSxx9xXXRE/sQFn7p7/grN5rVfQkyvoyRX05Ap6f0PdYmdzR9j3sGPnUpd0GHxVELqT9Qp6cgU9uYKeXEFvsG5x7BH54c6pnQ/hTI5wrsbazqSQxwvtbHV59bpfsV5BT66gJ1fQkyvolXWLY7sbwqfeuY0S4SaLS6Zu3Pl+j/3XvWK9gp5cQU+uoCdX0PtzyefTofCpd+4QkPBSOx0kP3GG6i/+i1qvoCdX0JMr6MkV9LbqFnPPtV990r/zlL92Z1vAwyWll2O1lrk/t/UKenIFPbmCnlxB77P5Fsc+Yv9q1ObD3DsKn+Mv6SB5eFVdCEtcO6xX0JMr6MkV9OQKemXdIjwYM3w2fXXluaM+v6rizPWIvPqjzFUI1r46YNZ6BT25gp5cQU+uoHfLeSLHag9r4ZEZoUsOXD02H/NV1erVzz7MlU+sV9CTK+jJFfTkCnqD54kc+6T/WMEgrGrsnOuxNrdB49U3h50rO20fr5hvAVeTK+jJFfTkCnqD/RYPxx7c1y4pCYTjI1+dKbq+8lp4tOmr2wh7cY7tT7FeQU+uoCdX0JMr6G3VLeY+276k0WHtWDVl5+H7knkex7a6XFLVsF5BT66gJ1fQkyvonTsH9djIirnn2q/e784LvXrd0J1HyIaNHWvWK+jJFfTkCnpyBb3BusUlkwaONQ2EvRrHLjVXIHnlksYO/RZwNbmCnlxBT66gd65uMVeK+Gpzx9qxuwq7T+a6QMIZFTuO1WmsV9CTK+jJFfTkCnpbdYv/celTj7nhbTxcsk/k2L6Y9c+Gd7Xjq11Cr1ivoCdX0JMr6MkV9Mq6xbGpDOtLfTXC4ZW57RvHflfhxM9Lmm/sE4GryRX05Ap6cgW9c+egvhJuK5jbKHHnTpBLDnq9pH5wrIj1YL2CnlxBT66gJ1fQ26pbXLIXYOeU1PVXwzLGsWfx9R9l5092yRkoO5c6xnoFPbmCnlxBT66gV87lnBvyuOPYjIrwdUPHjkS55KTTh68GgFqvoCdX0JMr6MkV9Ab3iXz1xHznEaNzD9BzDRbrSx1rdJj7bcy9BesV9OQKenIFPbmC3lbdYu5EifDoimNHX361QeNh5yl//UJhB8nOlX9iGIb1CnpyBT25gp5cQe/cfIu5roid1w1nY+y87lfbN9a3MXfC6tyU0rmffcV6BT25gp5cQU+uoPcXzrc4NtDizokOD1/9US75Z1izTwR+iVxBT66gJ1fQ26pbvHulU4eIhsM01746f3V9qZ2bvKRHZOdS6ysfq0tZr6AnV9CTK+jJFfTKfSJ3frS//uaHrw62WN9GOP7h2BDPV76qTIS38WC9gp5cQU+uoCdX0DvXb/F84VNPkMfaAtbmZlTMNXaEHSQ73/zqZ8O6lH4LuItcQU+uoCdX0CvPQZ2bCLnzqDq3jWJ9qR2vbuOSuwp/dm7i57HflfUKenIFPbmCnlxBr+y3OPZh9o5wzMZcG8Qrc7/JcDhE+AbnSk32icDV5Ap6cgU9uYJe2W+xNjd44NjoyfBI1blJEuG+mPD9vnqh8Jt3WlV2WK+gJ1fQkyvoyRX0ynNQH459TH7MXG/K3Ps9Nu/hJ86bPVaJsV5BT66gJ1fQkyvolf0W4ZDHuW0F4c/O7Yz4qjCzdmx+ydwZqsd+sdYr6MkV9OQKenIFvcH5FneOcfwLBkvMdQmsb2PHXHvN3AGzzhOBu8gV9OQKenIFvcH5FsdGR7x6vD7WfrFjp7gyN3h0rrNh7sCUr8a/Wq+gJ1fQkyvoyRX0zu0T2blUeBvHHoLDz/LnGkrmjkSZ2zWzrmq82pAyx3oFPbmCnlxBT66gd26fyKuffZibCDl3dutc78KdOyPC1z12/qrzROCXyBX05Ap6cgW9c/tEHsITKe8c4zh3Ckb4zTu+GrOx85+j3wJ+mFxBT66gJ1fQGzwH9SHsEtgR9gE8HPtNrn11hOyxZpSQfgv4JXIFPbmCnlxBr9wncsyxesmOY3Waud/Gqxf6iQ1HrzhPBO4iV9CTK+jJFfS29ol89bn43JCGuUfkucGUa19NKT3WmzI3wnWH9Qp6cgU9uYKeXEFv8DyRHeFT/sPco2pYTti58sPceNBX9YOvBod8Nf3CegU9uYKeXEFPrqD32VzOh/CR8aszVENzjSxfHfS6Uz6Za1WZ+/tar6AnV9CTK+jJFfQG6xZz5o7bmLuNS6opxxodwsNpv5raucN6BT25gp5cQU+uoPeTdYuHcGZDWIqY6z949UIP4daPuX6acDPLQ/jXX7NeQU+uoCdX0JMr6A3WLY7tqth56J8rGBxrv3h1V+tLhfs15oo6ry618807rFfQkyvoyRX05Ap6Zd3ikgb+8ADSYyM+L9nq8sqr1o1Xt/ETB6asWa+gJ1fQkyvoyRX0/hzrioD/H9Yr6MkV9OQKenIFPbmCnlxBT66gJ1fQkyvoyRX05Ap6cgU9uYKeXEFPrqAnV9CTK+jJFfTkCnr/BTfvp1Mw9p3NAAAAAElFTkSuQmCC",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/4e63e560-462e-4c74-81b5-e4cb212ef97b5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63048384",
+  "created_at": "2024-11-01T15:08:33.000000Z",
+  "updated_at": "2024-11-01 12:10:49",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Marcelo Ribeiro dos Santos",
+    "document": "11018646647",
+    "email": "atendimentoreinv.cdsal@gmail.com",
+    "phone": "38998544976"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:10:56,733 - __main__ - DEBUG - Normalizing status: approved
+2024-11-01 15:10:56,733 - __main__ - DEBUG - Normalized status: approved -> approved
+2024-11-01 15:10:56,733 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:10:56,733 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:10:56,733 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:56] "POST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1" 200 -
+2024-11-01 15:10:56,970 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:10:57,971 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:10:58,386 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:10:58,387 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:10:58,972 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:10:59,257 - __main__ - INFO - Received webhook request for integration: 6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b
+2024-11-01 15:10:59,257 - __main__ - DEBUG - Webhook data: {
+  "transaction_id": "3EQKL8z3",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "186.235.61.109",
+  "status": "pending",
+  "order_url": "https://pay.portal-cac-registro.org/order/3EQKL8z3",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/L9jZDa7ORA6Gp4q",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,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",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/4e63e560-462e-4c74-81b5-e4cb212ef97b5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63048384",
+  "created_at": "2024-11-01T15:08:33.000000Z",
+  "updated_at": "2024-11-01 12:08:38",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Marcelo Ribeiro dos Santos",
+    "document": "11018646647",
+    "email": "atendimentoreinv.cdsal@gmail.com",
+    "phone": "38998544976"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:10:59,258 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:10:59,258 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:10:59,258 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:10:59] "POST /webhook/6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b HTTP/1.1" 200 -
+2024-11-01 15:10:59,389 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:10:59,479 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:10:59,479 - __main__ - DEBUG - Webhook data: {
+  "transaction_id": "3EQKL8z3",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "186.235.61.109",
+  "status": "pending",
+  "order_url": "https://pay.portal-cac-registro.org/order/3EQKL8z3",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/L9jZDa7ORA6Gp4q",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,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",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/4e63e560-462e-4c74-81b5-e4cb212ef97b5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63048384",
+  "created_at": "2024-11-01T15:08:33.000000Z",
+  "updated_at": "2024-11-01 12:08:38",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Marcelo Ribeiro dos Santos",
+    "document": "11018646647",
+    "email": "atendimentoreinv.cdsal@gmail.com",
+    "phone": "38998544976"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:10:59,480 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:10:59,481 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:10:59,481 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:10:59,481 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:10:59,481 - __main__ - DEBUG - Formatting phone number: 38998544976
+2024-11-01 15:10:59,481 - __main__ - DEBUG - After removing non-numeric characters: 38998544976
+2024-11-01 15:10:59,481 - __main__ - DEBUG - Added country code: 5538998544976
+2024-11-01 15:10:59,481 - __main__ - DEBUG - Final formatted number: +5538998544976
+2024-11-01 15:10:59,485 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:10:59,485 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:10:59,973 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:00,389 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:00,486 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:00,973 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:01,390 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:01,488 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:01,974 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:02,391 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:02,489 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:02,975 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:03,392 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:03,490 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:03,767 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:03,768 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:03,976 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:04,126 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:04,126 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:04,392 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:04,491 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:04,677 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:04,677 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:04,768 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:04,978 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:04,982 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:04,983 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:05,127 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:05,393 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:05,491 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:05,678 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:05,769 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:05,775 - __main__ - INFO - Received webhook request for integration: 6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b
+2024-11-01 15:11:05,775 - __main__ - DEBUG - Webhook data: {
+  "transaction_id": "GVOELbJg",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "2804:30c:1c54:5800:94f3:7c6a:5861:b311",
+  "status": "pending",
+  "order_url": "https://pay.portal-cac-registro.org/order/GVOELbJg",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/EwR3Ak1lxlkGdKy",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,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",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/0fb2f3ff-6a1a-4f95-ba27-e9ffa7322a1c5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63049923",
+  "created_at": "2024-11-01T15:08:39.000000Z",
+  "updated_at": "2024-11-01 12:08:44",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Moacir Lampert",
+    "document": "02069506916",
+    "email": "moacirlampert@yahoo.com.br",
+    "phone": "47997143687"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:11:05,776 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:11:05,776 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:11:05,776 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:05] "POST /webhook/6ac5d0dd-0dd5-434e-ba98-bc0f71d1657b HTTP/1.1" 200 -
+2024-11-01 15:11:05,979 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:05,983 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:05,997 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:11:05,999 - __main__ - DEBUG - Webhook data: {
+  "transaction_id": "GVOELbJg",
+  "store_name": "Cadastro de CACs",
+  "method": "pix",
+  "total_price": "96.20",
+  "sub_price": "96.20",
+  "shipping_price": "0.00",
+  "tax_price": "0.00",
+  "discount_price": "0.00",
+  "ip": "2804:30c:1c54:5800:94f3:7c6a:5861:b311",
+  "status": "pending",
+  "order_url": "https://pay.portal-cac-registro.org/order/GVOELbJg",
+  "checkout_url": "https://pay.portal-cac-registro.org/recovery/EwR3Ak1lxlkGdKy",
+  "billet_url": null,
+  "billet_digitable_line": null,
+  "billet_due_date": null,
+  "pix_code_image64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAR0AAAEdCAIAAAC+CCQsAAAABnRSTlMA/wD/AP83WBt9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAIIUlEQVR4nO3dy45jKxZF0cpS/f8v3+qfBhJi8nDeMboZ5tgRuYTYhs2ff/755z9A6r+33wD8heQKenIFPbmCnlxBT66gJ1fQkyvoyRX05Ap6cgU9uYKeXEFPrqAnV9CTK+jJFfTkCnpyBb3/rbz4z58/1fsYGzfh+LyNqY4dUx/hM/LKc8fGI089d+VvdOw3OR5q/PH3WfmDmq+gJ1fQkyvoyRX0luoWH/sW7uN/3ddadDzyvsV3WKgInzv+4bF9tYdj/+ummK+gJ1fQkyvoyRX0yrrFR/gF/NQPT63yx+vplQLJvhrAlFvPXfm1r9j3v26K+Qp6cgU9uYKeXEFvY91in5Vl7r517Uq9ZDzU1IP2jTz1q1upl/wFd/Oar6AnV9CTK+jJFfR+sm4xtZ4Ou1+srLaP7TBY+eVMjTz2yHaTW8xX0JMr6MkV9OQKehvrFsfOPoQr9XDvwlSPilutRac88nnHHimBmK+gJ1fQkyvoyRX0yrrFsYsepoTr6Vv3XLx5cckjn/fN/3XmK+jJFfTkCnpyBb2lusWt77YfubjkzTYbj7x2nzff1Yf5CnpyBT25gp5cQe/PvoMDU8KSQHjbSHhraPjaqZE/Htlg8cgBnH0bWcxX0JMr6MkV9OQKehvrFrfWpqE3v9o/dowibLOxr5i0r06zwnwFPbmCnlxBT66gV/a3mFoUhmvTlbcxFt6CsW83RrgpZF9/zFtVjamhwjKG+Qp6cgU9uYKeXEHvlf0W+2oAU461vDz22rFH9mpMeeQM0Zj5CnpyBT25gp5cQW/jPaiPHGd45PzCvv0W43c1Hmrf9otHWmV87DsY8mG+gp5cQU+uoCdX0Fvab/Edq2tZsTLy2LGeHFPebPAQrvLDB+lvAf9ScgU9uYKeXEFvab/F1KJw5Qv4ff0exvbddLpv98nUWnxlG8QjHTtW6G8Bv0SuoCdX0JMr6JXnRMLjDFMjr9hXLzl2qORj5bkr/U/HD5p67Xioff8ZQuYr6MkV9OQKenIFvXP3iYzdarV5rF6yr/tFKDxUsu9BK/S3gB8mV9CTK+jJFfQ23iey4lgzjEdaVhx77bHPOzXysb+v/hbww+QKenIFPbmC3rm+nB/hevrY1RVTwp0cxy5MGb/22AUxY49cHzNmvoKeXEFPrqAnV9A715dz5bzG1HOPjRwOte9KlH1VjX0dLFbubn2E+Qp6cgU9uYKeXEGv3G8RunXV59itHQYrbjWHCDffhIc7jvURMV9BT66gJ1fQkyvolX05P/b1IZiyry/nsSaPU88NdyfcKgmEf339LeDvIVfQkyvoyRX0yr6ctxpL3LqQ89Y+gLFbDUvGjpWppt7Gh/4W8DS5gp5cQU+uoFfut3jzq/2pB60UOfb1qFgZavzDYefNqW0fUx/wVgVohfkKenIFPbmCnlxBb6lusa/fw75WCuOR3+wIGe4D2Lez4dgvZ6Xh6bGjPeYr6MkV9OQKenIFvY37LY4d39h3S+q+de2xBpErzx27dfTjkaM9Y+Yr6MkV9OQKenIFvY39LcY/HPqJUsSxX054YcqtQtSbRY4p5ivoyRX05Ap6cgW9c/0t9rVSWLHvltSVBg/7KjH7ruoYP+jYUOORj935Yr6CnlxBT66gJ1fQK/dbTFlZmt+qedw6CnHsUEl4pmbfUFNW3pX9FvAWuYKeXEFPrqC3VLeYe9Kpb773La/fvPj041bNY5/wAI7+FvDD5Ap6cgU9uYJeWbfYt7NhxbGeDW8edri1kWVfO9Rjt+DabwFvkSvoyRX05Ap6S/0t9m1WuHV95bHzC1MPeqTrRlg++cUWn1PMV9CTK+jJFfTkCnqv7LcI1+LhD38cO1TyZp1m6rXjoR55rf4W8EvkCnpyBT25gt61/hYfbxYMxm/ykf0HY/tqD8eGOtZpVH8LeJpcQU+uoCdX0CvvEznW8vLWvR5j+/pbjB8U1kuOdSjZ9wc9dk/NmPkKenIFPbmCnlxBb6m/xb5+D+GC8lY7hFsbO8JTM/vadE4992PfhSn2W8DT5Ap6cgU9uYLeUt3iI/yq+9jRjym36gcrplbq4SUg++4TGbt1se2H+Qp6cgU9uYKeXEFv4zmR8LXH1tMrz913XuPjF+9u3TfyI0N9mK+gJ1fQkyvoyRX0fuM+kWNVjRVvVnF+opqyMtQjf8EP8xX05Ap6cgU9uYLexrrF2LHn3ro0dezYpan7/ii3OqvuKwiFzFfQkyvoyRX05Ap65TmRsVv9Mfe9jVu3nEx55HbWYz1Ixs89VlozX0FPrqAnV9CTK+iV+y2O+YkDCz+xpeCR/ha3fhv6W8AvkSvoyRX05Ap6S/eJHNtD8GbvxfGD9o18rPvFsdYgx25nnXqu/RbwFrmCnlxBT66gt/Ee1BVvtqw4dovm1Lsa//BUNeWR5h9jKyMfO7xjvoKeXEFPrqAnV9Ar6xYfb3aEXHnulJU1cbievtXgYd9tpVNudRkxX0FPrqAnV9CTK+htrFscc+xii30bLG51ZVgZat/hjpUHTT1Xfwv4JXIFPbmCnlxB72+oW3yE+y2O3YESbgtY+fjhRxhbOWPyyC6QMfMV9OQKenIFPbmC3sa6xSM3ley79eMj/C7/WK/JR05zrDwo3JuiLyc8Ta6gJ1fQkyvolXWLYyvXsWP1kpWDEitD7Vt83zpVMSXsnbqP+Qp6cgU9uYKeXEHvzyO7IuBvYr6CnlxBT66gJ1fQkyvoyRX05Ap6cgU9uYKeXEFPrqAnV9CTK+jJFfTkCnpyBT25gp5cQU+uoPd/DWHIcfg03rcAAAAASUVORK5CYII=",
+  "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/0fb2f3ff-6a1a-4f95-ba27-e9ffa7322a1c5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63049923",
+  "created_at": "2024-11-01T15:08:39.000000Z",
+  "updated_at": "2024-11-01 12:08:44",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "customer": {
+    "name": "Moacir Lampert",
+    "document": "02069506916",
+    "email": "moacirlampert@yahoo.com.br",
+    "phone": "47997143687"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "complement": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:11:06,000 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:11:06,000 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:11:06,000 - __main__ - DEBUG - Normalizing status: pending
+2024-11-01 15:11:06,000 - __main__ - DEBUG - Normalized status: pending -> pending
+2024-11-01 15:11:06,000 - __main__ - DEBUG - Formatting phone number: 47997143687
+2024-11-01 15:11:06,000 - __main__ - DEBUG - After removing non-numeric characters: 47997143687
+2024-11-01 15:11:06,000 - __main__ - DEBUG - Added country code: 5547997143687
+2024-11-01 15:11:06,000 - __main__ - DEBUG - Final formatted number: +5547997143687
+2024-11-01 15:11:06,005 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:06,005 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:06,128 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:06,394 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:06,492 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:06,679 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:06,770 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:06,980 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:06,984 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:07,006 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:07,129 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:07,395 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:07,493 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:07,680 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:07,771 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:07,981 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:07,984 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:08,006 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:08,130 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:08,396 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:08,494 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:08,681 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:08,772 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:08,982 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:08,985 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:09,007 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:09,130 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:09,397 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:09,494 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:09,682 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:09,772 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:09,983 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:09,985 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:10,008 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:10,131 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:10,398 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:10,495 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:10,682 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:10,773 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:10,983 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:10,986 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:11,008 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:11,132 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:11,398 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:11,496 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:11,683 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:11,774 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:11,984 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:11,986 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:12,009 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:12,133 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:12,399 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:12,498 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:12,685 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:12,774 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:12,985 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:12,985 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:12,985 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:12] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:12,987 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:13,010 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:13,133 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:13,171 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:13,172 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:13,400 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:13,499 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:13,686 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:13,775 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:13,988 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:14,010 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:14,134 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:14,173 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:14,401 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:14,500 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:14,687 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:14,776 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:14,989 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:15,011 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:15,135 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:15,173 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:15,402 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:15,500 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:15,688 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:15,777 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:15,990 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:16,012 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:16,136 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:16,174 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:16,402 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:16,501 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:16,688 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:16,777 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:16,991 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:17,013 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:17,136 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:17,175 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:17,403 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:17,403 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:17,404 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:17] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:17,502 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:17,595 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:17,595 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:17,689 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:17,778 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:17,991 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:18,013 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:18,137 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:18,176 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:18,502 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:18,503 - __main__ - ERROR - Error processing campaign test-campaign-1: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:18,503 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:18] "POST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1" 200 -
+2024-11-01 15:11:18,596 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:18,690 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:18,779 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:18,992 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:19,014 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:19,138 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:19,176 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:19,597 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:19,691 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:19,780 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:19,993 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:20,015 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:20,138 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:20,177 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:20,597 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:20,692 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:20,781 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:20,994 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:21,015 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:21,139 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:21,178 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:21,598 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:21,693 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:21,782 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:21,995 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:22,016 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:22,140 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:22,179 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:22,599 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:22,693 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:22,783 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:22,783 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:22,784 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:22] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:22,995 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:23,001 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:23,001 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:23,017 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:23,141 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:23,141 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:23,141 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:23] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:23,180 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:23,330 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:23,330 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:23,600 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:23,694 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:23,694 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:23,695 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:23] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:23,876 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:23,876 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:23,996 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:23,996 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:23,997 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:23] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:24,002 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:24,020 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:24,177 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:11:24,177 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:11:24,181 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:24,331 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:24,601 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:24,877 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:25,003 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:25,021 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:25,021 - __main__ - ERROR - Error processing campaign test-campaign-1: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:25,022 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:25] "POST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1" 200 -
+2024-11-01 15:11:25,178 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:11:25,181 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:25,332 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:25,601 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:25,878 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:26,004 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:26,179 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:11:26,182 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:26,332 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:26,602 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:26,878 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:27,004 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:27,180 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:11:27,183 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:27,333 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:27,603 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:27,879 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:28,005 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:28,180 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:11:28,183 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:28,334 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:28,605 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:28,880 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:29,006 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:29,181 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:11:29,184 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:29,335 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:29,606 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:29,881 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:30,007 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:30,182 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:11:30,185 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:30,336 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:30,606 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:30,882 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:31,007 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:31,183 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:11:31,186 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:31,336 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:31,607 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:31,882 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:32,008 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:32,184 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:11:32,187 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:32,189 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:32,190 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:32] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:32,337 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:32,608 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:32,883 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:33,009 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:33,184 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:11:33,338 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:33,609 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:33,884 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:34,010 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:34,185 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:11:34,339 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:34,609 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:34,885 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:35,012 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:35,186 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:11:35,340 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:35,610 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:35,886 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:36,013 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:36,186 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:11:36,340 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:36,611 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:36,611 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:36,611 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:36] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:36,887 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:37,013 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:37,187 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:11:37,341 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:37,887 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:38,014 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:38,188 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:11:38,342 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:38,888 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:39,015 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:39,189 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:11:39,343 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:39,889 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:40,016 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:40,189 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:11:40,343 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:40,889 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:41,016 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:41,192 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:11:41,344 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:41,890 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:42,017 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:42,017 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:42,018 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:42] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:42,192 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:11:42,345 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:42,345 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:42,346 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:42] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:42,891 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:42,891 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:42,892 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:42] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:11:43,193 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:11:43,193 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:11:43,194 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:11:43] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:12:24,238 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:24] "GET / HTTP/1.1" 200 -
+2024-11-01 15:12:24,926 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:24] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 15:12:26,050 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:12:26,051 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "VOvGVm0p5N0ZD62",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/VOvGVm0p5N0ZD62",
+  "total_price": "96.20",
+  "ip": "191.58.97.209",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:12:07",
+  "customer": {
+    "name": "Alex da Silva Fernandes",
+    "document": "06513938414",
+    "email": "alexxsilvafernandess@gmail.com",
+    "phone": "(84) 99840-6014"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:12:26,051 - __main__ - ERROR - Missing required fields
+2024-11-01 15:12:26,051 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:26] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:12:34,363 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:12:34,363 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "ApQgzQbJNvVGEb7",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/ApQgzQbJNvVGEb7",
+  "total_price": ".",
+  "ip": "179.127.71.117",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:12:29",
+  "customer": {
+    "name": "Wanderley.francoz",
+    "document": "06204522850",
+    "email": "wanderleifrancozo69@gmAil.com",
+    "phone": "(67) 99885-8319"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:12:34,363 - __main__ - ERROR - Missing required fields
+2024-11-01 15:12:34,364 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:34] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:12:35,352 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:35] "GET /sms HTTP/1.1" 200 -
+2024-11-01 15:12:36,048 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:36] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-01 15:12:36,051 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:36] "[36mGET /static/js/sms.js HTTP/1.1[0m" 304 -
+2024-11-01 15:12:42,008 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (0/20) now.
+2024-11-01 15:12:42,008 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2024-11-01 15:12:43,009 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2024-11-01 15:12:44,010 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2024-11-01 15:12:45,011 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2024-11-01 15:12:46,012 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2024-11-01 15:12:47,012 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2024-11-01 15:12:47,435 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:12:47,436 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "wK43672VzBlZQ8b",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/wK43672VzBlZQ8b",
+  "total_price": ".",
+  "ip": "179.127.71.117",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:12:43",
+  "customer": {
+    "name": "Wanderley.francoz",
+    "document": "06204522850",
+    "email": "wanderleifrancozo69@gmAil.com",
+    "phone": "(67) 99885-8319"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:12:47,436 - __main__ - ERROR - Missing required fields
+2024-11-01 15:12:47,436 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:47] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:12:48,013 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2024-11-01 15:12:49,014 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2024-11-01 15:12:50,015 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2024-11-01 15:12:51,016 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2024-11-01 15:12:52,016 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2024-11-01 15:12:53,017 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2024-11-01 15:12:54,018 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2024-11-01 15:12:55,019 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2024-11-01 15:12:56,020 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2024-11-01 15:12:56,491 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:12:56,492 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "YL6geOk8r0YZrKM",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/YL6geOk8r0YZrKM",
+  "total_price": ".",
+  "ip": "179.127.71.117",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:12:46",
+  "customer": {
+    "name": "Wanderley.francoz",
+    "document": "06204522850",
+    "email": "wanderleifrancozo69@gmAil.com",
+    "phone": "(67) 99885-8319"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:12:56,492 - __main__ - ERROR - Missing required fields
+2024-11-01 15:12:56,492 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:12:56] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:12:57,021 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2024-11-01 15:12:58,021 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2024-11-01 15:12:59,022 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2024-11-01 15:13:00,023 - celery.backends.redis - ERROR - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2024-11-01 15:13:01,024 - celery.backends.redis - CRITICAL - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+2024-11-01 15:13:01,024 - __main__ - ERROR - Error sending SMS: Error 99 connecting to localhost:6379. Cannot assign requested address.
+2024-11-01 15:13:01,025 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:01] "[35m[1mPOST /api/send-sms HTTP/1.1[0m" 500 -
+2024-11-01 15:13:01,298 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:01,299 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "9ArZMkWpDLOg7xj",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/9ArZMkWpDLOg7xj",
+  "total_price": "96.20",
+  "ip": "187.126.150.108",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 11:27:35",
+  "customer": {
+    "name": "Wanderley Evaristo da Costa 21",
+    "document": "91611741734",
+    "email": "wanderleyevaristo459@gmail.com",
+    "phone": "(21) 96941-8562"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:01,299 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:01,299 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:01] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:01,559 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:01,559 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "eABG9okWx0d36Ea",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/eABG9okWx0d36Ea",
+  "total_price": "96.20",
+  "ip": "187.126.150.108",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 11:27:45",
+  "customer": {
+    "name": "Wanderley Evaristo da Costa 21",
+    "document": "91611741734",
+    "email": "wanderleyevaristo459@gmail.com",
+    "phone": "(21) 96941-8562"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:01,559 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:01,560 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:01] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:02,564 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:02,564 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "PXw3X0Op9PL3zmp",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/PXw3X0Op9PL3zmp",
+  "total_price": ".",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:12:56",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21) 98953-7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:02,564 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:02,565 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:02] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:04,605 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:04,605 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "wq7GrobODRAgBAN",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/wq7GrobODRAgBAN",
+  "total_price": ".",
+  "ip": "179.127.71.117",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:00",
+  "customer": {
+    "name": "Wanderley.francoz",
+    "document": "06204522850",
+    "email": "wanderleifrancozo69@gmAil.com",
+    "phone": "(67) 99885-8319"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:04,606 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:04,606 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:04] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:06,985 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:06,985 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "n4RgQDdpQ4NGwBV",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/n4RgQDdpQ4NGwBV",
+  "total_price": "96.20",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:01",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21) 98953-7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:06,985 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:06,985 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:06] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:08,383 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:08,383 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "VOvGVm0p595ZD62",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/VOvGVm0p595ZD62",
+  "total_price": ".",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:05",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21) 98953-7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:08,384 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:08,384 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:08] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:11,402 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:11,402 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "L9jZDa7OkbYGp4q",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/L9jZDa7OkbYGp4q",
+  "total_price": "96.20",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:06",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21) 98953-7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:11,402 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:11,403 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:11] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:12,465 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:12,465 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "0qn35V8JXaRZ98m",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/0qn35V8JXaRZ98m",
+  "total_price": "96.20",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:08",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21) 98953-7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:12,465 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:12,466 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:12] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:16,140 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:16,140 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "V603kYld2eAGw8y",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/V603kYld2eAGw8y",
+  "total_price": "96.20",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": null,
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:12",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21)98953 7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:16,140 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:16,140 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:16] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:18,408 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:18,409 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "mA83EbEAqzwZPVp",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/mA83EbEAqzwZPVp",
+  "total_price": "96.20",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:13",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21) 98953-7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:18,409 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:18,409 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:18] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:22,765 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:22,766 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "7R0gl704Ea7GVr9",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/7R0gl704Ea7GVr9",
+  "total_price": "96.20",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:19",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21)98953 7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:22,766 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:22,766 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:22] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:25,061 - __main__ - INFO - Received webhook request for integration: 06b42000-7771-4b22-b765-993fe881a270
+2024-11-01 15:13:25,062 - __main__ - DEBUG - Webhook data: {
+  "checkout_id": "L9jZDa7O898Gp4q",
+  "store_name": "Cadastro de CACs",
+  "abandoned_checkout_url": "https://pay.portal-cac-registro.org/recovery/L9jZDa7O898Gp4q",
+  "total_price": ".",
+  "ip": "2804:14d:5c18:c155:4198:8dcd:3880:b6a1",
+  "status": "abandoned_cart",
+  "checkout": {
+    "utm_source": "organic",
+    "utm_medium": null,
+    "utm_campaign": null,
+    "utm_term": null,
+    "utm_content": null
+  },
+  "created_at": "2024-11-01 12:13:21",
+  "customer": {
+    "name": "Ramon Gon\u00e7alves Gomes",
+    "document": "08437752701",
+    "email": "goncalvesgomesramon@gmail.com",
+    "phone": "(21) 98953-7205"
+  },
+  "address": {
+    "street": "",
+    "number": "",
+    "district": "",
+    "zip_code": "",
+    "city": "",
+    "state": "",
+    "country": ""
+  },
+  "plans": [
+    {
+      "id": "lqv130zBYNOGxbj",
+      "name": "TAXAS DE REGISTRO",
+      "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+      "amount": 1,
+      "value": 9620,
+      "created_at": "2024-10-27 17:22:51",
+      "products": [
+        {
+          "id": "nQ7kZ7J9pza30eJ",
+          "name": "TAXAS DE REGISTRO",
+          "description": "PAGAMENTO OBRIGAT\u00d3RIO",
+          "amount": 1,
+          "photo": "https://cloudfox-digital-products.s3.amazonaws.com/uploads/public/products/YgjqIyd2X8O0ZpcU7xUhTs4t1opKGgSMeRXdNxtq.png",
+          "created_at": "2024-10-27 17:17:11"
+        }
+      ]
+    }
+  ]
+}
+2024-11-01 15:13:25,062 - __main__ - ERROR - Missing required fields
+2024-11-01 15:13:25,062 - werkzeug - INFO - 172.31.196.176 - - [01/Nov/2024 15:13:25] "[31m[1mPOST /webhook/06b42000-7771-4b22-b765-993fe881a270 HTTP/1.1[0m" 400 -
+2024-11-01 15:13:28,410 - werkzeug - INFO -  * Detected change in '/home/runner/SMSWebhookIntegrations/celery_worker.py', reloading
+2024-11-01 15:13:28,514 - werkzeug - INFO -  * Restarting with stat
