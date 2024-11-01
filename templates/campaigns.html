@@ -24,20 +24,12 @@
                     <option value="approved">Venda Aprovada</option>
                 </select>
             </div>
-            
-            <!-- Messages Container -->
             <div class="mb-3">
-                <label class="form-label d-flex justify-content-between align-items-center">
-                    Mensagens do Funil
-                    <button type="button" class="btn btn-sm btn-primary" id="addMessageBtn">
-                        <i class="fas fa-plus me-1"></i> Adicionar Mensagem
-                    </button>
-                </label>
-                <div id="messagesContainer">
-                    <!-- Message templates will be added here -->
-                </div>
+                <label class="form-label">Modelo de Mensagem</label>
+                <textarea class="form-control" id="messageTemplate" rows="3" required 
+                          placeholder="Variáveis disponíveis: {customer.name}, {total_price}"></textarea>
+                <small class="text-muted">Exemplo: Olá {customer.name}, seu pedido no valor de R$ {total_price} foi confirmado!</small>
             </div>
-            
             <button type="submit" class="btn btn-primary">Criar Campanha</button>
         </form>
     </div>
@@ -51,34 +43,6 @@
         <div id="campaignsList"></div>
     </div>
 </div>
-
-<!-- Message Template (hidden) -->
-<template id="messageTemplate">
-    <div class="card mb-3 message-card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="card-subtitle">Mensagem #<span class="message-number"></span></h6>
-                <div class="form-check form-switch">
-                    <input class="form-check-input message-active" type="checkbox" checked>
-                    <label class="form-check-label">Ativo</label>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Atraso (minutos)</label>
-                <input type="number" class="form-control message-delay" min="0" value="0" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Modelo de Mensagem</label>
-                <textarea class="form-control message-template" rows="3" required 
-                          placeholder="Variáveis disponíveis: {customer_name}, {total_price}"></textarea>
-                <small class="text-muted">Exemplo: Olá {customer_name}, seu pedido no valor de R$ {total_price} foi confirmado!</small>
-            </div>
-            <button type="button" class="btn btn-sm btn-danger remove-message">
-                <i class="fas fa-trash me-1"></i> Remover Mensagem
-            </button>
-        </div>
-    </div>
-</template>
 {% endblock %}
 
 {% block scripts %}
