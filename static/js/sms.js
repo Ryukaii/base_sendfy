@@ -17,12 +17,12 @@ document.getElementById('smsForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            alert('SMS sent successfully!');
+            alert('SMS queued successfully! Task ID: ' + data.task_id);
             e.target.reset();
         } else {
-            alert('Error sending SMS: ' + data.message);
+            alert('Error queuing SMS: ' + data.message);
         }
     } catch (error) {
-        alert('Error sending SMS: ' + error.message);
+        alert('Error queuing SMS: ' + error.message);
     }
 });
