@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h2>Create Integration</h2>
+    </div>
+    <div class="card-body">
+        <form id="integrationForm">
+            <div class="mb-3">
+                <label class="form-label">Integration Name</label>
+                <input type="text" class="form-control" id="integrationName" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Integration</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Existing Integrations</h2>
+    </div>
+    <div class="card-body">
+        <div id="integrationsList"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/integrations.js"></script>
+{% endblock %}

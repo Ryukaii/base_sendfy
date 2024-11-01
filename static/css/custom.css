@@ -1,0 +1,12 @@
+/* Additional custom styles if needed */
+.card {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.alert {
+    margin-top: 1rem;
+}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Send SMS</h2>
+    </div>
+    <div class="card-body">
+        <form id="smsForm">
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Operator</label>
+                <select class="form-select" id="operator" required>
+                    <option value="claro">Claro</option>
+                    <option value="vivo">Vivo</option>
+                    <option value="tim">Tim</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Message</label>
+                <textarea class="form-control" id="message" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send SMS</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/sms.js"></script>
+{% endblock %}

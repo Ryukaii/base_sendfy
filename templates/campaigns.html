@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h2>Create Campaign</h2>
+    </div>
+    <div class="card-body">
+        <form id="campaignForm">
+            <div class="mb-3">
+                <label class="form-label">Campaign Name</label>
+                <input type="text" class="form-control" id="campaignName" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Integration</label>
+                <select class="form-control" id="integrationId" required>
+                    <!-- Will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Event Type</label>
+                <input type="text" class="form-control" id="eventType" required 
+                       placeholder="e.g., order.completed">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Message Template</label>
+                <textarea class="form-control" id="messageTemplate" rows="3" required 
+                          placeholder="Use {variable} for dynamic content, e.g.: Thank you for your order {order_id}!"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Campaign</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Existing Campaigns</h2>
+    </div>
+    <div class="card-body">
+        <div id="campaignsList"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/campaigns.js"></script>
+{% endblock %}
