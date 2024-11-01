@@ -619,5 +619,14 @@
     "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': 'g4wc0lcq8tzyl09frji69ajfs957pr', 'status': 'processed', 'created_at': '2024-11-01 11:56:28'}}",
     "campaign_id": "test-campaign-1",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-01 15:29:25",
+    "phone": "+5561982132603",
+    "message": "teste",
+    "status": "success",
+    "api_response": "{'success': True, 'message': 'Message sent successfully', 'data': {'id': '0iw36iacrlg8f28j2gkcwjecr38uzs', 'status': 'processed', 'created_at': '2024-11-01 12:29:25'}}",
+    "campaign_id": null,
+    "event_type": "manual"
   }
 ]
