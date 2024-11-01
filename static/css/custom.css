@@ -8,6 +8,13 @@ body {
     min-height: 100vh;
 }
 
+.navbar-logo {
+    height: 40px;
+    width: auto;
+    margin-right: 10px;
+    filter: brightness(1.2);
+}
+
 .card {
     transition: var(--card-transition);
     border: none;
@@ -97,6 +104,10 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .navbar-logo {
+        height: 30px;
+    }
+
     .display-4 {
         font-size: 2.5rem;
     }
