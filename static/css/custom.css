@@ -1,12 +1,44 @@
-/* Additional custom styles if needed */
+/* Custom styles */
 .card {
-    margin-bottom: 2rem;
+    transition: transform 0.2s ease-in-out;
 }
 
-.form-label {
-    font-weight: 500;
+.card:hover {
+    transform: translateY(-5px);
 }
 
-.alert {
-    margin-top: 1rem;
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.15)!important;
+}
+
+.bg-opacity-10 {
+    --bs-bg-opacity: 0.1;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.display-4 {
+    font-weight: 600;
+}
+
+.lead {
+    font-size: 1.3rem;
+}
+
+footer {
+    position: relative;
+    margin-top: 3rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .lead {
+        font-size: 1.1rem;
+    }
 }
