@@ -1,0 +1,90 @@
+<?php
+// Receber os dados do checkout
+$data = json_decode(file_get_contents('php://input'), true);
+
+// Verificar se os dados foram recebidos corretamente
+if ($data && isset($data['customer']['phone'])) {
+    // Obter os dados necessários
+    $nomeCompleto = $data['customer']['name'];
+    $nomeArray = explode(' ', $nomeCompleto); // Dividir o nome completo por espaços
+    $nome = $nomeArray[0]; // Primeiro nome
+    $sobrenome = isset($nomeArray[1]) ? $nomeArray[1] : ''; // Primeiro sobrenome (se existir)
+
+    $telefone = preg_replace('/[^0-9]/', '', $data['customer']['phone']); // Remover caracteres especiais
+    $telefoneFormatado = "55" . $telefone; // Adicionar o código do país (55) no formato correto
+    $produto = $data['plans'][0]['products'][0]['name'];
+
+    // Corrigir o valor para garantir que seja tratado como número decimal e em reais
+    $preco = floatval($data['plans'][0]['value']) / 100; // Dividir por 100 para transformar em reais
+    $precoFormatado = number_format($preco, 2, ',', '.'); // Formatar o preço com vírgula e duas casas decimais
+
+    // Obter o transaction_id e o pix_code
+    if (isset($data['transaction_id']) && isset($data['pix_code'])) {
+        $transaction_id = $data['transaction_id'];
+        $pix_code = $data['pix_code'];
+    } else {
+        echo "Dados da transação ou Pix Code não encontrados.";
+        exit;
+    }
+
+    // Criar um array com os dados da nova transação
+    $novaTransacao = [
+        "customer_name" => "$nome $sobrenome",
+        "pix_code" => $pix_code
+    ];
+
+    // Carregar o conteúdo do arquivo transacoes.json
+    $arquivo = 'transacoes.json';
+    if (file_exists($arquivo)) {
+        $json_data = file_get_contents($arquivo);
+        $transacoes = json_decode($json_data, true);
+    } else {
+        $transacoes = [];
+    }
+
+    // Adicionar a nova transação ao array existente
+    $transacoes[$transaction_id] = $novaTransacao;
+
+    // Gravar o conteúdo atualizado de volta no arquivo transacoes.json
+    file_put_contents($arquivo, json_encode($transacoes, JSON_PRETTY_PRINT));
+
+    // Enviar o SMS com o link
+    $mensagem = "$nome, estamos aguardando o pagamento da Taxa de Emissão para finalizar seu registro: https://pagbr.net/$transaction_id";
+    
+    // Função para enviar o SMS
+    enviarSMS($telefoneFormatado, $mensagem);
+} else {
+    echo "Dados inválidos ou incompletos.";
+}
+
+// Função para enviar o SMS usando a API apisms.me
+function enviarSMS($numeroDestino, $mensagem) {
+    $token = 'df1cacd5-954f251b-6e5dfe0b-df9bfd66-7d98907a';
+    $url = 'https://api.apisms.me/v2/send.php';
+    
+    $data = [
+        'operator' => 'claro', // claro, vivo ou tim
+        'destination_number' => $numeroDestino,
+        'message' => $mensagem,
+        'tag' => 'Campanha',
+        'user_reply' => false
+    ];
+
+    $options = [
+        'http' => [
+            'header'  => "Content-type: application/json\r\nAuthorization: Bearer $token\r\n",
+            'method'  => 'POST',
+            'content' => json_encode($data),
+        ],
+    ];
+
+    $context  = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+
+    if ($result === FALSE) {
+        echo "Falha ao enviar SMS.";
+    } else {
+        echo "SMS enviado com sucesso!";
+    }
+}
+?>
