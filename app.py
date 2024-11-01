@@ -46,6 +46,23 @@ def format_phone_number(phone):
         numbers = '+' + numbers
     return numbers
 
+def normalize_status(status):
+    """Normalize status value to handle variations"""
+    if not status:
+        return None
+    # Convert to lowercase and remove whitespace
+    normalized = status.lower().strip()
+    # Map common variations to expected values
+    status_map = {
+        'pending': 'pending',
+        'pend': 'pending',
+        'pendente': 'pending',
+        'approved': 'approved',
+        'aprovado': 'approved',
+        'approve': 'approved',
+    }
+    return status_map.get(normalized, normalized)
+
 @app.route('/')
 def index():
     logger.info("Accessing index page")
@@ -190,7 +207,7 @@ def manage_campaigns():
                 'id': str(uuid.uuid4()),
                 'name': data['name'],
                 'integration_id': data['integration_id'],
-                'event_type': data['event_type'],
+                'event_type': normalize_status(data['event_type']),  # Normalize status when creating campaign
                 'message_template': data['message_template'],
                 'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -211,17 +228,24 @@ def manage_campaigns():
 @app.route('/webhook/<integration_id>', methods=['POST'])
 def webhook_handler(integration_id):
     logger.info(f"Received webhook for integration: {integration_id}")
+    logger.debug(f"Integration ID: {integration_id}")
+    
     try:
         webhook_data = request.json
-        logger.debug(f"Webhook data: {json.dumps(webhook_data, indent=2)}")
+        logger.debug(f"Raw webhook data: {json.dumps(webhook_data, indent=2)}")
         
-        # Extract required fields from webhook data
-        status = webhook_data.get('status')
+        # Extract and normalize required fields from webhook data
+        status = normalize_status(webhook_data.get('status'))
         customer = webhook_data.get('customer', {})
         total_price = webhook_data.get('total_price')
         
+        # Log extracted data
+        logger.debug(f"Webhook status (normalized): {status}")
+        logger.debug(f"Customer data: {json.dumps(customer, indent=2)}")
+        logger.debug(f"Total price: {total_price}")
+        
         if not status or not customer or not total_price:
-            logger.warning("Missing required fields in webhook data")
+            logger.warning(f"Missing required fields in webhook data: status={status}, customer={bool(customer)}, total_price={total_price}")
             return jsonify({
                 'success': False,
                 'message': 'Missing required fields in webhook data'
@@ -231,12 +255,16 @@ def webhook_handler(integration_id):
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
         
+        # Log all campaigns for debugging
+        logger.debug(f"All campaigns: {json.dumps(campaigns, indent=2)}")
+        
         # Find matching campaigns
         matching_campaigns = [c for c in campaigns 
                             if c['integration_id'] == integration_id 
-                            and c['event_type'] == status]
+                            and normalize_status(c['event_type']) == status]
         
         logger.info(f"Found {len(matching_campaigns)} matching campaigns")
+        logger.debug(f"Matching campaigns: {json.dumps(matching_campaigns, indent=2)}")
         
         tasks = []
         for campaign in matching_campaigns:
@@ -246,6 +274,10 @@ def webhook_handler(integration_id):
                     customer=customer,
                     total_price=total_price
                 )
+                
+                logger.debug(f"Preparing to queue SMS for campaign {campaign['id']}")
+                logger.debug(f"Formatted phone: {phone}")
+                logger.debug(f"Formatted message: {message}")
                 
                 task = send_sms_task.delay(
                     phone=phone,
