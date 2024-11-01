@@ -161,37 +161,52 @@ def manage_campaigns():
 
 @app.route('/webhook/<integration_id>', methods=['POST'])
 def webhook_handler(integration_id):
-    data = request.json
+    webhook_data = request.json
+    
+    # Extract required fields from webhook data
+    status = webhook_data.get('status')
+    customer = webhook_data.get('customer', {})
+    total_price = webhook_data.get('total_price')
+    
+    if not status or not customer or not total_price:
+        return jsonify({
+            'success': False,
+            'message': 'Missing required fields in webhook data'
+        }), 400
     
     # Load campaigns
     with open(CAMPAIGNS_FILE, 'r') as f:
         campaigns = json.load(f)
     
-    # Find matching campaigns and send SMS
-    matching_campaigns = [c for c in campaigns if c['integration_id'] == integration_id 
-                        and c['event_type'] == data.get('event_type')]
+    # Find matching campaigns for this integration and status
+    matching_campaigns = [c for c in campaigns 
+                         if c['integration_id'] == integration_id 
+                         and c['event_type'] == status]
     
     for campaign in matching_campaigns:
-        # Process message template
-        message = campaign['message_template'].format(**data)
-        
-        # Prepare SMS data
-        sms_data = {
-            "operator": data.get('operator', 'claro'),  # Default to claro if not specified
-            "destination_number": data.get('phone'),
-            "message": message,
-            "tag": "SMS Platform",
-            "user_reply": False
-        }
-        
-        # Prepare headers with token using Bearer authentication
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {SMS_API_TOKEN}'
-        }
-        
-        # Send SMS
         try:
+            # Format message using webhook data
+            message = campaign['message_template'].format(
+                customer=customer,
+                total_price=total_price
+            )
+            
+            # Prepare SMS data
+            sms_data = {
+                "operator": "claro",  # Default operator
+                "destination_number": customer['phone'],
+                "message": message,
+                "tag": "SMS Platform",
+                "user_reply": False
+            }
+            
+            # Prepare headers with token using Bearer authentication
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {SMS_API_TOKEN}'
+            }
+            
+            # Send SMS
             response = requests.post(
                 SMS_API_ENDPOINT,
                 json=sms_data,
@@ -199,6 +214,9 @@ def webhook_handler(integration_id):
                 timeout=10
             )
             response.raise_for_status()
+            
+        except KeyError as e:
+            print(f"Error formatting message for campaign {campaign['id']}: Missing key {str(e)}")
         except Exception as e:
             print(f"Error sending SMS for campaign {campaign['id']}: {str(e)}")
     

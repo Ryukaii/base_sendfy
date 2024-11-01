@@ -19,13 +19,16 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Event Type</label>
-                <input type="text" class="form-control" id="eventType" required 
-                       placeholder="e.g., order.completed">
+                <select class="form-control" id="eventType" required>
+                    <option value="pending">Venda Pendente</option>
+                    <option value="approved">Venda Aprovada</option>
+                </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Message Template</label>
                 <textarea class="form-control" id="messageTemplate" rows="3" required 
-                          placeholder="Use {variable} for dynamic content, e.g.: Thank you for your order {order_id}!"></textarea>
+                          placeholder="Available variables: {customer.name}, {total_price}"></textarea>
+                <small class="text-muted">Example: Olá {customer.name}, seu pedido no valor de R$ {total_price} foi confirmado!</small>
             </div>
             <button type="submit" class="btn btn-primary">Create Campaign</button>
         </form>
