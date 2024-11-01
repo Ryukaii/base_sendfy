@@ -1,4 +1,4 @@
-// Load existing campaigns and integrations
+// Carregar campanhas e integrações existentes
 async function loadCampaigns() {
     try {
         const [campaignsResponse, integrationsResponse] = await Promise.all([
@@ -11,14 +11,14 @@ async function loadCampaigns() {
             integrationsResponse.json()
         ]);
         
-        // Populate integrations dropdown
+        // Preencher dropdown de integrações
         const integrationSelect = document.getElementById('integrationId');
-        integrationSelect.innerHTML = `<option value="">Select Integration</option>` + 
+        integrationSelect.innerHTML = `<option value="">Selecione uma Integração</option>` + 
             integrations.map(integration => 
                 `<option value="${integration.id}">${integration.name}</option>`
             ).join('');
         
-        // Display campaigns
+        // Exibir campanhas
         const list = document.getElementById('campaignsList');
         list.innerHTML = '';
         
@@ -32,16 +32,16 @@ async function loadCampaigns() {
                         <div>
                             <h5 class="card-title">${campaign.name}</h5>
                             <p class="card-text">
-                                <strong>Integration:</strong> ${integration ? integration.name : 'Unknown'}<br>
-                                <strong>Event Type:</strong> ${campaign.event_type}<br>
-                                <strong>Message Template:</strong><br>
+                                <strong>Integração:</strong> ${integration ? integration.name : 'Desconhecida'}<br>
+                                <strong>Tipo de Evento:</strong> ${campaign.event_type}<br>
+                                <strong>Modelo de Mensagem:</strong><br>
                                 <code>${campaign.message_template}</code>
                             </p>
-                            <p class="card-text"><small class="text-muted">Created: ${campaign.created_at}</small></p>
+                            <p class="card-text"><small class="text-muted">Criada em: ${campaign.created_at}</small></p>
                         </div>
                         <div>
-                            <button class="btn btn-primary mb-2" onclick="editCampaign('${campaign.id}')">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteCampaign('${campaign.id}')">Delete</button>
+                            <button class="btn btn-primary mb-2" onclick="editCampaign('${campaign.id}')">Editar</button>
+                            <button class="btn btn-danger" onclick="deleteCampaign('${campaign.id}')">Excluir</button>
                         </div>
                     </div>
                 </div>
@@ -49,12 +49,12 @@ async function loadCampaigns() {
             list.appendChild(div);
         });
     } catch (error) {
-        console.error('Error loading data:', error);
-        alert('Error loading campaigns and integrations. Please try again.');
+        console.error('Erro ao carregar dados:', error);
+        alert('Erro ao carregar campanhas e integrações. Por favor, tente novamente.');
     }
 }
 
-// Handle campaign creation/update
+// Manipular criação/atualização de campanha
 document.getElementById('campaignForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -72,7 +72,7 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
     if (campaignId) {
         url += `/${campaignId}`;
         method = 'PUT';
-        delete formData.integration_id; // Don't update integration ID
+        delete formData.integration_id;
     }
     
     try {
@@ -85,29 +85,29 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         });
         
         if (response.ok) {
-            alert(campaignId ? 'Campaign updated successfully!' : 'Campaign created successfully!');
+            alert(campaignId ? 'Campanha atualizada com sucesso!' : 'Campanha criada com sucesso!');
             resetForm();
             loadCampaigns();
         } else {
             const data = await response.json();
-            alert(`Error ${campaignId ? 'updating' : 'creating'} campaign: ${data.error}`);
+            alert(`Erro ao ${campaignId ? 'atualizar' : 'criar'} campanha: ${data.error}`);
         }
     } catch (error) {
-        console.error('Error saving campaign:', error);
-        alert(`Error ${campaignId ? 'updating' : 'creating'} campaign. Please try again.`);
+        console.error('Erro ao salvar campanha:', error);
+        alert(`Erro ao ${campaignId ? 'atualizar' : 'criar'} campanha. Por favor, tente novamente.`);
     }
 });
 
-// Reset form to creation mode
+// Resetar formulário para modo de criação
 function resetForm() {
     const form = document.getElementById('campaignForm');
     form.reset();
     delete form.dataset.campaignId;
     document.getElementById('integrationId').disabled = false;
-    document.querySelector('button[type="submit"]').textContent = 'Create Campaign';
+    document.querySelector('button[type="submit"]').textContent = 'Criar Campanha';
 }
 
-// Load campaign data for editing
+// Carregar dados da campanha para edição
 async function editCampaign(campaignId) {
     try {
         const response = await fetch('/api/campaigns');
@@ -115,7 +115,7 @@ async function editCampaign(campaignId) {
         const campaign = campaigns.find(c => c.id === campaignId);
         
         if (!campaign) {
-            alert('Campaign not found');
+            alert('Campanha não encontrada');
             return;
         }
         
@@ -128,19 +128,18 @@ async function editCampaign(campaignId) {
         document.getElementById('eventType').value = campaign.event_type;
         document.getElementById('messageTemplate').value = campaign.message_template;
         
-        document.querySelector('button[type="submit"]').textContent = 'Update Campaign';
+        document.querySelector('button[type="submit"]').textContent = 'Atualizar Campanha';
         
-        // Scroll to form
         form.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
-        console.error('Error loading campaign for edit:', error);
-        alert('Error loading campaign data. Please try again.');
+        console.error('Erro ao carregar campanha para edição:', error);
+        alert('Erro ao carregar dados da campanha. Por favor, tente novamente.');
     }
 }
 
-// Delete campaign
+// Excluir campanha
 async function deleteCampaign(campaignId) {
-    if (!confirm('Are you sure you want to delete this campaign?')) {
+    if (!confirm('Tem certeza que deseja excluir esta campanha?')) {
         return;
     }
     
@@ -150,28 +149,28 @@ async function deleteCampaign(campaignId) {
         });
         
         if (response.ok) {
-            alert('Campaign deleted successfully!');
+            alert('Campanha excluída com sucesso!');
             resetForm();
             loadCampaigns();
         } else {
             const data = await response.json();
-            alert(`Error deleting campaign: ${data.error}`);
+            alert(`Erro ao excluir campanha: ${data.error}`);
         }
     } catch (error) {
-        console.error('Error deleting campaign:', error);
-        alert('Error deleting campaign. Please try again.');
+        console.error('Erro ao excluir campanha:', error);
+        alert('Erro ao excluir campanha. Por favor, tente novamente.');
     }
 }
 
-// Load data when page loads
+// Carregar dados quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
     loadCampaigns();
     
-    // Add cancel button handler
+    // Adicionar manipulador do botão cancelar
     const cancelButton = document.createElement('button');
     cancelButton.type = 'button';
     cancelButton.className = 'btn btn-secondary ms-2';
-    cancelButton.textContent = 'Cancel';
+    cancelButton.textContent = 'Cancelar';
     cancelButton.onclick = resetForm;
     
     const submitButton = document.querySelector('button[type="submit"]');

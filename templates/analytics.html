@@ -3,11 +3,11 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <!-- Overview Cards -->
+        <!-- Cartões de Visão Geral -->
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Total Messages</h5>
+                    <h5 class="card-title">Total de Mensagens</h5>
                     <h2 class="card-text">{{ total_messages }}</h2>
                 </div>
             </div>
@@ -15,7 +15,7 @@
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Success Rate</h5>
+                    <h5 class="card-title">Taxa de Sucesso</h5>
                     <h2 class="card-text">{{ success_rate }}%</h2>
                 </div>
             </div>
@@ -23,7 +23,7 @@
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Manual Messages</h5>
+                    <h5 class="card-title">Mensagens Manuais</h5>
                     <h2 class="card-text">{{ manual_messages }}</h2>
                 </div>
             </div>
@@ -31,7 +31,7 @@
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Campaign Messages</h5>
+                    <h5 class="card-title">Mensagens de Campanha</h5>
                     <h2 class="card-text">{{ campaign_messages }}</h2>
                 </div>
             </div>
@@ -39,11 +39,11 @@
     </div>
 
     <div class="row">
-        <!-- Messages by Status -->
+        <!-- Mensagens por Status -->
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Messages by Status</h5>
+                    <h5 class="mb-0">Mensagens por Status</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -51,8 +51,8 @@
                             <thead>
                                 <tr>
                                     <th>Status</th>
-                                    <th>Count</th>
-                                    <th>Percentage</th>
+                                    <th>Quantidade</th>
+                                    <th>Porcentagem</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,7 +60,7 @@
                                 <tr>
                                     <td>
                                         <span class="badge {% if status.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
-                                            {{ status.status }}
+                                            {{ 'Sucesso' if status.status == 'success' else 'Falha' }}
                                         </span>
                                     </td>
                                     <td>{{ status.count }}</td>
@@ -74,20 +74,20 @@
             </div>
         </div>
 
-        <!-- Messages by Event Type -->
+        <!-- Mensagens por Tipo de Evento -->
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Messages by Event Type</h5>
+                    <h5 class="mb-0">Mensagens por Tipo de Evento</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Event Type</th>
-                                    <th>Count</th>
-                                    <th>Percentage</th>
+                                    <th>Tipo de Evento</th>
+                                    <th>Quantidade</th>
+                                    <th>Porcentagem</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -106,23 +106,23 @@
         </div>
     </div>
 
-    <!-- Recent Activity -->
+    <!-- Atividade Recente -->
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Recent Activity</h5>
+                    <h5 class="mb-0">Atividade Recente</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Date/Time</th>
-                                    <th>Phone</th>
-                                    <th>Event Type</th>
+                                    <th>Data/Hora</th>
+                                    <th>Telefone</th>
+                                    <th>Tipo de Evento</th>
                                     <th>Status</th>
-                                    <th>Message</th>
+                                    <th>Mensagem</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -133,7 +133,7 @@
                                     <td>{{ activity.event_type }}</td>
                                     <td>
                                         <span class="badge {% if activity.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
-                                            {{ activity.status }}
+                                            {{ 'Sucesso' if activity.status == 'success' else 'Falha' }}
                                         </span>
                                     </td>
                                     <td>{{ activity.message }}</td>

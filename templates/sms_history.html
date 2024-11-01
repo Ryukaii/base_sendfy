@@ -3,19 +3,19 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2>SMS History</h2>
+        <h2>Histórico de SMS</h2>
     </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Date/Time</th>
-                        <th>Phone</th>
-                        <th>Message</th>
+                        <th>Data/Hora</th>
+                        <th>Telefone</th>
+                        <th>Mensagem</th>
                         <th>Status</th>
-                        <th>Event Type</th>
-                        <th>Response</th>
+                        <th>Tipo de Evento</th>
+                        <th>Resposta</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,7 +26,7 @@
                         <td>{{ entry.message }}</td>
                         <td>
                             <span class="badge {% if entry.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
-                                {{ entry.status }}
+                                {{ 'Sucesso' if entry.status == 'success' else 'Falha' }}
                             </span>
                         </td>
                         <td>{{ entry.event_type }}</td>

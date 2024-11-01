@@ -3,41 +3,41 @@
 {% block content %}
 <div class="card mb-4">
     <div class="card-header">
-        <h2>Create Campaign</h2>
+        <h2>Criar Campanha</h2>
     </div>
     <div class="card-body">
         <form id="campaignForm">
             <div class="mb-3">
-                <label class="form-label">Campaign Name</label>
+                <label class="form-label">Nome da Campanha</label>
                 <input type="text" class="form-control" id="campaignName" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">Integration</label>
+                <label class="form-label">Integração</label>
                 <select class="form-control" id="integrationId" required>
-                    <!-- Will be populated by JavaScript -->
+                    <!-- Será preenchido por JavaScript -->
                 </select>
             </div>
             <div class="mb-3">
-                <label class="form-label">Event Type</label>
+                <label class="form-label">Tipo de Evento</label>
                 <select class="form-control" id="eventType" required>
                     <option value="pending">Venda Pendente</option>
                     <option value="approved">Venda Aprovada</option>
                 </select>
             </div>
             <div class="mb-3">
-                <label class="form-label">Message Template</label>
+                <label class="form-label">Modelo de Mensagem</label>
                 <textarea class="form-control" id="messageTemplate" rows="3" required 
-                          placeholder="Available variables: {customer.name}, {total_price}"></textarea>
-                <small class="text-muted">Example: Olá {customer.name}, seu pedido no valor de R$ {total_price} foi confirmado!</small>
+                          placeholder="Variáveis disponíveis: {customer.name}, {total_price}"></textarea>
+                <small class="text-muted">Exemplo: Olá {customer.name}, seu pedido no valor de R$ {total_price} foi confirmado!</small>
             </div>
-            <button type="submit" class="btn btn-primary">Create Campaign</button>
+            <button type="submit" class="btn btn-primary">Criar Campanha</button>
         </form>
     </div>
 </div>
 
 <div class="card">
     <div class="card-header">
-        <h2>Existing Campaigns</h2>
+        <h2>Campanhas Existentes</h2>
     </div>
     <div class="card-body">
         <div id="campaignsList"></div>

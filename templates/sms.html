@@ -3,16 +3,16 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2>Send SMS</h2>
+        <h2>Enviar SMS</h2>
     </div>
     <div class="card-body">
         <form id="smsForm">
             <div class="mb-3">
-                <label class="form-label">Phone Number</label>
+                <label class="form-label">Número de Telefone</label>
                 <input type="tel" class="form-control" id="phone" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">Operator</label>
+                <label class="form-label">Operadora</label>
                 <select class="form-select" id="operator" required>
                     <option value="claro">Claro</option>
                     <option value="vivo">Vivo</option>
@@ -20,10 +20,10 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label class="form-label">Message</label>
+                <label class="form-label">Mensagem</label>
                 <textarea class="form-control" id="message" rows="3" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Send SMS</button>
+            <button type="submit" class="btn btn-primary">Enviar SMS</button>
         </form>
     </div>
 </div>
