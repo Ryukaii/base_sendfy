@@ -8,6 +8,10 @@ import requests
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 
+# API Configuration
+SMS_API_ENDPOINT = "https://api.apisms.me/v2/send.php"
+SMS_API_TOKEN = "df1cacd5-954f251b-6e5dfe0b-df9bfd66-7d98907a"
+
 # File paths
 INTEGRATIONS_FILE = 'data/integrations.json'
 CAMPAIGNS_FILE = 'data/campaigns.json'
@@ -47,12 +51,63 @@ def send_sms():
     message = data.get('message')
     operator = data.get('operator')
     
-    # Here we would integrate with SMS API
+    if not all([phone, message, operator]):
+        return jsonify({
+            'success': False, 
+            'message': 'Missing required fields: phone, message, or operator'
+        }), 400
+    
+    # Prepare request payload
+    sms_data = {
+        "operator": operator,
+        "destination_number": phone,
+        "message": message,
+        "tag": "SMS Platform",
+        "user_reply": False
+    }
+    
+    # Prepare headers with token
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': SMS_API_TOKEN
+    }
+    
     try:
-        # For now, just simulate success
-        return jsonify({'success': True, 'message': 'SMS sent successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        # Make request to SMS API
+        response = requests.post(
+            SMS_API_ENDPOINT,
+            json=sms_data,
+            headers=headers,
+            timeout=10
+        )
+        
+        # Check if request was successful
+        response.raise_for_status()
+        
+        # Parse response
+        api_response = response.json()
+        
+        if api_response.get('success', False):
+            return jsonify({
+                'success': True,
+                'message': 'SMS sent successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': api_response.get('message', 'Failed to send SMS')
+            }), 400
+            
+    except requests.exceptions.Timeout:
+        return jsonify({
+            'success': False,
+            'message': 'Request timed out while trying to send SMS'
+        }), 504
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error sending SMS: {str(e)}'
+        }), 500
 
 @app.route('/api/integrations', methods=['GET', 'POST'])
 def manage_integrations():
@@ -120,10 +175,30 @@ def webhook_handler(integration_id):
         # Process message template
         message = campaign['message_template'].format(**data)
         
+        # Prepare SMS data
+        sms_data = {
+            "operator": data.get('operator', 'claro'),  # Default to claro if not specified
+            "destination_number": data.get('phone'),
+            "message": message,
+            "tag": "SMS Platform",
+            "user_reply": False
+        }
+        
+        # Prepare headers
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': SMS_API_TOKEN
+        }
+        
         # Send SMS
         try:
-            # For now, just print the message that would be sent
-            print(f"Would send SMS: {message} to {data.get('phone')}")
+            response = requests.post(
+                SMS_API_ENDPOINT,
+                json=sms_data,
+                headers=headers,
+                timeout=10
+            )
+            response.raise_for_status()
         except Exception as e:
             print(f"Error sending SMS for campaign {campaign['id']}: {str(e)}")
     
