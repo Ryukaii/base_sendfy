@@ -10,13 +10,3 @@
 .alert {
     margin-top: 1rem;
 }
-
-.navbar-brand img {
-    height: 40px;
-    margin-right: 10px;
-    transition: transform 0.2s ease;
-}
-
-.navbar-brand img:hover {
-    transform: scale(1.05);
-}

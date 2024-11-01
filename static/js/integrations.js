@@ -2,17 +2,10 @@
 async function loadIntegrations() {
     try {
         const response = await fetch('/api/integrations');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
         const integrations = await response.json();
         
         const list = document.getElementById('integrationsList');
         list.innerHTML = '';
-        
-        if (!Array.isArray(integrations)) {
-            throw new Error('Invalid response format: expected an array');
-        }
         
         integrations.forEach(integration => {
             const div = document.createElement('div');
@@ -24,8 +17,8 @@ async function loadIntegrations() {
                             <h5 class="card-title">${integration.name}</h5>
                             <p class="card-text">
                                 <strong>Webhook URL:</strong> 
-                                <code>${window.location.origin}/webhook/${integration.id}</code>
-                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('${window.location.origin}/webhook/${integration.id}')">
+                                <code>${window.location.origin}${integration.webhook_url}</code>
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('${window.location.origin}${integration.webhook_url}')">
                                     Copy
                                 </button>
                             </p>
@@ -38,9 +31,8 @@ async function loadIntegrations() {
             list.appendChild(div);
         });
     } catch (error) {
-        console.error('Error loading integrations:', error.message || error);
-        const list = document.getElementById('integrationsList');
-        list.innerHTML = '<div class="alert alert-danger">Error loading integrations. Please refresh the page to try again.</div>';
+        console.error('Error loading integrations:', error);
+        alert('Error loading integrations. Please try again.');
     }
 }
 
@@ -50,20 +42,7 @@ async function copyToClipboard(text) {
         await navigator.clipboard.writeText(text);
         alert('Webhook URL copied to clipboard!');
     } catch (err) {
-        console.error('Failed to copy text:', err.message || err);
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            alert('Webhook URL copied to clipboard!');
-        } catch (err) {
-            console.error('Fallback copying failed:', err.message || err);
-            alert('Failed to copy URL. Please copy it manually.');
-        }
-        document.body.removeChild(textArea);
+        console.error('Failed to copy text: ', err);
     }
 }
 
@@ -82,17 +61,17 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
             body: JSON.stringify({ name })
         });
         
-        if (!response.ok) {
+        if (response.ok) {
+            alert('Integration created successfully!');
+            e.target.reset();
+            loadIntegrations();
+        } else {
             const data = await response.json();
-            throw new Error(data.error || 'Failed to create integration');
+            alert(`Error creating integration: ${data.error}`);
         }
-        
-        alert('Integration created successfully!');
-        e.target.reset();
-        loadIntegrations();
     } catch (error) {
-        console.error('Error creating integration:', error.message || error);
-        alert(`Error creating integration: ${error.message || 'Please try again'}`);
+        console.error('Error creating integration:', error);
+        alert('Error creating integration. Please try again.');
     }
 });
 
@@ -107,16 +86,16 @@ async function deleteIntegration(integrationId) {
             method: 'DELETE'
         });
         
-        if (!response.ok) {
+        if (response.ok) {
+            alert('Integration deleted successfully!');
+            loadIntegrations();
+        } else {
             const data = await response.json();
-            throw new Error(data.error || 'Failed to delete integration');
+            alert(`Error deleting integration: ${data.error}`);
         }
-        
-        alert('Integration deleted successfully!');
-        loadIntegrations();
     } catch (error) {
-        console.error('Error deleting integration:', error.message || error);
-        alert(`Error deleting integration: ${error.message || 'Please try again'}`);
+        console.error('Error deleting integration:', error);
+        alert('Error deleting integration. Please try again.');
     }
 }
 
