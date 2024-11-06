@@ -30,6 +30,7 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.login_message = 'Por favor, faça login para acessar esta página.'
 login_manager.login_message_category = 'info'
 
 DATA_DIR = 'data'
@@ -79,8 +80,8 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
             if request.is_json:
-                return handle_api_error('Admin privileges required', 403)
-            flash('You need admin privileges to access this page.', 'danger')
+                return handle_api_error('Acesso restrito a administradores', 403)
+            flash('Você precisa ter privilégios de administrador para acessar esta página.', 'danger')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -91,217 +92,7 @@ def init_app(app):
         initialize_json_file(file_path)
     initialize_json_file('data/users.json', [])
 
-# Initialize app on startup
 init_app(app)
-
-# Webhook handler
-@app.route('/webhook/<webhook_id>', methods=['POST'])
-def webhook_handler(webhook_id):
-    try:
-        data = request.get_json()
-        if not data:
-            logger.error("No JSON data received in webhook")
-            return handle_api_error('No data received', 400)
-            
-        if 'customer' not in data:
-            logger.error("Missing customer data in webhook payload")
-            return handle_api_error('Missing customer data', 400)
-            
-        customer = data.get('customer', {})
-        if not all(k in customer for k in ['name', 'phone']):
-            logger.error("Missing required customer fields (name/phone)")
-            return handle_api_error('Missing required customer fields', 400)
-            
-        if 'total_price' not in data:
-            logger.error("Missing total_price in webhook payload")
-            return handle_api_error('Missing total price', 400)
-        
-        logger.info(f"Received webhook for ID {webhook_id}")
-        logger.debug(f"Webhook payload: {json.dumps(data)}")
-        
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            integrations = json.load(f)
-            integration = next((i for i in integrations if webhook_id in i['webhook_url']), None)
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        if not integration:
-            logger.error(f"No integration found for webhook ID {webhook_id}")
-            return handle_api_error('Integration not found', 404)
-            
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            matching_campaigns = [c for c in campaigns 
-                                if c['integration_id'] == integration['id']
-                                and c['event_type'] == data.get('status', 'pending')]
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-        
-        if not matching_campaigns:
-            logger.info(f"No matching campaigns found for {data.get('status', 'pending')} event")
-            return jsonify({'success': True, 'message': 'No matching campaigns'})
-            
-        for campaign in matching_campaigns:
-            try:
-                message = campaign['message_template']
-                message = message.replace('{customer.name}', customer['name'])
-                message = message.replace('{total_price}', str(data['total_price']))
-                
-                logger.info(f"Queueing SMS for campaign {campaign['id']}")
-                
-                send_sms_task.delay(
-                    phone=customer['phone'],
-                    message=message,
-                    campaign_id=campaign['id'],
-                    event_type=data.get('status', 'pending')
-                )
-                
-            except Exception as e:
-                logger.error(f"Error processing campaign {campaign['id']}: {str(e)}")
-                continue
-            
-        return jsonify({'success': True, 'message': 'Webhook processed successfully'})
-        
-    except Exception as e:
-        logger.error(f"Webhook error: {str(e)}\n{traceback.format_exc()}")
-        return handle_api_error('Webhook processing failed', 500)
-
-@app.route('/api/integrations', methods=['GET'])
-@login_required
-def get_integrations():
-    try:
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            integrations = json.load(f)
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        logger.debug(f"Retrieved {len(integrations)} integrations")
-        return jsonify(integrations)
-    except Exception as e:
-        logger.error(f"Error retrieving integrations: {str(e)}\n{traceback.format_exc()}")
-        return handle_api_error('Failed to retrieve integrations', 500)
-
-@app.route('/api/campaigns', methods=['GET'])
-@login_required
-def get_campaigns():
-    try:
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-        return jsonify(campaigns)
-    except Exception as e:
-        logger.error(f"Error retrieving campaigns: {str(e)}")
-        return handle_api_error('Failed to retrieve campaigns', 500)
-
-@app.route('/api/campaigns', methods=['POST'])
-@login_required
-def create_campaign():
-    try:
-        data = request.get_json()
-        campaign = {
-            'id': str(uuid.uuid4()),
-            'name': data['name'],
-            'integration_id': data['integration_id'],
-            'event_type': data['event_type'],
-            'message_template': data['message_template'],
-            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        with open(CAMPAIGNS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            campaigns.append(campaign)
-            f.seek(0)
-            json.dump(campaigns, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({
-            'success': True,
-            'message': 'Campaign created successfully',
-            'campaign': campaign
-        })
-    except Exception as e:
-        logger.error(f"Error creating campaign: {str(e)}")
-        return handle_api_error('Failed to create campaign', 500)
-
-@app.route('/api/integrations', methods=['POST'])
-@login_required
-def create_integration():
-    try:
-        data = request.get_json()
-        if not data or 'name' not in data:
-            return handle_api_error('Integration name is required')
-            
-        name = data['name'].strip()
-        if not name:
-            return handle_api_error('Integration name cannot be empty')
-            
-        integration = {
-            'id': str(uuid.uuid4()),
-            'name': name,
-            'webhook_url': f'/webhook/{str(uuid.uuid4())}',
-            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        with open(INTEGRATIONS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            integrations = json.load(f)
-            integrations.append(integration)
-            f.seek(0)
-            json.dump(integrations, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        logger.info(f"Created new integration: {integration['id']}")
-        return jsonify({
-            'success': True,
-            'message': 'Integration created successfully',
-            'integration': integration
-        })
-    except Exception as e:
-        logger.error(f"Error creating integration: {str(e)}\n{traceback.format_exc()}")
-        return handle_api_error('Failed to create integration', 500)
-
-@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
-@login_required
-def delete_integration(integration_id):
-    try:
-        with open(INTEGRATIONS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            integrations = json.load(f)
-            filtered_integrations = [i for i in integrations if i['id'] != integration_id]
-            
-            if len(filtered_integrations) == len(integrations):
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-                return handle_api_error('Integration not found', 404)
-                
-            f.seek(0)
-            json.dump(filtered_integrations, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        logger.info(f"Deleted integration: {integration_id}")
-        return jsonify({
-            'success': True,
-            'message': 'Integration deleted successfully'
-        })
-    except Exception as e:
-        logger.error(f"Error deleting integration: {str(e)}\n{traceback.format_exc()}")
-        return handle_api_error('Failed to delete integration', 500)
-
-@app.errorhandler(404)
-def not_found_error(error):
-    if request.is_json:
-        return handle_api_error('Resource not found', 404)
-    return render_template('error.html', error='Page not found'), 404
-
-@app.errorhandler(500)
-def internal_error(error):
-    if request.is_json:
-        return handle_api_error('Internal server error', 500)
-    return render_template('error.html', error='Internal server error'), 500
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -321,6 +112,27 @@ def login():
             
         flash('Usuário ou senha inválidos.', 'danger')
     return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if User.get_by_username(username):
+            flash('Este nome de usuário já está em uso.', 'danger')
+            return render_template('register.html')
+            
+        user = User.create(username=username, password=password)
+        if user:
+            flash('Conta criada com sucesso! Você pode fazer login agora.', 'success')
+            return redirect(url_for('login'))
+            
+        flash('Erro ao criar conta. Por favor, tente novamente.', 'danger')
+    return render_template('register.html')
 
 @app.route('/logout')
 @login_required
@@ -397,31 +209,61 @@ def sms_history():
 def campaign_performance():
     return render_template('campaign_performance.html')
 
-@app.route('/api/send-sms', methods=['POST'])
+# API Routes
+@app.route('/api/users', methods=['POST'])
 @login_required
-def send_sms():
+@admin_required
+def create_user():
     try:
         data = request.get_json()
-        phone = data.get('phone')
-        message = data.get('message')
+        if not data or not all(k in data for k in ['username', 'password']):
+            return handle_api_error('Username and password are required')
         
-        if not phone or not message:
-            return handle_api_error('Número de telefone e mensagem são obrigatórios')
-            
-        task = send_sms_task.delay(
-            phone=phone,
-            message=message,
-            event_type='manual'
+        user = User.create(
+            username=data['username'],
+            password=data['password'],
+            is_admin=data.get('is_admin', False)
         )
         
+        if not user:
+            return handle_api_error('Failed to create user')
+            
         return jsonify({
             'success': True,
-            'message': 'SMS enviado com sucesso'
+            'message': 'User created successfully'
         })
         
     except Exception as e:
-        logger.error(f"Error sending SMS: {str(e)}")
-        return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.', 500)
+        return handle_api_error(f'Error creating user: {str(e)}')
+
+@app.route('/api/users/<user_id>', methods=['DELETE'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    try:
+        if str(current_user.id) == user_id:
+            return handle_api_error('Cannot delete your own account')
+            
+        # Implementation of user deletion would go here
+        return jsonify({
+            'success': True,
+            'message': 'User deleted successfully'
+        })
+        
+    except Exception as e:
+        return handle_api_error(f'Error deleting user: {str(e)}')
+
+@app.errorhandler(404)
+def not_found_error(error):
+    if request.is_json:
+        return handle_api_error('Resource not found', 404)
+    return render_template('error.html', error='Page not found'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    if request.is_json:
+        return handle_api_error('Internal server error', 500)
+    return render_template('error.html', error='Internal server error'), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)

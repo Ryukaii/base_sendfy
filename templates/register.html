@@ -2,13 +2,13 @@
 
 {% block content %}
 <div class="container">
-    <div class="row justify-content-center mt-5">
+    <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card bg-dark border-secondary shadow-lg">
-                <div class="card-header border-secondary text-center py-4">
-                    <h2 class="mb-0">Acesso ao Sistema</h2>
+            <div class="card bg-dark border-secondary shadow-lg mt-5">
+                <div class="card-header border-secondary text-center py-3">
+                    <h2 class="mb-0">Criar Nova Conta</h2>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body">
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
@@ -20,16 +20,16 @@
                         {% endif %}
                     {% endwith %}
                     
-                    <form method="POST" action="{{ url_for('login') }}">
-                        <div class="mb-4">
-                            <label for="username" class="form-label">Usuário</label>
+                    <form method="POST" action="{{ url_for('register') }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nome de Usuário</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-dark border-secondary">
                                     <i class="fas fa-user"></i>
                                 </span>
                                 <input type="text" class="form-control bg-dark border-secondary text-light" 
                                        id="username" name="username" required
-                                       placeholder="Digite seu usuário" autofocus>
+                                       placeholder="Escolha seu nome de usuário" autofocus>
                             </div>
                         </div>
                         <div class="mb-4">
@@ -43,14 +43,14 @@
                                        placeholder="Digite sua senha">
                             </div>
                         </div>
-                        <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>
-                                Entrar
-                            </button>
-                            <a href="/register" class="btn btn-outline-primary btn-lg">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg mb-3">
                                 <i class="fas fa-user-plus me-2"></i>
                                 Criar Conta
+                            </button>
+                            <a href="/login" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Voltar para Login
                             </a>
                         </div>
                     </form>

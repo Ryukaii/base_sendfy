@@ -754,5 +754,59 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139127671', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-06 22:04:08",
+    "phone": "5583987940883",
+    "message": "Wallas Henrique Ara\u00fajo Pessoa de Lima, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139128369', 'number': '5583987940883', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:04:27",
+    "phone": "5561982132603",
+    "message": "Pedrossso Silveiras, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139128400', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:09:17",
+    "phone": "5579996423407",
+    "message": "Alberto Leniton Silva Santos, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139128709', 'number': '5579996423407', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:10:23",
+    "phone": "5565999339430",
+    "message": "Jaimison Alves borges, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139128766', 'number': '5565999339430', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:10:50",
+    "phone": "5577999570553",
+    "message": "Leonardo dos Santos Prates, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139128796', 'number': '5577999570553', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:12:17",
+    "phone": "5531983467766",
+    "message": "Laercio Pereira J\u00fanior, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139128871', 'number': '5531983467766', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
+    "event_type": "pending"
   }
 ]
