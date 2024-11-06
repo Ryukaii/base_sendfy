@@ -1,27 +1,34 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card mb-4">
-    <div class="card-header">
-        <h2>Criar Integração</h2>
-    </div>
-    <div class="card-body">
-        <form id="integrationForm">
-            <div class="mb-3">
-                <label class="form-label">Nome da Integração</label>
-                <input type="text" class="form-control" id="integrationName" required>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Nova Integração</h2>
+                </div>
+                <div class="card-body">
+                    <form id="integrationForm" method="POST">
+                        <div class="mb-3">
+                            <label for="integrationName" class="form-label">Nome da Integração</label>
+                            <input type="text" class="form-control" id="integrationName" name="name" required
+                                   placeholder="Ex: Minha Loja Virtual">
+                            <div class="form-text">Um nome para identificar esta integração</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>
+                            Criar Integração
+                        </button>
+                    </form>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Criar Integração</button>
-        </form>
-    </div>
-</div>
 
-<div class="card">
-    <div class="card-header">
-        <h2>Integrações Existentes</h2>
-    </div>
-    <div class="card-body">
-        <div id="integrationsList"></div>
+            <div id="integrationsList">
+                <!-- Lista de integrações será carregada via JavaScript -->
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
