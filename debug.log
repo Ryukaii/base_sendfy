@@ -42349,3 +42349,71 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 21:55:21,182 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:21] "[32mGET /login HTTP/1.1[0m" 302 -
 2024-11-06 21:55:21,524 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:21] "GET / HTTP/1.1" 200 -
 2024-11-06 21:55:21,978 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:21] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:55:35,637 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:35] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 21:55:35,946 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:35] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 21:55:35,954 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:35] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:55:37,084 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:37] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 21:55:37,086 - __main__ - DEBUG - [app.py:107] - Retrieved 1 integrations
+2024-11-06 21:55:37,086 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:37] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 21:55:44,016 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:44] "GET /sms HTTP/1.1" 200 -
+2024-11-06 21:55:44,340 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:44] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:55:49,796 - celery.utils.functional - DEBUG - [functional.py:335] - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-06 21:55:49,960 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:49] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-06 21:55:54,352 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:54] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 21:55:54,674 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:54] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 21:55:54,678 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:54] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:55:56,143 - __main__ - DEBUG - [app.py:107] - Retrieved 1 integrations
+2024-11-06 21:55:56,144 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:56] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 21:55:56,196 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:55:56] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 21:56:23,864 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:56:23] "GET /integrations HTTP/1.1" 200 -
+2024-11-06 21:56:24,107 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:56:24] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:56:24,108 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:56:24] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-06 21:56:27,545 - __main__ - DEBUG - [app.py:107] - Retrieved 1 integrations
+2024-11-06 21:56:27,546 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:56:27] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 21:56:35,930 - __main__ - INFO - [app.py:186] - Created new integration: e465cf8c-8795-439f-86e4-b8cc7738617b
+2024-11-06 21:56:35,931 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:56:35] "POST /api/integrations HTTP/1.1" 200 -
+2024-11-06 21:56:36,148 - __main__ - DEBUG - [app.py:107] - Retrieved 2 integrations
+2024-11-06 21:56:36,149 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:56:36] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 21:57:12,676 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:12] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 21:57:12,950 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:12] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 21:57:12,998 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:57:15,045 - __main__ - DEBUG - [app.py:107] - Retrieved 2 integrations
+2024-11-06 21:57:15,045 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:15] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 21:57:15,056 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:15] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 21:57:39,450 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:39] "POST /api/campaigns HTTP/1.1" 200 -
+2024-11-06 21:57:39,656 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:39] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 21:57:39,686 - __main__ - DEBUG - [app.py:107] - Retrieved 2 integrations
+2024-11-06 21:57:39,688 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:57:39] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 21:58:36,976 - __main__ - ERROR - [app.py:65] - API Error: Resource not found
+2024-11-06 21:58:36,978 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:58:36] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:02:12,179 - werkzeug - INFO - [_internal.py:97] -  * Detected change in '/home/runner/SMSWebhookIntegrations/app.py', reloading
+2024-11-06 22:02:12,250 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 22:02:12,993 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 22:02:13,011 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 22:02:13,012 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 117-290-287
+2024-11-06 22:02:17,530 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 22:02:17,542 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.126:3000
+2024-11-06 22:02:17,548 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 22:02:17,549 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 22:02:17,863 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 22:02:17,877 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 22:02:17,879 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 978-806-456
+2024-11-06 22:02:18,097 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:18] "[32mGET / HTTP/1.1[0m" 302 -
+2024-11-06 22:02:18,109 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:18] "GET /login?next=/ HTTP/1.1" 200 -
+2024-11-06 22:02:18,128 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:18] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 22:02:18,752 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:18] "GET / HTTP/1.1" 200 -
+2024-11-06 22:02:18,989 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:18] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:02:31,353 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:31] "[32mGET / HTTP/1.1[0m" 302 -
+2024-11-06 22:02:31,360 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:31] "GET /login?next=/ HTTP/1.1" 200 -
+2024-11-06 22:02:31,376 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:31] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 22:02:32,817 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:32] "GET / HTTP/1.1" 200 -
+2024-11-06 22:02:33,106 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:02:33] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:03:26,745 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:03:26] "[32mGET / HTTP/1.1[0m" 302 -
+2024-11-06 22:03:26,753 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:03:26] "GET /login?next=/ HTTP/1.1" 200 -
+2024-11-06 22:03:26,764 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:03:26] "GET /static/css/custom.css HTTP/1.1" 200 -

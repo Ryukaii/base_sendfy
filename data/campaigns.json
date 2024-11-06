@@ -6,5 +6,13 @@
     "event_type": "pending",
     "message_template": "Ol\u00e1 {customer_name}, seu pedido no valor de R$ {total_price} est\u00e1 pendente.",
     "created_at": "2024-11-01 02:30:00"
+  },
+  {
+    "id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
+    "name": "VEGA",
+    "integration_id": "eccc0bb8-bde8-4531-908f-d2255e3a7855",
+    "event_type": "pending",
+    "message_template": "{customer.name}, efetue seu pagamento.",
+    "created_at": "2024-11-06 21:57:39"
   }
 ]

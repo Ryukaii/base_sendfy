@@ -94,7 +94,78 @@ def init_app(app):
 # Initialize app on startup
 init_app(app)
 
-# API Routes
+# Webhook handler
+@app.route('/webhook/<webhook_id>', methods=['POST'])
+def webhook_handler(webhook_id):
+    try:
+        data = request.get_json()
+        if not data:
+            logger.error("No JSON data received in webhook")
+            return handle_api_error('No data received', 400)
+            
+        if 'customer' not in data:
+            logger.error("Missing customer data in webhook payload")
+            return handle_api_error('Missing customer data', 400)
+            
+        customer = data.get('customer', {})
+        if not all(k in customer for k in ['name', 'phone']):
+            logger.error("Missing required customer fields (name/phone)")
+            return handle_api_error('Missing required customer fields', 400)
+            
+        if 'total_price' not in data:
+            logger.error("Missing total_price in webhook payload")
+            return handle_api_error('Missing total price', 400)
+        
+        logger.info(f"Received webhook for ID {webhook_id}")
+        logger.debug(f"Webhook payload: {json.dumps(data)}")
+        
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integration = next((i for i in integrations if webhook_id in i['webhook_url']), None)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        if not integration:
+            logger.error(f"No integration found for webhook ID {webhook_id}")
+            return handle_api_error('Integration not found', 404)
+            
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            matching_campaigns = [c for c in campaigns 
+                                if c['integration_id'] == integration['id']
+                                and c['event_type'] == data.get('status', 'pending')]
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        
+        if not matching_campaigns:
+            logger.info(f"No matching campaigns found for {data.get('status', 'pending')} event")
+            return jsonify({'success': True, 'message': 'No matching campaigns'})
+            
+        for campaign in matching_campaigns:
+            try:
+                message = campaign['message_template']
+                message = message.replace('{customer.name}', customer['name'])
+                message = message.replace('{total_price}', str(data['total_price']))
+                
+                logger.info(f"Queueing SMS for campaign {campaign['id']}")
+                
+                send_sms_task.delay(
+                    phone=customer['phone'],
+                    message=message,
+                    campaign_id=campaign['id'],
+                    event_type=data.get('status', 'pending')
+                )
+                
+            except Exception as e:
+                logger.error(f"Error processing campaign {campaign['id']}: {str(e)}")
+                continue
+            
+        return jsonify({'success': True, 'message': 'Webhook processed successfully'})
+        
+    except Exception as e:
+        logger.error(f"Webhook error: {str(e)}\n{traceback.format_exc()}")
+        return handle_api_error('Webhook processing failed', 500)
+
 @app.route('/api/integrations', methods=['GET'])
 @login_required
 def get_integrations():
@@ -220,7 +291,6 @@ def delete_integration(integration_id):
         logger.error(f"Error deleting integration: {str(e)}\n{traceback.format_exc()}")
         return handle_api_error('Failed to delete integration', 500)
 
-# Error Handlers
 @app.errorhandler(404)
 def not_found_error(error):
     if request.is_json:
@@ -233,7 +303,6 @@ def internal_error(error):
         return handle_api_error('Internal server error', 500)
     return render_template('error.html', error='Internal server error'), 500
 
-# Regular routes (unchanged)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -339,7 +408,6 @@ def send_sms():
         if not phone or not message:
             return handle_api_error('Número de telefone e mensagem são obrigatórios')
             
-        # Queue SMS sending task
         task = send_sms_task.delay(
             phone=phone,
             message=message,
@@ -355,6 +423,5 @@ def send_sms():
         logger.error(f"Error sending SMS: {str(e)}")
         return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.', 500)
 
-# Run the app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)

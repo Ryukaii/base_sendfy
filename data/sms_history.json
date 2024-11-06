@@ -745,5 +745,14 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139127423', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-06 21:55:50",
+    "phone": "5561982132603",
+    "message": "OI",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139127671', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
   }
 ]
