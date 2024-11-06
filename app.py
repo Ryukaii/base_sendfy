@@ -5,13 +5,15 @@ import datetime
 import re
 import logging
 import fcntl
-from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, make_response
 from celery_worker import send_sms_task
 from collections import Counter
 from functools import wraps
 import traceback
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models.users import User
+import secrets
+from datetime import timedelta
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -24,12 +26,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', secrets.token_hex(32))
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)  # For "remember me"
+app.config['SESSION_PROTECTION'] = 'strong'
 
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
 DATA_DIR = 'data'
@@ -67,9 +72,16 @@ def load_user(user_id):
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.is_admin:
-            flash('You need admin privileges to access this page.', 'danger')
-            return redirect(url_for('login'))
+        if not current_user.is_authenticated:
+            return jsonify({
+                'success': False,
+                'message': 'Authentication required'
+            }), 401
+        if not current_user.is_admin:
+            return jsonify({
+                'success': False,
+                'message': 'Admin privileges required'
+            }), 403
         return f(*args, **kwargs)
     return decorated_function
 
@@ -85,62 +97,131 @@ init_app(app)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return jsonify({'success': True, 'redirect': url_for('index')})
         
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        remember = request.form.get('remember') == 'on'
+        
+        if not username or not password:
+            return jsonify({
+                'success': False,
+                'message': 'Username and password are required'
+            }), 400
+            
         user = User.get_by_username(username)
         
         if user and user.check_password(password):
-            login_user(user)
-            flash('Login realizado com sucesso!', 'success')
-            next_page = request.args.get('next')
-            return redirect(next_page if next_page else url_for('index'))
+            login_user(user, remember=remember)
+            if remember:
+                session.permanent = True
             
-        flash('Usuário ou senha inválidos.', 'danger')
+            return jsonify({
+                'success': True,
+                'redirect': request.args.get('next') or url_for('index')
+            })
+            
+        return jsonify({
+            'success': False,
+            'message': 'Invalid username or password'
+        }), 401
+        
     return render_template('login.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('Você foi desconectado com sucesso.', 'success')
+    flash('You have been logged out successfully.', 'success')
     return redirect(url_for('login'))
+
+@app.route('/reset-password-request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        user = User.get_by_username(username)
+        
+        if user:
+            token = secrets.token_urlsafe(32)
+            user.set_reset_token(token)
+            flash(f'Password reset instructions have been sent to your email.', 'info')
+            
+        return jsonify({
+            'success': True,
+            'message': 'If an account exists with that username, you will receive reset instructions.'
+        })
+    
+    return render_template('reset_password_request.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    user = User.verify_reset_token(token)
+    if not user:
+        flash('Invalid or expired reset token.', 'danger')
+        return redirect(url_for('reset_password_request'))
+    
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if user.reset_password(password):
+            flash('Your password has been reset.', 'success')
+            return jsonify({
+                'success': True,
+                'redirect': url_for('login')
+            })
+        
+        return jsonify({
+            'success': False,
+            'message': 'Failed to reset password. Please try again.'
+        }), 400
+    
+    return render_template('reset_password.html')
 
 @app.route('/admin')
 @login_required
 @admin_required
 def admin_dashboard():
-    # Get statistics
-    users = User.get_all()
-    sms_history = []
-    campaigns = []
-    
     try:
-        with open(SMS_HISTORY_FILE, 'r') as f:
-            sms_history = json.load(f)
-    except:
-        pass
+        users = User.get_all()
+        sms_history = []
+        campaigns = []
         
-    try:
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            campaigns = json.load(f)
-    except:
-        pass
-    
-    success_messages = sum(1 for msg in sms_history if msg.get('status') == 'success')
-    total_messages = len(sms_history)
-    success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
-    
-    stats = {
-        'total_users': len(users),
-        'total_sms': total_messages,
-        'active_campaigns': len(campaigns),
-        'success_rate': success_rate
-    }
-    
-    return render_template('admin/dashboard.html', stats=stats, users=users)
+        try:
+            with open(SMS_HISTORY_FILE, 'r') as f:
+                sms_history = json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading SMS history: {str(e)}")
+            
+        try:
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                campaigns = json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading campaigns: {str(e)}")
+        
+        success_messages = sum(1 for msg in sms_history if msg.get('status') == 'success')
+        total_messages = len(sms_history)
+        success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
+        
+        stats = {
+            'total_users': len(users),
+            'total_sms': total_messages,
+            'active_campaigns': len(campaigns),
+            'success_rate': success_rate
+        }
+        
+        return render_template('admin/dashboard.html', stats=stats, users=users)
+    except Exception as e:
+        logger.error(f"Error in admin dashboard: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Error loading admin dashboard'
+        }), 500
 
 @app.route('/api/users', methods=['POST'])
 @login_required
@@ -153,29 +234,43 @@ def create_user():
         is_admin = data.get('is_admin', False)
         
         if not username or not password:
-            return jsonify({'success': False, 'message': 'Username and password are required'}), 400
+            return jsonify({
+                'success': False,
+                'message': 'Username and password are required'
+            }), 400
             
         user = User.create(username, password, is_admin)
         if not user:
-            return jsonify({'success': False, 'message': 'Username already exists'}), 400
+            return jsonify({
+                'success': False,
+                'message': 'Username already exists'
+            }), 400
             
-        return jsonify({'success': True, 'message': 'User created successfully'})
+        return jsonify({
+            'success': True,
+            'message': 'User created successfully'
+        })
     except Exception as e:
         logger.error(f"Error creating user: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
 
 @app.route('/api/users/<user_id>', methods=['DELETE'])
 @login_required
 @admin_required
 def delete_user(user_id):
     try:
-        # Prevent deleting the last admin user
         users = User.get_all()
         admin_users = [u for u in users if u.is_admin]
         user_to_delete = User.get(user_id)
         
         if not user_to_delete:
-            return jsonify({'success': False, 'message': 'User not found'}), 404
+            return jsonify({
+                'success': False,
+                'message': 'User not found'
+            }), 404
             
         if user_to_delete.is_admin and len(admin_users) <= 1:
             return jsonify({
@@ -183,20 +278,22 @@ def delete_user(user_id):
                 'message': 'Cannot delete the last admin user'
             }), 400
             
-        # Read users file
-        with open('data/users.json', 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            users = json.load(f)
-            users = [u for u in users if u['id'] != user_id]
-            f.seek(0)
-            json.dump(users, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({'success': True, 'message': 'User deleted successfully'})
+        if User.delete(user_id):
+            return jsonify({
+                'success': True,
+                'message': 'User deleted successfully'
+            })
+        
+        return jsonify({
+            'success': False,
+            'message': 'Failed to delete user'
+        }), 500
     except Exception as e:
         logger.error(f"Error deleting user: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
 
 @app.route('/')
 @login_required
@@ -244,10 +341,9 @@ def send_sms():
         if not phone or not message:
             return jsonify({
                 'success': False,
-                'message': 'Número de telefone e mensagem são obrigatórios'
+                'message': 'Phone number and message are required'
             }), 400
             
-        # Queue SMS sending task
         task = send_sms_task.delay(
             phone=phone,
             message=message,
@@ -256,14 +352,14 @@ def send_sms():
         
         return jsonify({
             'success': True,
-            'message': 'SMS enviado com sucesso'
+            'message': 'SMS queued successfully'
         })
         
     except Exception as e:
         logger.error(f"Error sending SMS: {str(e)}")
         return jsonify({
             'success': False,
-            'message': 'Erro ao enviar SMS. Por favor, tente novamente.'
+            'message': 'Error sending SMS. Please try again.'
         }), 500
 
 if __name__ == '__main__':
