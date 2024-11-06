@@ -41908,3 +41908,34 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
     return 1
 
 2024-11-06 11:40:06,343 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:06] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-06 11:40:19,095 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:19] "GET / HTTP/1.1" 200 -
+2024-11-06 11:40:19,302 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:19] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:40:24,907 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:24] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 11:40:26,239 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:26] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:40:26,241 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:26] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 11:40:28,515 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/campaigns.json
+2024-11-06 11:40:28,515 - __main__ - INFO - [app.py:382] - Successfully retrieved 1 campaigns
+2024-11-06 11:40:28,516 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:28] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 11:40:28,519 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/integrations.json
+2024-11-06 11:40:28,519 - __main__ - INFO - [app.py:507] - Successfully retrieved 1 integrations
+2024-11-06 11:40:28,520 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:28] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 11:40:38,977 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/campaigns.json
+2024-11-06 11:40:38,978 - __main__ - DEBUG - [app.py:92] - Successfully wrote to JSON file: data/campaigns.json
+2024-11-06 11:40:38,978 - __main__ - INFO - [app.py:420] - Created new campaign: 301f14dd-c640-447f-8d3a-75e60f9c5cf6
+2024-11-06 11:40:38,978 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:38] "POST /api/campaigns HTTP/1.1" 200 -
+2024-11-06 11:40:39,149 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/campaigns.json
+2024-11-06 11:40:39,149 - __main__ - INFO - [app.py:382] - Successfully retrieved 2 campaigns
+2024-11-06 11:40:39,150 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:39] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 11:40:39,163 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/integrations.json
+2024-11-06 11:40:39,163 - __main__ - INFO - [app.py:507] - Successfully retrieved 1 integrations
+2024-11-06 11:40:39,164 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:39] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 11:40:45,653 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/campaigns.json
+2024-11-06 11:40:45,654 - __main__ - DEBUG - [app.py:92] - Successfully wrote to JSON file: data/campaigns.json
+2024-11-06 11:40:45,654 - __main__ - INFO - [app.py:459] - Deleted campaign: 301f14dd-c640-447f-8d3a-75e60f9c5cf6
+2024-11-06 11:40:45,654 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:45] "DELETE /api/campaigns/301f14dd-c640-447f-8d3a-75e60f9c5cf6 HTTP/1.1" 200 -
+2024-11-06 11:40:46,127 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/campaigns.json
+2024-11-06 11:40:46,127 - __main__ - INFO - [app.py:382] - Successfully retrieved 1 campaigns
+2024-11-06 11:40:46,127 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:46] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 11:40:46,305 - __main__ - DEBUG - [app.py:77] - Successfully read JSON file: data/integrations.json
+2024-11-06 11:40:46,305 - __main__ - INFO - [app.py:507] - Successfully retrieved 1 integrations
+2024-11-06 11:40:46,305 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:40:46] "GET /api/integrations HTTP/1.1" 200 -
