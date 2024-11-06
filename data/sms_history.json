@@ -727,32 +727,5 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139074265', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "manual"
-  },
-  {
-    "timestamp": "2024-11-06 11:56:02",
-    "phone": "5561982132603",
-    "message": "oi",
-    "status": "success",
-    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139074825', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
-    "campaign_id": null,
-    "event_type": "manual"
-  },
-  {
-    "timestamp": "2024-11-06 12:00:37",
-    "phone": "5561982132603",
-    "message": "oi",
-    "status": "success",
-    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139075162', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
-    "campaign_id": null,
-    "event_type": "manual"
-  },
-  {
-    "timestamp": "2024-11-06 12:01:13",
-    "phone": "5561982132603",
-    "message": "oi",
-    "status": "success",
-    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139075318', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
-    "campaign_id": null,
-    "event_type": "manual"
   }
 ]
