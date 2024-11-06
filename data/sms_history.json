@@ -916,5 +916,50 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139132410', 'number': '5511987658730', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:14:46",
+    "phone": "5561982132603",
+    "message": "oi",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139133128', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-06 23:16:03",
+    "phone": "5561982132613",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139133182', 'number': '5561982132613', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:16:03",
+    "phone": "5561982132613",
+    "message": "Marina, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/e9756bc1",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139133181', 'number': '5561982132613', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:16:03",
+    "phone": "5561982132613",
+    "message": "Marina, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/e6edb7a7",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139133183', 'number': '5561982132613', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:16:04",
+    "phone": "5561982132613",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139133184', 'number': '5561982132613', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
   }
 ]

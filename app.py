@@ -343,6 +343,8 @@ def send_sms():
 def webhook_handler(webhook_path):
     try:
         webhook_data = request.get_json()
+        logger.debug(f"Received webhook data: {webhook_data}")
+        
         if not webhook_data:
             return handle_api_error('Invalid webhook data')
 
@@ -352,40 +354,48 @@ def webhook_handler(webhook_path):
         
         # Find integration with matching webhook URL
         integration = next(
-            (i for i in integrations if i['webhook_url'] == f"/webhook/{webhook_path}"),
+            (i for i in integrations if webhook_path in i['webhook_url']),
             None
         )
         
         if not integration:
+            logger.error(f"No integration found for webhook path: {webhook_path}")
             return handle_api_error('Integration not found', 404)
 
         # Load campaigns for this integration
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
+            
+        # Get status from webhook data
+        status = webhook_data.get('status', 'pending').lower()
         
+        # Find matching campaigns for this status
         matching_campaigns = [
             c for c in campaigns 
-            if c['integration_id'] == integration['id'] and c['event_type'] == webhook_data.get('status', '')
+            if c['integration_id'] == integration['id'] and c['event_type'].lower() == status
         ]
 
         if not matching_campaigns:
-            return handle_api_error('No matching campaigns found')
+            logger.warning(f"No campaigns found for integration {integration['id']} and status {status}")
+            return jsonify({
+                'success': True,
+                'message': 'No matching campaigns found for this event type'
+            })
 
         # Process transaction data
         transaction_id = str(uuid.uuid4())[:8]
         customer_data = webhook_data.get('customer', {})
-        address_data = webhook_data.get('address', {})
-
+        
+        # Create transaction record
         transaction = {
             'transaction_id': transaction_id,
             'customer_name': customer_data.get('name', ''),
             'customer_phone': customer_data.get('phone', ''),
             'customer_email': customer_data.get('email', ''),
-            'address': address_data,
             'product_name': webhook_data.get('product_name', ''),
             'total_price': webhook_data.get('total_price', '0.00'),
             'pix_code': webhook_data.get('pix_code', ''),
-            'status': 'pending',
+            'status': status,
             'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
@@ -399,28 +409,37 @@ def webhook_handler(webhook_path):
             f.truncate()
             fcntl.flock(f.fileno(), fcntl.LOCK_UN)
 
+        success_count = 0
         # Send SMS for each matching campaign
         for campaign in matching_campaigns:
-            # Get first name
-            full_name = customer_data.get('name', '')
-            first_name = full_name.split()[0] if full_name else ''
+            try:
+                # Get first name
+                full_name = customer_data.get('name', '')
+                first_name = full_name.split()[0] if full_name else ''
 
-            # Format message
-            message = campaign['message_template']
-            message = message.replace('{customer.first_name}', first_name)
-            message = message.replace('{total_price}', webhook_data.get('total_price', ''))
-            message = message.replace('{link_pix}', f"{request.host_url}payment/{transaction_id}")
+                # Format message
+                message = campaign['message_template']
+                message = message.replace('{customer.first_name}', first_name)
+                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
+                
+                # Add PIX link only for pending status
+                if status == 'pending':
+                    message = message.replace('{link_pix}', f"{request.host_url}payment/{transaction_id}")
 
-            # Queue SMS
-            send_sms_task.delay(
-                phone=customer_data.get('phone', ''),
-                message=message,
-                event_type=campaign['event_type']
-            )
+                # Queue SMS
+                send_sms_task.delay(
+                    phone=customer_data.get('phone', ''),
+                    message=message,
+                    event_type=campaign['event_type']
+                )
+                success_count += 1
+                logger.info(f"SMS queued for campaign {campaign['id']}")
+            except Exception as e:
+                logger.error(f"Error sending SMS for campaign {campaign['id']}: {str(e)}")
 
         return jsonify({
             'success': True,
-            'message': 'Webhook processed successfully',
+            'message': f'Webhook processed successfully. Sent {success_count} messages',
             'transaction_id': transaction_id
         })
 
@@ -513,7 +532,7 @@ def create_integration():
     except Exception as e:
         logger.error(f"Error creating integration: {str(e)}")
         return handle_api_error('Failed to create integration')
-        
+
 @app.route('/api/integrations/<integration_id>', methods=['DELETE'])
 @login_required
 def delete_integration(integration_id):

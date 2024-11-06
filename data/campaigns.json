@@ -16,14 +16,6 @@
     "created_at": "2024-11-06 21:57:39"
   },
   {
-    "id": "feff03bd-b857-4381-9eac-8f5e6243e704",
-    "name": "pendente",
-    "integration_id": "e83a0d0b-517f-48aa-95f4-a02482f31d64",
-    "event_type": "pending",
-    "message_template": "gvugugyg",
-    "created_at": "2024-11-06 22:08:07"
-  },
-  {
     "id": "a2184cac-df06-4312-b24a-c77dbac8caf9",
     "name": "VEGA",
     "integration_id": "eccc0bb8-bde8-4531-908f-d2255e3a7855",

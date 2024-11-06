@@ -42949,3 +42949,71 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 23:14:16,793 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:16] "[32mGET / HTTP/1.1[0m" 302 -
 2024-11-06 23:14:16,799 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:16] "GET /login?next=/ HTTP/1.1" 200 -
 2024-11-06 23:14:16,808 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:16] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 23:14:29,289 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:29] "GET / HTTP/1.1" 200 -
+2024-11-06 23:14:29,521 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:29] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 23:14:36,712 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:36] "GET /sms HTTP/1.1" 200 -
+2024-11-06 23:14:36,942 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:36] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 23:14:45,274 - celery.utils.functional - DEBUG - [functional.py:335] - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-06 23:14:45,344 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:45] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-06 23:14:58,389 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:58] "GET /integrations HTTP/1.1" 200 -
+2024-11-06 23:14:58,609 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:58] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 23:14:59,169 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:59] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-06 23:14:59,900 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:14:59] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 23:15:12,405 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:12] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 23:15:12,646 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 23:15:13,219 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:13] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 23:15:13,885 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:13] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 23:15:13,886 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:13] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 23:15:29,454 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:29] "DELETE /api/campaigns/feff03bd-b857-4381-9eac-8f5e6243e704 HTTP/1.1" 200 -
+2024-11-06 23:15:29,971 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:29] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 23:15:30,162 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:15:30] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 23:16:02,783 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:16:02] "POST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1" 200 -
+2024-11-06 23:16:03,032 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:16:03] "POST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1" 200 -
+2024-11-06 23:17:06,892 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:17:06] "GET /integrations HTTP/1.1" 200 -
+2024-11-06 23:17:07,125 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:17:07] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 23:17:07,690 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:17:07] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-06 23:17:08,629 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:17:08] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 23:17:21,670 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:17:21,670 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:17:21] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:17:21,899 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:17:21,900 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:17:21] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:18:08,638 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:18:08,640 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:18:08] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:18:08,984 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:18:08,985 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:18:08] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:18:10,734 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:18:10,734 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:18:10] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:18:10,956 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:18:10,956 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:18:10] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:18:12,812 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:18:12,813 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:18:12] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:18:13,039 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:18:13,040 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:18:13] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:20:00,937 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:20:00,938 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:00] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:20:01,248 - __main__ - ERROR - [app.py:66] - API Error: No matching campaigns found
+2024-11-06 23:20:01,248 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:01] "[31m[1mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 400 -
+2024-11-06 23:20:06,727 - werkzeug - INFO - [_internal.py:97] -  * Detected change in '/home/runner/SMSWebhookIntegrations/app.py', reloading
+2024-11-06 23:20:06,791 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 23:20:07,062 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 23:20:07,075 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 23:20:07,077 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 942-222-675
+2024-11-06 23:20:11,220 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 23:20:11,235 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.78:3000
+2024-11-06 23:20:11,235 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 23:20:11,236 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 23:20:11,525 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 23:20:11,542 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 23:20:11,543 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 281-700-970
+2024-11-06 23:20:11,697 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:11] "[32mGET / HTTP/1.1[0m" 302 -
+2024-11-06 23:20:11,709 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:11] "GET /login?next=/ HTTP/1.1" 200 -
+2024-11-06 23:20:11,731 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:11] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 23:20:12,505 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:12] "[32mGET /login HTTP/1.1[0m" 302 -
+2024-11-06 23:20:12,785 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:12] "GET / HTTP/1.1" 200 -
+2024-11-06 23:20:13,545 - werkzeug - INFO - [_internal.py:97] - 172.31.196.78 - - [06/Nov/2024 23:20:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
