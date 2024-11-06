@@ -5,7 +5,7 @@ import datetime
 import re
 import logging
 import fcntl
-from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, make_response
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, make_response, session
 from celery_worker import send_sms_task
 from collections import Counter
 from functools import wraps
@@ -93,6 +93,49 @@ def init_app(app):
 
 # Initialize app on startup
 init_app(app)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not username or not password or not confirm_password:
+            return jsonify({
+                'success': False,
+                'message': 'All fields are required'
+            }), 400
+            
+        if password != confirm_password:
+            return jsonify({
+                'success': False,
+                'message': 'Passwords do not match'
+            }), 400
+            
+        if User.get_by_username(username):
+            return jsonify({
+                'success': False,
+                'message': 'Username already exists'
+            }), 400
+            
+        user = User.create(username, password)
+        if user:
+            login_user(user)
+            return jsonify({
+                'success': True,
+                'redirect': url_for('index')
+            })
+            
+        return jsonify({
+            'success': False,
+            'message': 'Failed to create account'
+        }), 500
+        
+    return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
