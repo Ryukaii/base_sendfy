@@ -233,5 +233,38 @@ def sms_history():
 def campaign_performance():
     return render_template('campaign_performance.html')
 
+@app.route('/api/send-sms', methods=['POST'])
+@login_required
+def send_sms():
+    try:
+        data = request.get_json()
+        phone = data.get('phone')
+        message = data.get('message')
+        
+        if not phone or not message:
+            return jsonify({
+                'success': False,
+                'message': 'Número de telefone e mensagem são obrigatórios'
+            }), 400
+            
+        # Queue SMS sending task
+        task = send_sms_task.delay(
+            phone=phone,
+            message=message,
+            event_type='manual'
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'SMS enviado com sucesso'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error sending SMS: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Erro ao enviar SMS. Por favor, tente novamente.'
+        }), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)
