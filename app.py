@@ -94,6 +94,107 @@ def init_app(app):
 # Initialize app on startup
 init_app(app)
 
+@app.route('/api/campaigns', methods=['GET'])
+@login_required
+def get_campaigns():
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            return jsonify(json.load(f))
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return jsonify([])
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        campaigns = []
+        try:
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                campaigns = json.load(f)
+        except:
+            pass
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'created_at': datetime.datetime.now().isoformat()
+        }
+        campaigns.append(campaign)
+        
+        with open(CAMPAIGNS_FILE, 'w') as f:
+            json.dump(campaigns, f, indent=2)
+            
+        return jsonify(campaign)
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return jsonify({
+            'error': 'Failed to create campaign'
+        }), 500
+
+@app.route('/api/integrations', methods=['GET'])
+@login_required
+def get_integrations():
+    try:
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            return jsonify(json.load(f))
+    except Exception as e:
+        logger.error(f"Error loading integrations: {str(e)}")
+        return jsonify([])
+
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def create_integration():
+    try:
+        data = request.get_json()
+        integrations = []
+        try:
+            with open(INTEGRATIONS_FILE, 'r') as f:
+                integrations = json.load(f)
+        except:
+            pass
+            
+        integration = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
+            'created_at': datetime.datetime.now().isoformat()
+        }
+        integrations.append(integration)
+        
+        with open(INTEGRATIONS_FILE, 'w') as f:
+            json.dump(integrations, f, indent=2)
+            
+        return jsonify(integration)
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}")
+        return jsonify({
+            'error': 'Failed to create integration'
+        }), 500
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+@login_required
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+            
+        integrations = [i for i in integrations if i['id'] != integration_id]
+        
+        with open(INTEGRATIONS_FILE, 'w') as f:
+            json.dump(integrations, f, indent=2)
+            
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}")
+        return jsonify({
+            'error': 'Failed to delete integration'
+        }), 500
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
