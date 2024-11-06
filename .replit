@@ -19,6 +19,10 @@ args = "SMS Platform"
 task = "workflow.run"
 args = "Flask Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Init Admin"
+
 [[workflows.workflow]]
 name = "SMS Platform"
 author = "agent"
@@ -48,6 +52,20 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "python3 app.py"
 waitForPort = 3000
+
+[[workflows.workflow]]
+name = "Init Admin"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python3 init_admin.py"
 
 [deployment]
 run = ["sh", "-c", "./start.sh"]
