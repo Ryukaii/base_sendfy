@@ -18,14 +18,10 @@
             max-width: 800px;
             margin: 0 auto;
         }
-        .pix-logo {
-            max-height: 80px;
-            width: auto;
-        }
-        .countdown {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--bs-primary);
+        .pix-qr {
+            max-width: 200px;
+            height: auto;
+            margin: 0 auto;
         }
         .pix-code {
             user-select: all;
@@ -35,36 +31,12 @@
             padding: 1rem;
             border-radius: 0.5rem;
             margin: 1rem 0;
+            word-break: break-all;
         }
-        .step {
-            transition: transform 0.2s;
-            padding: 1rem;
-            border-radius: 0.5rem;
-        }
-        .step:hover {
-            transform: translateX(5px);
-            background-color: var(--bs-dark);
-        }
-        .step-number {
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bs-primary);
-            color: var(--bs-light);
-            border-radius: 50%;
-            margin-right: 1rem;
-        }
-        .toast {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            min-width: 250px;
-        }
-        .bank-logo {
-            max-height: 40px;
-            width: auto;
+        .countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--bs-primary);
         }
     </style>
 </head>
@@ -83,7 +55,8 @@
         <div class="card">
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <img src="https://logospng.org/download/pix/logo-pix-512.png" alt="PIX Logo" class="pix-logo">
+                    <img src="{{ pix_qr_code }}" alt="PIX QR Code" class="pix-qr mb-3" onerror="this.style.display='none'">
+                    <img src="https://logospng.org/download/pix/logo-pix-512.png" alt="PIX Logo" class="img-fluid" style="max-height: 80px;">
                 </div>
 
                 <h2 class="card-title">Pagamento via PIX</h2>
@@ -126,29 +99,29 @@
                             Como pagar com PIX:
                         </h5>
                         <div class="steps">
-                            <div class="step d-flex align-items-start">
-                                <div class="step-number">1</div>
+                            <div class="step d-flex align-items-start mb-3">
+                                <div class="btn btn-primary btn-sm me-3">1</div>
                                 <div>
                                     <h6>Copie o código PIX</h6>
                                     <small class="text-muted">Clique no botão acima para copiar automaticamente</small>
                                 </div>
                             </div>
-                            <div class="step d-flex align-items-start">
-                                <div class="step-number">2</div>
+                            <div class="step d-flex align-items-start mb-3">
+                                <div class="btn btn-primary btn-sm me-3">2</div>
                                 <div>
                                     <h6>Abra seu banco</h6>
                                     <small class="text-muted">Acesse o aplicativo do seu banco preferido</small>
                                 </div>
                             </div>
-                            <div class="step d-flex align-items-start">
-                                <div class="step-number">3</div>
+                            <div class="step d-flex align-items-start mb-3">
+                                <div class="btn btn-primary btn-sm me-3">3</div>
                                 <div>
                                     <h6>Selecione PIX Copia e Cola</h6>
                                     <small class="text-muted">Encontre a opção PIX > Pix Copia e Cola</small>
                                 </div>
                             </div>
                             <div class="step d-flex align-items-start">
-                                <div class="step-number">4</div>
+                                <div class="btn btn-primary btn-sm me-3">4</div>
                                 <div>
                                     <h6>Confirme o pagamento</h6>
                                     <small class="text-muted">Cole o código e confirme a transação</small>
@@ -163,11 +136,11 @@
 
     <footer class="bg-dark py-3">
         <div class="container text-center">
-            <img src="https://logospng.org/download/banco-central-do-brasil/logo-banco-central-256.png" alt="Banco Central do Brasil" class="bank-logo">
+            <img src="https://logospng.org/download/banco-central-do-brasil/logo-banco-central-256.png" alt="Banco Central do Brasil" style="max-height: 40px;">
         </div>
     </footer>
 
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <i class="fas fa-check-circle text-success me-2"></i>
             <strong class="me-auto">Sucesso</strong>
@@ -195,6 +168,7 @@
                 if (--timer < 0) {
                     clearInterval(interval);
                     display.textContent = "00:00";
+                    window.location.reload();
                 }
             }, 1000);
         }

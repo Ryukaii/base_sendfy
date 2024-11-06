@@ -41736,3 +41736,51 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 11:08:18,072 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:08:18] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
 2024-11-06 11:09:03,095 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:09:03] "GET / HTTP/1.1" 200 -
 2024-11-06 11:09:03,111 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:09:03] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 11:09:14,470 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:09:14] "GET / HTTP/1.1" 200 -
+2024-11-06 11:09:15,488 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:09:15] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:13:01,007 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:01] "GET /sms HTTP/1.1" 200 -
+2024-11-06 11:13:01,201 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:01] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:13:07,653 - __main__ - DEBUG - [app.py:351] - Sending SMS
+2024-11-06 11:13:07,653 - __main__ - DEBUG - [app.py:158] - Formatting phone number: 61982132603
+2024-11-06 11:13:07,653 - __main__ - DEBUG - [app.py:160] - After removing non-numeric characters: 61982132603
+2024-11-06 11:13:07,654 - __main__ - DEBUG - [app.py:167] - Added country code: 5561982132603
+2024-11-06 11:13:07,654 - __main__ - DEBUG - [app.py:175] - Final formatted number: +5561982132603
+2024-11-06 11:13:07,661 - celery.utils.functional - DEBUG - [functional.py:335] - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-06 11:13:07,754 - __main__ - INFO - [app.py:378] - SMS task created: 6caa2832-6285-4fb2-8592-a2612b193437
+2024-11-06 11:13:07,755 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:07] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-06 11:13:21,805 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:21] "GET / HTTP/1.1" 200 -
+2024-11-06 11:13:21,984 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:21] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:13:26,857 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:26] "GET /integrations HTTP/1.1" 200 -
+2024-11-06 11:13:27,582 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:27] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-06 11:13:27,690 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:27] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:13:28,081 - __main__ - DEBUG - [app.py:229] - Fetching integrations
+2024-11-06 11:13:28,082 - __main__ - DEBUG - [app.py:84] - Successfully read JSON file: data/integrations.json
+2024-11-06 11:13:28,082 - __main__ - INFO - [app.py:231] - Successfully retrieved 0 integrations
+2024-11-06 11:13:28,082 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:28] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 11:13:30,343 - __main__ - DEBUG - [app.py:245] - Creating new integration
+2024-11-06 11:13:30,344 - __main__ - DEBUG - [app.py:84] - Successfully read JSON file: data/integrations.json
+2024-11-06 11:13:30,344 - __main__ - DEBUG - [app.py:100] - Successfully wrote to JSON file: data/integrations.json
+2024-11-06 11:13:30,344 - __main__ - INFO - [app.py:292] - Created new integration: eccc0bb8-bde8-4531-908f-d2255e3a7855 - VEGA PENDENTE
+2024-11-06 11:13:30,345 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:30] "POST /api/integrations HTTP/1.1" 200 -
+2024-11-06 11:13:30,515 - __main__ - DEBUG - [app.py:229] - Fetching integrations
+2024-11-06 11:13:30,515 - __main__ - DEBUG - [app.py:84] - Successfully read JSON file: data/integrations.json
+2024-11-06 11:13:30,515 - __main__ - INFO - [app.py:231] - Successfully retrieved 1 integrations
+2024-11-06 11:13:30,515 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:30] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 11:13:45,076 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:13:45] "[33mGET /campaigns HTTP/1.1[0m" 404 -
+2024-11-06 11:18:54,635 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:18:54] "GET / HTTP/1.1" 200 -
+2024-11-06 11:18:54,842 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:18:54] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:19:02,285 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:19:02] "[33mGET /campaigns HTTP/1.1[0m" 404 -
+2024-11-06 11:20:16,739 - __main__ - INFO - [app.py:39] - Data directory data exists and is accessible
+2024-11-06 11:21:46,372 - __main__ - INFO - [app.py:39] - Data directory data exists and is accessible
+2024-11-06 11:21:46,375 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.174:3000
+2024-11-06 11:21:46,375 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 11:21:46,653 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:21:46] "GET / HTTP/1.1" 200 -
+2024-11-06 11:21:46,663 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:21:46] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 11:21:47,947 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:21:47] "GET / HTTP/1.1" 200 -
+2024-11-06 11:21:48,321 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:21:48] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
