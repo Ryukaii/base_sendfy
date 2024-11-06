@@ -41784,3 +41784,18 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 11:21:46,663 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:21:46] "GET /static/css/custom.css HTTP/1.1" 200 -
 2024-11-06 11:21:47,947 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:21:47] "GET / HTTP/1.1" 200 -
 2024-11-06 11:21:48,321 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:21:48] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:21:59,102 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:21:59] "GET / HTTP/1.1" 200 -
+2024-11-06 11:21:59,963 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:21:59] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:24:45,886 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:24:45] "[33mGET /campaigns HTTP/1.1[0m" 404 -
+2024-11-06 11:28:21,804 - __main__ - INFO - [app.py:39] - Data directory data exists and is accessible
+2024-11-06 11:28:21,810 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.174:3000
+2024-11-06 11:28:21,810 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 11:28:22,332 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:28:22] "GET / HTTP/1.1" 200 -
+2024-11-06 11:28:22,341 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:28:22] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 11:28:22,593 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:28:22] "GET / HTTP/1.1" 200 -
+2024-11-06 11:28:23,617 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:28:23] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:28:23,992 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:28:23] "GET / HTTP/1.1" 200 -
+2024-11-06 11:28:24,849 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:28:24] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -

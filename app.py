@@ -5,7 +5,7 @@ import datetime
 import re
 import logging
 import fcntl
-from flask import Flask, render_template, request, jsonify, flash
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from celery_worker import send_sms_task
 from collections import Counter
 from functools import wraps
@@ -200,6 +200,54 @@ def index():
     except Exception as e:
         logger.error(f"Error rendering index template: {str(e)}")
         return render_template('error.html', error="Failed to load page"), 500
+
+@app.route('/campaigns')
+def campaigns():
+    try:
+        return render_template('campaigns.html')
+    except Exception as e:
+        logger.error(f"Error rendering campaigns template: {str(e)}")
+        return render_template('error.html', error="Falha ao carregar página"), 500
+
+@app.route('/sms')
+def sms():
+    try:
+        return render_template('sms.html')
+    except Exception as e:
+        logger.error(f"Error rendering sms template: {str(e)}")
+        return render_template('error.html', error="Falha ao carregar página"), 500
+
+@app.route('/integrations')
+def integrations():
+    try:
+        return render_template('integrations.html')
+    except Exception as e:
+        logger.error(f"Error rendering integrations template: {str(e)}")
+        return render_template('error.html', error="Falha ao carregar página"), 500
+
+@app.route('/analytics')
+def analytics():
+    try:
+        return render_template('analytics.html')
+    except Exception as e:
+        logger.error(f"Error rendering analytics template: {str(e)}")
+        return render_template('error.html', error="Falha ao carregar página"), 500
+
+@app.route('/sms-history')
+def sms_history():
+    try:
+        return render_template('sms_history.html')
+    except Exception as e:
+        logger.error(f"Error rendering sms history template: {str(e)}")
+        return render_template('error.html', error="Falha ao carregar página"), 500
+
+@app.route('/campaign-performance')
+def campaign_performance():
+    try:
+        return render_template('campaign_performance.html')
+    except Exception as e:
+        logger.error(f"Error rendering campaign performance template: {str(e)}")
+        return render_template('error.html', error="Falha ao carregar página"), 500
 
 @app.route('/payment/<transaction_id>')
 def payment(transaction_id):
