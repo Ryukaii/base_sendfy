@@ -817,5 +817,104 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139129834', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-06 22:48:32",
+    "phone": "5527996221319",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139131529', 'number': '5527996221319', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:48:43",
+    "phone": "5516993168702",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139131546', 'number': '5516993168702', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:48:54",
+    "phone": "5582988670871",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139131579', 'number': '5582988670871', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:54:52",
+    "phone": "5561982132603",
+    "message": "Teste, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/b6970eac",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139131967', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:54:52",
+    "phone": "5561982132603",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139131966', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:54:52",
+    "phone": "5561982132603",
+    "message": "Teste, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/523fe6f2",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139131969', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:54:52",
+    "phone": "5561982132603",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139131970', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:02:20",
+    "phone": "5511987658730",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139132407', 'number': '5511987658730', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:02:20",
+    "phone": "5511987658730",
+    "message": "Fernando, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/3d81c237",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139132408', 'number': '5511987658730', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:02:20",
+    "phone": "5511987658730",
+    "message": "Fernando, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/b044653e",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139132409', 'number': '5511987658730', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 23:02:21",
+    "phone": "5511987658730",
+    "message": "{customer.name}, efetue seu pagamento.",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139132410', 'number': '5511987658730', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
   }
 ]

@@ -233,14 +233,14 @@ def analytics():
         )[:10]
         
         return render_template('analytics.html',
-                            total_messages=total_messages,
-                            success_rate=success_rate,
-                            manual_messages=manual_messages,
-                            campaign_messages=campaign_messages,
-                            messages_by_status=messages_by_status,
-                            messages_by_event=messages_by_event,
-                            recent_activity=recent_activity)
-                            
+                           total_messages=total_messages,
+                           success_rate=success_rate,
+                           manual_messages=manual_messages,
+                           campaign_messages=campaign_messages,
+                           messages_by_status=messages_by_status,
+                           messages_by_event=messages_by_event,
+                           recent_activity=recent_activity)
+                           
     except Exception as e:
         logger.error(f"Error loading analytics data: {str(e)}")
         flash('Erro ao carregar dados de análise.', 'danger')
