@@ -808,5 +808,14 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139128871', 'number': '5531983467766', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": "c6b56355-a655-4448-a9d5-c8ddcbd4c846",
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-06 22:26:59",
+    "phone": "5561982132603",
+    "message": "oi",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139129834', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
   }
 ]

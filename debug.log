@@ -42657,3 +42657,47 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 22:23:58,902 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:23:58] "[32mGET /login HTTP/1.1[0m" 302 -
 2024-11-06 22:23:59,103 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:23:59] "GET / HTTP/1.1" 200 -
 2024-11-06 22:23:59,343 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:23:59] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:24:12,510 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:12] "GET / HTTP/1.1" 200 -
+2024-11-06 22:24:12,750 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:24:21,872 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:21] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-11-06 22:24:22,059 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:22] "GET /login HTTP/1.1" 200 -
+2024-11-06 22:24:22,285 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:22] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:24:34,791 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:34] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-11-06 22:24:35,007 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:35] "GET / HTTP/1.1" 200 -
+2024-11-06 22:24:35,257 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:24:35] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:26:42,357 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:26:42,358 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:26:42] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:26:50,477 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:26:50] "GET /sms HTTP/1.1" 200 -
+2024-11-06 22:26:50,710 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:26:50] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:26:58,490 - celery.utils.functional - DEBUG - [functional.py:335] - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-06 22:26:58,615 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:26:58] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-06 22:27:09,453 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:27:09] "GET /integrations HTTP/1.1" 200 -
+2024-11-06 22:27:09,670 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:27:09] "[36mGET /static/js/integrations.js HTTP/1.1[0m" 304 -
+2024-11-06 22:27:09,735 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:27:09] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:27:10,948 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:27:10] "[33mGET /api/integrations HTTP/1.1[0m" 404 -
+2024-11-06 22:27:37,113 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:27:37,113 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:27:37] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:28:52,110 - werkzeug - INFO - [_internal.py:97] -  * Detected change in '/home/runner/SMSWebhookIntegrations/app.py', reloading
+2024-11-06 22:28:52,186 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 22:28:52,541 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 22:28:52,556 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 22:28:52,558 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 877-642-430
+2024-11-06 22:28:57,296 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 22:28:57,308 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.126:3000
+2024-11-06 22:28:57,309 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 22:28:57,309 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 22:28:57,598 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 22:28:57,607 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 22:28:57,608 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 100-932-907
+2024-11-06 22:28:57,781 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:28:57] "[32mGET / HTTP/1.1[0m" 302 -
+2024-11-06 22:28:57,789 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:28:57] "GET /login?next=/ HTTP/1.1" 200 -
+2024-11-06 22:28:57,800 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:28:57] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 22:28:58,599 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:28:58] "[32mGET /login HTTP/1.1[0m" 302 -
+2024-11-06 22:28:58,813 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:28:58] "GET / HTTP/1.1" 200 -
+2024-11-06 22:28:59,312 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:28:59] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
