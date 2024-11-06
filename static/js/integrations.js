@@ -18,7 +18,7 @@ async function loadIntegrations() {
         const response = await fetch('/api/integrations');
         if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+            throw new Error(data.message || `Erro HTTP: ${response.status}`);
         }
         
         const integrations = await response.json();
@@ -140,7 +140,7 @@ document.getElementById('integrationForm').addEventListener('submit', async (e) 
         
         showToast('success', 'Integração criada com sucesso!');
         form.reset();
-        loadIntegrations();
+        await loadIntegrations();
     } catch (error) {
         console.error('Erro ao criar integração:', error);
         showToast('error', error.message);
@@ -218,7 +218,9 @@ function showToast(type, message) {
         </div>
     `;
     document.body.appendChild(toastDiv);
-    const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'));
+    const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'), {
+        delay: 3000
+    });
     toast.show();
     
     // Remove toast element after it's hidden

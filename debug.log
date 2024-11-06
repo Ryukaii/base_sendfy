@@ -42218,3 +42218,85 @@ jinja2.exceptions.UndefinedError: 'current_user' is undefined
 2024-11-06 18:33:01,219 - werkzeug - INFO - [_internal.py:97] - 172.31.196.232 - - [06/Nov/2024 18:33:01] "[32mGET / HTTP/1.1[0m" 302 -
 2024-11-06 18:33:01,228 - werkzeug - INFO - [_internal.py:97] - 172.31.196.232 - - [06/Nov/2024 18:33:01] "GET /login?next=/ HTTP/1.1" 200 -
 2024-11-06 18:33:01,243 - werkzeug - INFO - [_internal.py:97] - 172.31.196.232 - - [06/Nov/2024 18:33:01] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 21:32:03,388 - app - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:32:03,397 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.196.25:5000
+2024-11-06 21:32:03,397 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 21:32:04,448 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:32:04] "GET /login HTTP/1.1" 200 -
+2024-11-06 21:32:04,680 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:32:04] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:32:24,218 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:32:24] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-11-06 21:32:24,425 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:32:24] "GET / HTTP/1.1" 200 -
+2024-11-06 21:32:24,675 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:32:24] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:32:54,400 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:32:54] "GET /sms HTTP/1.1" 200 -
+2024-11-06 21:32:54,647 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:32:54] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:33:01,251 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:33:01] "GET /sms HTTP/1.1" 200 -
+2024-11-06 21:33:01,489 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:33:01] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:33:09,516 - celery.utils.functional - DEBUG - [functional.py:335] - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-06 21:33:09,585 - werkzeug - INFO - [_internal.py:97] - 172.31.196.25 - - [06/Nov/2024 21:33:09] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-06 21:50:37,438 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:50:37,468 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.126:3000
+2024-11-06 21:50:37,469 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 21:50:37,474 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 21:50:37,923 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:50:37,942 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 21:50:37,962 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 112-317-787
+2024-11-06 21:50:39,192 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:50:39] "[32mGET /login HTTP/1.1[0m" 302 -
+2024-11-06 21:50:39,424 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:50:39] "GET / HTTP/1.1" 200 -
+2024-11-06 21:50:39,817 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:50:39] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:50:53,569 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:50:53,581 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.126:3000
+2024-11-06 21:50:53,581 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 21:50:53,582 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 21:50:53,911 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:50:53,927 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 21:50:53,934 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 890-540-073
+2024-11-06 21:51:12,547 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:12] "GET / HTTP/1.1" 200 -
+2024-11-06 21:51:12,790 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:51:17,498 - app - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:51:17,511 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.196.126:5000
+2024-11-06 21:51:17,511 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 21:51:18,310 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:51:18,345 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.126:3000
+2024-11-06 21:51:18,346 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 21:51:18,351 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 21:51:19,279 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:51:19,298 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.126:3000
+2024-11-06 21:51:19,299 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 21:51:19,300 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 21:51:19,380 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:19] "[32mGET /login HTTP/1.1[0m" 302 -
+2024-11-06 21:51:19,632 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:19] "GET / HTTP/1.1" 200 -
+2024-11-06 21:51:19,660 - __main__ - INFO - [app.py:44] - Data directory data exists and is accessible
+2024-11-06 21:51:19,672 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 21:51:19,673 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 364-084-580
+2024-11-06 21:51:19,762 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:19] "[32mGET /login HTTP/1.1[0m" 302 -
+2024-11-06 21:51:19,816 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:19] "GET /login HTTP/1.1" 200 -
+2024-11-06 21:51:19,839 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:19] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 21:51:19,970 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:19] "GET / HTTP/1.1" 200 -
+2024-11-06 21:51:20,223 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:20] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:51:31,546 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:31] "GET /login HTTP/1.1" 200 -
+2024-11-06 21:51:31,571 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:31] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 21:51:32,239 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:32] "[32mGET /login HTTP/1.1[0m" 302 -
+2024-11-06 21:51:32,461 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:32] "GET / HTTP/1.1" 200 -
+2024-11-06 21:51:32,825 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:51:32] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 21:52:00,070 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:52:00] "GET /login HTTP/1.1" 200 -
+2024-11-06 21:52:00,090 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 21:52:00] "GET /static/css/custom.css HTTP/1.1" 200 -

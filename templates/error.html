@@ -8,11 +8,16 @@
                 <div class="card-header bg-danger text-white">
                     <h4 class="mb-0">
                         <i class="fas fa-exclamation-circle me-2"></i>
-                        Erro
+                        Erro {{ error.code if error.code else '' }}
                     </h4>
                 </div>
                 <div class="card-body text-center">
-                    <p class="lead mb-4">{{ error }}</p>
+                    <p class="lead mb-4">{{ error if error is string else error.description }}</p>
+                    {% if error.details %}
+                    <div class="alert alert-secondary">
+                        <pre class="mb-0"><code>{{ error.details }}</code></pre>
+                    </div>
+                    {% endif %}
                     <a href="/" class="btn btn-primary">
                         <i class="fas fa-home me-2"></i>
                         Voltar para a Página Inicial

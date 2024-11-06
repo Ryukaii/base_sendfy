@@ -5,7 +5,7 @@ import datetime
 import re
 import logging
 import fcntl
-from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
+from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, make_response
 from celery_worker import send_sms_task
 from collections import Counter
 from functools import wraps
@@ -60,6 +60,16 @@ def initialize_json_file(filepath, initial_data=None):
         logger.error(f"Error initializing JSON file {filepath}: {str(e)}\n{traceback.format_exc()}")
         return False
 
+def handle_api_error(error_message, status_code=400):
+    """Helper function to handle API errors consistently"""
+    logger.error(f"API Error: {error_message}")
+    response = jsonify({
+        'success': False,
+        'message': error_message
+    })
+    response.status_code = status_code
+    return response
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
@@ -68,6 +78,8 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
+            if request.is_json:
+                return handle_api_error('Admin privileges required', 403)
             flash('You need admin privileges to access this page.', 'danger')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
@@ -82,6 +94,101 @@ def init_app(app):
 # Initialize app on startup
 init_app(app)
 
+# API Routes
+@app.route('/api/integrations', methods=['GET'])
+@login_required
+def get_integrations():
+    try:
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        logger.debug(f"Retrieved {len(integrations)} integrations")
+        return jsonify(integrations)
+    except Exception as e:
+        logger.error(f"Error retrieving integrations: {str(e)}\n{traceback.format_exc()}")
+        return handle_api_error('Failed to retrieve integrations', 500)
+
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def create_integration():
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data:
+            return handle_api_error('Integration name is required')
+            
+        name = data['name'].strip()
+        if not name:
+            return handle_api_error('Integration name cannot be empty')
+            
+        integration = {
+            'id': str(uuid.uuid4()),
+            'name': name,
+            'webhook_url': f'/webhook/{str(uuid.uuid4())}',
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations.append(integration)
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        logger.info(f"Created new integration: {integration['id']}")
+        return jsonify({
+            'success': True,
+            'message': 'Integration created successfully',
+            'integration': integration
+        })
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}\n{traceback.format_exc()}")
+        return handle_api_error('Failed to create integration', 500)
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+@login_required
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            filtered_integrations = [i for i in integrations if i['id'] != integration_id]
+            
+            if len(filtered_integrations) == len(integrations):
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                return handle_api_error('Integration not found', 404)
+                
+            f.seek(0)
+            json.dump(filtered_integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        logger.info(f"Deleted integration: {integration_id}")
+        return jsonify({
+            'success': True,
+            'message': 'Integration deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}\n{traceback.format_exc()}")
+        return handle_api_error('Failed to delete integration', 500)
+
+# Error Handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    if request.is_json:
+        return handle_api_error('Resource not found', 404)
+    return render_template('error.html', error='Page not found'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    if request.is_json:
+        return handle_api_error('Internal server error', 500)
+    return render_template('error.html', error='Internal server error'), 500
+
+# Regular routes (unchanged)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -112,7 +219,6 @@ def logout():
 @login_required
 @admin_required
 def admin_dashboard():
-    # Get statistics
     users = User.get_all()
     sms_history = []
     campaigns = []
@@ -141,62 +247,6 @@ def admin_dashboard():
     }
     
     return render_template('admin/dashboard.html', stats=stats, users=users)
-
-@app.route('/api/users', methods=['POST'])
-@login_required
-@admin_required
-def create_user():
-    try:
-        data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-        is_admin = data.get('is_admin', False)
-        
-        if not username or not password:
-            return jsonify({'success': False, 'message': 'Username and password are required'}), 400
-            
-        user = User.create(username, password, is_admin)
-        if not user:
-            return jsonify({'success': False, 'message': 'Username already exists'}), 400
-            
-        return jsonify({'success': True, 'message': 'User created successfully'})
-    except Exception as e:
-        logger.error(f"Error creating user: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/users/<user_id>', methods=['DELETE'])
-@login_required
-@admin_required
-def delete_user(user_id):
-    try:
-        # Prevent deleting the last admin user
-        users = User.get_all()
-        admin_users = [u for u in users if u.is_admin]
-        user_to_delete = User.get(user_id)
-        
-        if not user_to_delete:
-            return jsonify({'success': False, 'message': 'User not found'}), 404
-            
-        if user_to_delete.is_admin and len(admin_users) <= 1:
-            return jsonify({
-                'success': False,
-                'message': 'Cannot delete the last admin user'
-            }), 400
-            
-        # Read users file
-        with open('data/users.json', 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            users = json.load(f)
-            users = [u for u in users if u['id'] != user_id]
-            f.seek(0)
-            json.dump(users, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({'success': True, 'message': 'User deleted successfully'})
-    except Exception as e:
-        logger.error(f"Error deleting user: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/')
 @login_required
@@ -242,10 +292,7 @@ def send_sms():
         message = data.get('message')
         
         if not phone or not message:
-            return jsonify({
-                'success': False,
-                'message': 'Número de telefone e mensagem são obrigatórios'
-            }), 400
+            return handle_api_error('Número de telefone e mensagem são obrigatórios')
             
         # Queue SMS sending task
         task = send_sms_task.delay(
@@ -261,10 +308,8 @@ def send_sms():
         
     except Exception as e:
         logger.error(f"Error sending SMS: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': 'Erro ao enviar SMS. Por favor, tente novamente.'
-        }), 500
+        return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.', 500)
 
+# Run the app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)
