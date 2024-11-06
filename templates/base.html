@@ -8,13 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/custom.css">
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<body class="d-flex flex-column min-vh-100 bg-dark text-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 border-bottom border-secondary">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <img src="https://i.ibb.co/ZgfsXMc/CAC-12-1-removebg-preview.png" alt="SendFy" class="navbar-logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -61,12 +62,12 @@
                     {% if current_user.is_admin %}
                     <a class="nav-link" href="/admin">
                         <i class="fas fa-cog me-1"></i>
-                        Admin
+                        Administração
                     </a>
                     {% endif %}
                     <a class="nav-link" href="/logout">
                         <i class="fas fa-sign-out-alt me-1"></i>
-                        Logout
+                        Sair
                     </a>
                 </div>
                 {% endif %}
@@ -78,7 +79,7 @@
         {% block content %}{% endblock %}
     </div>
 
-    <footer class="footer mt-auto py-4 bg-dark">
+    <footer class="footer mt-auto py-4 bg-dark border-top border-secondary">
         <div class="container">
             <div class="text-center">
                 <small class="text-muted">SendFy &copy; 2024. Todos os direitos reservados.</small>
