@@ -600,5 +600,45 @@ def delete_integration(integration_id):
             'message': error_msg
         }), 500
 
+@app.route('/api/send-sms', methods=['POST'])
+def send_sms():
+    try:
+        data = request.get_json()
+        if not data:
+            raise ValueError("Missing request data")
+            
+        required_fields = ['phone', 'message']
+        missing_fields = [field for field in required_fields if field not in data]
+        
+        if missing_fields:
+            raise ValueError(f"Missing required fields: {', '.join(missing_fields)}")
+            
+        # Format phone number
+        phone = format_phone_number(data['phone'])
+        
+        # Send SMS using celery task
+        task = send_sms_task.delay(
+            phone=phone,
+            message=data['message'],
+            event_type='manual'
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'SMS enviado com sucesso!'
+        })
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 400
+    except Exception as e:
+        logger.error(f"Error sending SMS: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Erro ao enviar SMS. Por favor, tente novamente.'
+        }), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
