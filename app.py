@@ -253,6 +253,30 @@ def delete_user(user_id):
     except Exception as e:
         return handle_api_error(f'Error deleting user: {str(e)}')
 
+@app.route('/api/send-sms', methods=['POST'])
+@login_required
+def send_sms():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['phone', 'message']):
+            return handle_api_error('Phone number and message are required')
+        
+        # Queue the SMS task
+        task = send_sms_task.delay(
+            phone=data['phone'],
+            message=data['message'],
+            event_type='manual'
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'SMS enviado com sucesso'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error sending SMS: {str(e)}")
+        return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
+
 @app.errorhandler(404)
 def not_found_error(error):
     if request.is_json:
