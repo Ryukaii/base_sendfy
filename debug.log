@@ -41799,3 +41799,22 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 11:28:23,617 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:28:23] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
 2024-11-06 11:28:23,992 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:28:23] "GET / HTTP/1.1" 200 -
 2024-11-06 11:28:24,849 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:28:24] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:28:35,638 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:28:35] "GET / HTTP/1.1" 200 -
+2024-11-06 11:28:36,019 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:28:36] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:32:02,948 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:32:02] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 11:32:03,837 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:32:03] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 11:32:03,838 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:32:03] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 11:32:04,976 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:32:04] "[33mGET /api/campaigns HTTP/1.1[0m" 404 -
+2024-11-06 11:32:04,980 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:32:04] "[33mGET /api/integrations HTTP/1.1[0m" 404 -
+2024-11-06 11:34:32,219 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:34:32] "[33mGET /api/campaigns HTTP/1.1[0m" 404 -
+2024-11-06 11:34:32,220 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:34:32] "[33mGET /api/integrations HTTP/1.1[0m" 404 -
+2024-11-06 11:35:37,901 - __main__ - INFO - [app.py:36] - Data directory data exists and is accessible
+2024-11-06 11:35:37,908 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.174:3000
+2024-11-06 11:35:37,908 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 11:35:38,322 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:35:38] "GET / HTTP/1.1" 200 -
+2024-11-06 11:35:38,333 - werkzeug - INFO - 172.31.196.174 - - [06/Nov/2024 11:35:38] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 11:35:39,092 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:35:39] "GET / HTTP/1.1" 200 -
+2024-11-06 11:35:39,935 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 11:35:39] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
