@@ -42175,3 +42175,15 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 12:00:40,256 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:00:40] "[32mGET / HTTP/1.1[0m" 302 -
 2024-11-06 12:00:40,262 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:00:40] "GET /login?next=/ HTTP/1.1" 200 -
 2024-11-06 12:00:40,272 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:00:40] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 12:00:52,981 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:00:52] "GET / HTTP/1.1" 200 -
+2024-11-06 12:00:53,374 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:00:53] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 12:01:04,435 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:01:04] "GET /sms HTTP/1.1" 200 -
+2024-11-06 12:01:04,629 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:01:04] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 12:01:12,266 - celery.utils.functional - DEBUG - [functional.py:335] - 
+def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2):
+    return 1
+
+2024-11-06 12:01:12,331 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:01:12] "POST /api/send-sms HTTP/1.1" 200 -
+2024-11-06 12:01:20,666 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:01:20] "[32mGET /logout HTTP/1.1[0m" 302 -
+2024-11-06 12:01:20,861 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:01:20] "GET /login HTTP/1.1" 200 -
+2024-11-06 12:01:21,746 - werkzeug - INFO - [_internal.py:97] - 172.31.196.174 - - [06/Nov/2024 12:01:21] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
