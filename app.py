@@ -344,6 +344,75 @@ def delete_integration(integration_id):
         logger.error(f"Error deleting integration: {str(e)}")
         return handle_api_error('Failed to delete integration')
 
+@app.route('/api/campaigns', methods=['GET'])
+@login_required
+def get_campaigns():
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        return jsonify(campaigns)
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return handle_api_error('Failed to load campaigns')
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'message_template']):
+            return handle_api_error('Missing required fields')
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign created successfully',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Failed to create campaign')
+
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+@login_required
+def delete_campaign(campaign_id):
+    try:
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns = [c for c in campaigns if c['id'] != campaign_id]
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return handle_api_error('Failed to delete campaign')
+
 @app.errorhandler(404)
 def not_found_error(error):
     if request.is_json:
