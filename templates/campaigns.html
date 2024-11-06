@@ -26,9 +26,25 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Modelo de Mensagem</label>
-                <textarea class="form-control" id="messageTemplate" rows="3" required 
-                          placeholder="Variáveis disponíveis: {customer.name}, {total_price}"></textarea>
-                <small class="text-muted">Exemplo: Olá {customer.name}, seu pedido no valor de R$ {total_price} foi confirmado!</small>
+                <textarea class="form-control" id="messageTemplate" rows="3" required></textarea>
+                <small class="text-muted">
+                    Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
+                    Acesse sua página de pagamento: {link_pix}
+                </small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Variáveis Disponíveis:</label>
+                <div class="btn-group-vertical w-100">
+                    <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{customer.first_name}')">
+                        <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
+                    </button>
+                    <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{total_price}')">
+                        <i class="fas fa-tags me-2"></i>Valor Total
+                    </button>
+                    <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{link_pix}')">
+                        <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
+                    </button>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Criar Campanha</button>
         </form>
@@ -46,5 +62,15 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+function insertVariable(variable) {
+    const textarea = document.getElementById('messageTemplate');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + variable + text.substring(end);
+    textarea.focus();
+}
+</script>
 <script src="/static/js/campaigns.js"></script>
 {% endblock %}

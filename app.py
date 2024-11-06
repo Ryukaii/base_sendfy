@@ -152,14 +152,14 @@ def admin_dashboard():
     try:
         with open(SMS_HISTORY_FILE, 'r') as f:
             sms_history = json.load(f)
-    except:
-        pass
+    except Exception as e:
+        logger.error(f"Error loading SMS history: {str(e)}")
         
     try:
         with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
-    except:
-        pass
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
     
     success_messages = sum(1 for msg in sms_history if msg.get('status') == 'success')
     total_messages = len(sms_history)
@@ -197,12 +197,66 @@ def integrations():
 @app.route('/analytics')
 @login_required
 def analytics():
-    return render_template('analytics.html')
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            sms_history = json.load(f)
+            
+        total_messages = len(sms_history)
+        success_messages = sum(1 for msg in sms_history if msg.get('status') == 'success')
+        success_rate = round((success_messages / total_messages * 100) if total_messages > 0 else 0, 1)
+        
+        manual_messages = sum(1 for msg in sms_history if msg.get('event_type') == 'manual')
+        campaign_messages = total_messages - manual_messages
+        
+        messages_by_status = []
+        status_counts = Counter(msg.get('status') for msg in sms_history)
+        for status, count in status_counts.items():
+            messages_by_status.append({
+                'status': status,
+                'count': count,
+                'percentage': round((count / total_messages * 100) if total_messages > 0 else 0, 1)
+            })
+            
+        messages_by_event = []
+        event_counts = Counter(msg.get('event_type') for msg in sms_history)
+        for event_type, count in event_counts.items():
+            messages_by_event.append({
+                'type': event_type,
+                'count': count,
+                'percentage': round((count / total_messages * 100) if total_messages > 0 else 0, 1)
+            })
+            
+        recent_activity = sorted(
+            sms_history,
+            key=lambda x: x.get('timestamp', ''),
+            reverse=True
+        )[:10]
+        
+        return render_template('analytics.html',
+                            total_messages=total_messages,
+                            success_rate=success_rate,
+                            manual_messages=manual_messages,
+                            campaign_messages=campaign_messages,
+                            messages_by_status=messages_by_status,
+                            messages_by_event=messages_by_event,
+                            recent_activity=recent_activity)
+                            
+    except Exception as e:
+        logger.error(f"Error loading analytics data: {str(e)}")
+        flash('Erro ao carregar dados de análise.', 'danger')
+        return render_template('analytics.html')
 
 @app.route('/sms-history')
 @login_required
 def sms_history():
-    return render_template('sms_history.html')
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            history = json.load(f)
+        return render_template('sms_history.html', history=history)
+    except Exception as e:
+        logger.error(f"Error loading SMS history: {str(e)}")
+        flash('Erro ao carregar histórico de SMS.', 'danger')
+        return render_template('sms_history.html', history=[])
 
 @app.route('/campaign-performance')
 @login_required
@@ -244,7 +298,15 @@ def delete_user(user_id):
         if str(current_user.id) == user_id:
             return handle_api_error('Cannot delete your own account')
             
-        # Implementation of user deletion would go here
+        with open('data/users.json', 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            users = json.load(f)
+            users = [u for u in users if u['id'] != user_id]
+            f.seek(0)
+            json.dump(users, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
         return jsonify({
             'success': True,
             'message': 'User deleted successfully'
@@ -276,6 +338,135 @@ def send_sms():
     except Exception as e:
         logger.error(f"Error sending SMS: {str(e)}")
         return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
+
+@app.route('/webhook/<path:webhook_path>', methods=['POST'])
+def webhook_handler(webhook_path):
+    try:
+        webhook_data = request.get_json()
+        if not webhook_data:
+            return handle_api_error('Invalid webhook data')
+
+        # Load integrations to find matching webhook
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+        
+        # Find integration with matching webhook URL
+        integration = next(
+            (i for i in integrations if i['webhook_url'] == f"/webhook/{webhook_path}"),
+            None
+        )
+        
+        if not integration:
+            return handle_api_error('Integration not found', 404)
+
+        # Load campaigns for this integration
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+        
+        matching_campaigns = [
+            c for c in campaigns 
+            if c['integration_id'] == integration['id'] and c['event_type'] == webhook_data.get('status', '')
+        ]
+
+        if not matching_campaigns:
+            return handle_api_error('No matching campaigns found')
+
+        # Process transaction data
+        transaction_id = str(uuid.uuid4())[:8]
+        customer_data = webhook_data.get('customer', {})
+        address_data = webhook_data.get('address', {})
+
+        transaction = {
+            'transaction_id': transaction_id,
+            'customer_name': customer_data.get('name', ''),
+            'customer_phone': customer_data.get('phone', ''),
+            'customer_email': customer_data.get('email', ''),
+            'address': address_data,
+            'product_name': webhook_data.get('product_name', ''),
+            'total_price': webhook_data.get('total_price', '0.00'),
+            'pix_code': webhook_data.get('pix_code', ''),
+            'status': 'pending',
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+        # Save transaction
+        with open(TRANSACTIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            transactions = json.load(f)
+            transactions.append(transaction)
+            f.seek(0)
+            json.dump(transactions, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
+        # Send SMS for each matching campaign
+        for campaign in matching_campaigns:
+            # Get first name
+            full_name = customer_data.get('name', '')
+            first_name = full_name.split()[0] if full_name else ''
+
+            # Format message
+            message = campaign['message_template']
+            message = message.replace('{customer.first_name}', first_name)
+            message = message.replace('{total_price}', webhook_data.get('total_price', ''))
+            message = message.replace('{link_pix}', f"{request.host_url}payment/{transaction_id}")
+
+            # Queue SMS
+            send_sms_task.delay(
+                phone=customer_data.get('phone', ''),
+                message=message,
+                event_type=campaign['event_type']
+            )
+
+        return jsonify({
+            'success': True,
+            'message': 'Webhook processed successfully',
+            'transaction_id': transaction_id
+        })
+
+    except Exception as e:
+        logger.error(f"Error processing webhook: {str(e)}\n{traceback.format_exc()}")
+        return handle_api_error('Error processing webhook')
+
+@app.route('/payment/<transaction_id>')
+def payment_page(transaction_id):
+    try:
+        # Load transaction
+        with open(TRANSACTIONS_FILE, 'r') as f:
+            transactions = json.load(f)
+        
+        transaction = next(
+            (t for t in transactions if t['transaction_id'] == transaction_id),
+            None
+        )
+        
+        if not transaction:
+            return render_template('error.html', error='Transaction not found'), 404
+
+        # Format address for display
+        address_parts = []
+        address = transaction.get('address', {})
+        if address.get('street'):
+            address_parts.append(address['street'])
+        if address.get('number'):
+            address_parts.append(address['number'])
+        if address.get('district'):
+            address_parts.append(address['district'])
+        if address.get('city'):
+            address_parts.append(address['city'])
+        if address.get('state'):
+            address_parts.append(address['state'])
+            
+        return render_template('payment.html',
+                           customer_name=transaction['customer_name'],
+                           customer_address=' - '.join(address_parts) if address_parts else None,
+                           product_name=transaction['product_name'],
+                           total_price=transaction['total_price'],
+                           pix_code=transaction['pix_code'])
+                           
+    except Exception as e:
+        logger.error(f"Error loading payment page: {str(e)}")
+        return render_template('error.html', error='Error loading payment page')
 
 @app.route('/api/integrations', methods=['GET'])
 @login_required

@@ -42747,3 +42747,62 @@ def send_sms_task(self, phone, message, operator=0, campaign_id=1, event_type=2)
 2024-11-06 22:32:43,338 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:32:43] "[32mGET /login HTTP/1.1[0m" 302 -
 2024-11-06 22:32:43,553 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:32:43] "GET / HTTP/1.1" 200 -
 2024-11-06 22:32:43,792 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:32:43] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:32:56,049 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:32:56] "GET / HTTP/1.1" 200 -
+2024-11-06 22:32:56,313 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:32:56] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:33:13,292 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:13] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 22:33:13,516 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:33:14,111 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:14] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 22:33:15,267 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:15] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 22:33:15,268 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:15] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 22:33:20,258 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:33:20,260 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:20] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:33:39,548 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:33:39,549 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:39] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:33:45,096 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:33:45,097 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:45] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:33:45,118 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:33:45,118 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:33:45] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:36:08,336 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:36:08,336 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:36:08] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:36:22,969 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:36:22,970 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:36:22] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:36:48,546 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:36:48,547 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:36:48] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:39:06,748 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:39:06,749 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:39:06] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:42:45,481 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:42:45] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 22:42:46,063 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:42:46] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:42:46,332 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:42:46] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 22:42:47,318 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:42:47] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 22:42:47,319 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:42:47] "GET /api/integrations HTTP/1.1" 200 -
+2024-11-06 22:44:13,096 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:44:13,096 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:44:13] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:45:25,024 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:45:25,024 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:45:25] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:46:12,166 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:46:12] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 22:46:32,052 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:46:32] "[31m[1mPUT /api/campaigns/c6b56355-a655-4448-a9d5-c8ddcbd4c846 HTTP/1.1[0m" 405 -
+2024-11-06 22:47:11,224 - __main__ - ERROR - [app.py:66] - API Error: Resource not found
+2024-11-06 22:47:11,225 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:11] "[33mPOST /webhook/eccc0bb8-bde8-4531-908f-d2255e3a7855 HTTP/1.1[0m" 404 -
+2024-11-06 22:47:28,367 - werkzeug - INFO - [_internal.py:97] -  * Detected change in '/home/runner/SMSWebhookIntegrations/app.py', reloading
+2024-11-06 22:47:28,430 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 22:47:29,255 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 22:47:29,278 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 22:47:29,280 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 134-557-332
+2024-11-06 22:47:33,172 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 22:47:33,187 - werkzeug - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://172.31.196.126:3000
+2024-11-06 22:47:33,187 - werkzeug - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2024-11-06 22:47:33,188 - werkzeug - INFO - [_internal.py:97] -  * Restarting with stat
+2024-11-06 22:47:33,515 - __main__ - INFO - [app.py:45] - Data directory data exists and is accessible
+2024-11-06 22:47:33,528 - werkzeug - WARNING - [_internal.py:97] -  * Debugger is active!
+2024-11-06 22:47:33,529 - werkzeug - INFO - [_internal.py:97] -  * Debugger PIN: 581-666-858
+2024-11-06 22:47:34,275 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:34] "GET /campaigns HTTP/1.1" 200 -
+2024-11-06 22:47:34,330 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:34] "[32mGET / HTTP/1.1[0m" 302 -
+2024-11-06 22:47:34,338 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:34] "GET /login?next=/ HTTP/1.1" 200 -
+2024-11-06 22:47:34,355 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:34] "GET /static/css/custom.css HTTP/1.1" 200 -
+2024-11-06 22:47:34,519 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:34] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-11-06 22:47:35,060 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:35] "[36mGET /static/js/campaigns.js HTTP/1.1[0m" 304 -
+2024-11-06 22:47:35,943 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:35] "GET /api/campaigns HTTP/1.1" 200 -
+2024-11-06 22:47:35,952 - werkzeug - INFO - [_internal.py:97] - 172.31.196.126 - - [06/Nov/2024 22:47:35] "GET /api/integrations HTTP/1.1" 200 -
