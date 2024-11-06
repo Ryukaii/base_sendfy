@@ -110,6 +110,51 @@ def get_integrations():
         logger.error(f"Error retrieving integrations: {str(e)}\n{traceback.format_exc()}")
         return handle_api_error('Failed to retrieve integrations', 500)
 
+@app.route('/api/campaigns', methods=['GET'])
+@login_required
+def get_campaigns():
+    try:
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        return jsonify(campaigns)
+    except Exception as e:
+        logger.error(f"Error retrieving campaigns: {str(e)}")
+        return handle_api_error('Failed to retrieve campaigns', 500)
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign created successfully',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Failed to create campaign', 500)
+
 @app.route('/api/integrations', methods=['POST'])
 @login_required
 def create_integration():
