@@ -68,7 +68,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
-            flash('Você precisa de privilégios de administrador para acessar esta página.', 'danger')
+            flash('You need admin privileges to access this page.', 'danger')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -81,45 +81,6 @@ def init_app(app):
 
 # Initialize app on startup
 init_app(app)
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-        
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        
-        if not username or not password:
-            flash('Nome de usuário e senha são obrigatórios.', 'danger')
-            return render_template('register.html')
-            
-        if password != confirm_password:
-            flash('As senhas não conferem.', 'danger')
-            return render_template('register.html')
-            
-        if len(password) < 6:
-            flash('A senha deve ter pelo menos 6 caracteres.', 'danger')
-            return render_template('register.html')
-            
-        if not re.match("^[a-zA-Z0-9_]+$", username):
-            flash('Nome de usuário deve conter apenas letras, números e underscore.', 'danger')
-            return render_template('register.html')
-            
-        if len(username) < 3 or len(username) > 20:
-            flash('Nome de usuário deve ter entre 3 e 20 caracteres.', 'danger')
-            return render_template('register.html')
-            
-        user = User.create(username, password)
-        if user:
-            flash('Conta criada com sucesso! Por favor, faça login.', 'success')
-            return redirect(url_for('login'))
-        else:
-            flash('Este nome de usuário já está em uso.', 'danger')
-            
-    return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
