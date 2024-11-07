@@ -70,5 +70,50 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139143429', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-07 01:50:02",
+    "phone": "5511987658730",
+    "message": "Fernando, seu pedido aguarda entrega: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/d368b967",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139143923', 'number': '5511987658730', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 01:51:02",
+    "phone": "5561982132603",
+    "message": "Marina, seu pedido aguarda entrega: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/e7dc372b",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139143974', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 01:51:02",
+    "phone": "5561982132603",
+    "message": "Marina, pendente pendente http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/fdae60ae",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139143976', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 01:56:03",
+    "phone": "5561982132603",
+    "message": "Marina, aprovado lindo",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139144091', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-07 01:56:04",
+    "phone": "5561982132603",
+    "message": "Marina, aprovado lindo",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139144092', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "approved"
   }
 ]

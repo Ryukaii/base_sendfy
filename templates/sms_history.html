@@ -1,40 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h2>Histórico de SMS</h2>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Telefone</th>
-                        <th>Mensagem</th>
-                        <th>Status</th>
-                        <th>Tipo de Evento</th>
-                        <th>Resposta</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for entry in sms_history %}
-                    <tr>
-                        <td>{{ entry.timestamp }}</td>
-                        <td>{{ entry.phone }}</td>
-                        <td>{{ entry.message }}</td>
-                        <td>
-                            <span class="badge {% if entry.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
-                                {{ 'Sucesso' if entry.status == 'success' else 'Falha' }}
-                            </span>
-                        </td>
-                        <td>{{ entry.event_type }}</td>
-                        <td>{{ entry.api_response }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header border-secondary">
+                    <h2 class="mb-0">Histórico de SMS</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Telefone</th>
+                                    <th>Tipo</th>
+                                    <th>Status</th>
+                                    <th>Mensagem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sms in sms_history %}
+                                <tr>
+                                    <td>{{ sms.timestamp }}</td>
+                                    <td>{{ sms.phone }}</td>
+                                    <td>
+                                        <span class="badge {% if sms.type == 'manual' %}bg-info{% else %}bg-primary{% endif %}">
+                                            {{ 'Manual' if sms.type == 'manual' else 'Campanha' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if sms.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ 'Sucesso' if sms.status == 'success' else 'Falha' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ sms.message }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

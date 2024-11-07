@@ -49,5 +49,14 @@
     "message_template": "{customer.first_name}, seu pedido aguarda entrega: {link_pix}",
     "user_id": "2",
     "created_at": "2024-11-07 01:41:01"
+  },
+  {
+    "id": "0c159099-324b-435c-8946-ea5acbf2b98d",
+    "name": "VEGA",
+    "integration_id": "16851e8b-544d-4d90-ba77-f454c23ae6dd",
+    "event_type": "approved",
+    "message_template": "{customer.first_name}, aprovado lindo",
+    "user_id": "2",
+    "created_at": "2024-11-07 01:54:29"
   }
 ]
