@@ -63,6 +63,7 @@
                                     <th>ID</th>
                                     <th>Usuário</th>
                                     <th>Admin</th>
+                                    <th>Créditos</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
@@ -75,6 +76,12 @@
                                         <span class="badge {% if user.is_admin %}bg-success{% else %}bg-secondary{% endif %}">
                                             {{ 'Sim' if user.is_admin else 'Não' }}
                                         </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ user.credits }}</span>
+                                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="manageCredits('{{ user.id }}', '{{ user.username }}', {{ user.credits }})">
+                                            <i class="fas fa-coins"></i>
+                                        </button>
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ user.id }}')">
@@ -112,6 +119,11 @@
                         <input type="password" class="form-control bg-dark border-secondary text-light" 
                                id="newPassword" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="initialCredits" class="form-label">Créditos Iniciais</label>
+                        <input type="number" class="form-control bg-dark border-secondary text-light" 
+                               id="initialCredits" value="0" min="0" required>
+                    </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="isAdmin">
                         <label class="form-check-label" for="isAdmin">Usuário Administrador</label>
@@ -125,6 +137,46 @@
         </div>
     </div>
 </div>
+
+<!-- Manage Credits Modal -->
+<div class="modal fade" id="manageCreditsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Gerenciar Créditos</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Usuário: <span id="creditUsername" class="fw-bold"></span></p>
+                <p>Créditos Atuais: <span id="currentCredits" class="badge bg-info"></span></p>
+                <form id="creditForm">
+                    <input type="hidden" id="creditUserId">
+                    <div class="mb-3">
+                        <label for="creditAmount" class="form-label">Quantidade de Créditos</label>
+                        <input type="number" class="form-control bg-dark border-secondary text-light" 
+                               id="creditAmount" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="creditOperation" 
+                                   id="addCredits" value="add" checked>
+                            <label class="form-check-label" for="addCredits">Adicionar</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="creditOperation" 
+                                   id="removeCredits" value="remove">
+                            <label class="form-check-label" for="removeCredits">Remover</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="updateCredits()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -133,6 +185,7 @@ async function addUser() {
     const username = document.getElementById('newUsername').value;
     const password = document.getElementById('newPassword').value;
     const isAdmin = document.getElementById('isAdmin').checked;
+    const credits = parseInt(document.getElementById('initialCredits').value) || 0;
     
     try {
         const response = await fetch('/api/users', {
@@ -140,12 +193,49 @@ async function addUser() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password, is_admin: isAdmin })
+            body: JSON.stringify({ username, password, is_admin: isAdmin, credits })
         });
         
         if (!response.ok) {
             const data = await response.json();
             throw new Error(data.message || 'Falha ao adicionar usuário');
+        }
+        
+        window.location.reload();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function manageCredits(userId, username, credits) {
+    document.getElementById('creditUserId').value = userId;
+    document.getElementById('creditUsername').textContent = username;
+    document.getElementById('currentCredits').textContent = credits;
+    document.getElementById('creditAmount').value = '';
+    
+    new bootstrap.Modal(document.getElementById('manageCreditsModal')).show();
+}
+
+async function updateCredits() {
+    const userId = document.getElementById('creditUserId').value;
+    const amount = parseInt(document.getElementById('creditAmount').value);
+    const operation = document.querySelector('input[name="creditOperation"]:checked').value;
+    
+    try {
+        const response = await fetch(`/api/users/${userId}/credits`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                amount,
+                operation
+            })
+        });
+        
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Falha ao atualizar créditos');
         }
         
         window.location.reload();

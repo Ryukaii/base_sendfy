@@ -51,7 +51,7 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python3 app.py"
-waitForPort = 3000
+waitForPort = 5000
 
 [[workflows.workflow]]
 name = "Init Admin"
