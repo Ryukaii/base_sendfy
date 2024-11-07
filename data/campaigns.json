@@ -60,12 +60,12 @@
     "created_at": "2024-11-07 01:54:29"
   },
   {
-    "id": "e660e722-48f2-42e0-827f-76d3bf19d0b5",
+    "id": "c1089d46-bbab-4d53-ad49-27d79cda6474",
     "name": "VEGA",
-    "integration_id": "d8feda24-fc7b-4ee3-b729-79bcbeec50e0",
+    "integration_id": "16851e8b-544d-4d90-ba77-f454c23ae6dd",
     "event_type": "approved",
-    "message_template": "{customer.first_name}",
+    "message_template": "{customer.first_name}{total_price}",
     "user_id": "2",
-    "created_at": "2024-11-07 02:17:27"
+    "created_at": "2024-11-07 02:22:40"
   }
 ]
