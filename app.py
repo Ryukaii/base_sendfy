@@ -29,6 +29,14 @@ INTEGRATIONS_FILE = 'data/integrations.json'
 CAMPAIGNS_FILE = 'data/campaigns.json'
 TRANSACTIONS_FILE = 'data/transactions.json'
 
+def ensure_data_files():
+    if not os.path.exists('data'):
+        os.makedirs('data')
+    for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE]:
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+
 def handle_api_error(message, status_code=400):
     return jsonify({
         'success': False,
@@ -96,7 +104,6 @@ def logout():
     flash('You have been logged out', 'success')
     return redirect(url_for('login'))
 
-# Added missing routes
 @app.route('/sms')
 @login_required
 def sms():
@@ -115,7 +122,6 @@ def integrations():
 @app.route('/analytics')
 @login_required
 def analytics():
-    # Add analytics data
     stats = {
         'total_messages': 0,
         'success_rate': 0,
@@ -126,6 +132,152 @@ def analytics():
         'recent_activity': []
     }
     return render_template('analytics.html', **stats)
+
+# Campaign API Routes
+@app.route('/api/campaigns', methods=['GET'])
+@login_required
+def get_campaigns():
+    try:
+        # Get only campaigns for current user
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_campaigns = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_campaigns = [c for c in all_campaigns if c.get('user_id') == current_user.id]
+        return jsonify(user_campaigns)
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return handle_api_error('Failed to load campaigns')
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'message_template']):
+            return handle_api_error('Missing required fields')
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign created successfully',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Failed to create campaign')
+
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+@login_required
+def delete_campaign(campaign_id):
+    try:
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns = [c for c in campaigns if c['id'] != campaign_id or c.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return handle_api_error('Failed to delete campaign')
+
+# Integration API Routes
+@app.route('/api/integrations', methods=['GET'])
+@login_required
+def get_integrations():
+    try:
+        # Get only integrations for current user
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_integrations = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_integrations = [i for i in all_integrations if i.get('user_id') == current_user.id]
+        return jsonify(user_integrations)
+    except Exception as e:
+        logger.error(f"Error loading integrations: {str(e)}")
+        return handle_api_error('Failed to load integrations')
+
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def create_integration():
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data:
+            return handle_api_error('Integration name is required')
+            
+        integration = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations.append(integration)
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration created successfully',
+            'integration': integration
+        })
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}")
+        return handle_api_error('Failed to create integration')
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+@login_required
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations = [i for i in integrations if i['id'] != integration_id or i.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}")
+        return handle_api_error('Failed to delete integration')
 
 # Admin routes
 @app.route('/admin')
@@ -241,7 +393,7 @@ def internal_error(error):
     }), 500
 
 if __name__ == '__main__':
-    # Try different ports if 5000 is in use
+    ensure_data_files()
     ports = [5000, 3000, 8080]
     for port in ports:
         try:
