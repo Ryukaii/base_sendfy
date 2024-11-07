@@ -67,5 +67,14 @@
     "message_template": "{customer.first_name}{total_price}",
     "user_id": "2",
     "created_at": "2024-11-07 02:22:40"
+  },
+  {
+    "id": "c4beeac7-67be-4f82-876a-aeb17e0f81cf",
+    "name": "VEGA",
+    "integration_id": "16851e8b-544d-4d90-ba77-f454c23ae6dd",
+    "event_type": "pending",
+    "message_template": "{customer.first_name}, efetue o pagamento: {link_pix}",
+    "user_id": "2",
+    "created_at": "2024-11-07 02:28:16"
   }
 ]

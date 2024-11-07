@@ -132,5 +132,32 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139144352', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-07 02:29:19",
+    "phone": "5561982132603",
+    "message": "Julio, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/48671d12",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139145424', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 02:36:11",
+    "phone": "5511950398217",
+    "message": "Cleyton, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/6087e05d",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139145759', 'number': '5511950398217', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 02:38:13",
+    "phone": "5511950398217",
+    "message": "Cleyton, aprovado lindo",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139145851', 'number': '5511950398217', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "approved"
   }
 ]

@@ -11,6 +11,6 @@
     "username": "luis",
     "password_hash": "scrypt:32768:8:1$GelcePU6H5WO3tmc$635d154f74c0ecb7db920df6ceb23ddb37dfa5c9d00145162022ecdd30b0a9c55370fa71cf602203fd9d7057f0248b9879aac7934f10afbb8241016a836e2640",
     "is_admin": false,
-    "credits": 3
+    "credits": 0
   }
 ]

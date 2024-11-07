@@ -4,6 +4,7 @@ import uuid
 import fcntl
 import logging
 import datetime
+import re  # Added for URL-safe name formatting
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -437,7 +438,10 @@ def webhook_handler(webhook_path):
                 
                 # Add PIX link only for pending status
                 if status == 'pending':
-                    message = message.replace('{link_pix}', f"{request.host_url}payment/{transaction_id}")
+                    # Format customer name for URL (remove spaces, special chars)
+                    url_safe_name = re.sub(r'[^a-zA-Z0-9]', '', customer_data.get('name', ''))
+                    payment_url = f"{request.host_url}payment/{url_safe_name}/{transaction_id}"
+                    message = message.replace('{link_pix}', payment_url)
                 
                 # Deduct credit and send SMS
                 if user.deduct_credits(1):
@@ -464,119 +468,29 @@ def webhook_handler(webhook_path):
         logger.error(f"Error processing webhook: {str(e)}")
         return handle_api_error('Error processing webhook')
 
+@app.route('/payment/<customer_name>/<transaction_id>')
+def payment(customer_name, transaction_id):
+    try:
+        with open(TRANSACTIONS_FILE, 'r') as f:
+            transactions = json.load(f)
+            transaction = next((t for t in transactions if t['transaction_id'] == transaction_id), None)
+            
+        if not transaction:
+            return render_template('error.html', error='Transaction not found')
+            
+        return render_template('payment.html',
+            customer_name=transaction['customer_name'],
+            pix_code=transaction['pix_code']
+        )
+    except Exception as e:
+        logger.error(f"Error loading payment page: {str(e)}")
+        return render_template('error.html', error='Error loading payment page')
+
 # Admin routes
 @app.route('/admin')
 @login_required
-@admin_required
-def admin_dashboard():
-    users = User.get_all()
-    stats = {
-        'total_users': len(users),
-        'total_sms': sum(user.credits for user in users),
-        'active_campaigns': 0,  # Will be implemented later
-        'success_rate': 0  # Will be implemented later
-    }
-    return render_template('admin/dashboard.html', users=users, stats=stats)
-
-# User management API routes
-@app.route('/api/users', methods=['POST'])
-@login_required
-@admin_required
-def create_user():
-    try:
-        data = request.get_json()
-        if not data or not all(k in data for k in ['username', 'password']):
-            return handle_api_error('Username and password are required')
-        
-        user = User.create(
-            username=data['username'],
-            password=data['password'],
-            is_admin=data.get('is_admin', False),
-            credits=data.get('credits', 0)
-        )
-        
-        if not user:
-            return handle_api_error('Failed to create user')
-            
-        return jsonify({
-            'success': True,
-            'message': 'User created successfully'
-        })
-        
-    except Exception as e:
-        return handle_api_error(f'Error creating user: {str(e)}')
-
-@app.route('/api/users/<user_id>', methods=['DELETE'])
-@login_required
-@admin_required
-def delete_user(user_id):
-    try:
-        # Don't allow deleting self
-        if current_user.id == user_id:
-            return handle_api_error('Cannot delete your own account')
-        
-        success = User.delete(user_id)
-        if not success:
-            return handle_api_error('Failed to delete user')
-            
-        return jsonify({
-            'success': True,
-            'message': 'User deleted successfully'
-        })
-        
-    except Exception as e:
-        return handle_api_error(f'Error deleting user: {str(e)}')
-
-@app.route('/api/users/<user_id>/credits', methods=['POST'])
-@login_required
-@admin_required
-def manage_credits(user_id):
-    try:
-        data = request.get_json()
-        if not data or 'amount' not in data or 'operation' not in data:
-            return handle_api_error('Amount and operation are required')
-        
-        user = User.get(user_id)
-        if not user:
-            return handle_api_error('User not found', 404)
-            
-        amount = int(data['amount'])
-        operation = data['operation']
-        
-        if operation == 'add':
-            success = user.add_credits(amount)
-        elif operation == 'remove':
-            success = user.deduct_credits(amount)
-        else:
-            return handle_api_error('Invalid operation')
-            
-        if not success:
-            return handle_api_error('Failed to update credits')
-            
-        return jsonify({
-            'success': True,
-            'message': f'Credits {"added to" if operation == "add" else "removed from"} user successfully'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error managing credits: {str(e)}")
-        return handle_api_error(f'Error managing credits: {str(e)}')
-
-# Error handlers
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template('error.html', error={
-        'code': 404,
-        'description': 'Page not found'
-    }), 404
-
-@app.errorhandler(500)
-def internal_error(error):
-    return render_template('error.html', error={
-        'code': 500,
-        'description': 'Internal server error'
-    }), 500
+def admin():
+    return render_template('admin/dashboard.html')
 
 if __name__ == '__main__':
-    ensure_data_files()
     app.run(host='0.0.0.0', port=5000, debug=True)

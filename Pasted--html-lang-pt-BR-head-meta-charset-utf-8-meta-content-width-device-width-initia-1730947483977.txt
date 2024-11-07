@@ -1,0 +1,261 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Pagamento PIX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <style>
+        * {
+            border-radius: 3px !important;
+            font-family: 'Poppins', sans-serif;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        .toast {
+            visibility: hidden;
+            min-width: 300px;
+            background-color: #fff;
+            color: #000;
+            text-align: center;
+            border-radius: 8px;
+            padding: 20px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 15s;
+        }
+        @keyframes fadein {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        @keyframes fadeout {
+            from {opacity: 1;}
+            to {opacity: 0;}
+        }
+        #pixCode {
+            -webkit-user-select: all;
+            -moz-user-select: all;
+            -ms-user-select: all;
+            user-select: all;
+        }
+        .step-animation {
+            transition: all 0.3s ease;
+        }
+        .step-animation:hover {
+            transform: translateX(5px);
+        }
+        header {
+            border-radius: 0 !important;
+        }
+        .backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 40;
+            visibility: hidden;
+        }
+        .backdrop.show {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-['Inter',sans-serif] flex flex-col min-h-screen">
+    <header class="bg-green-700 shadow-lg py-2">
+        <div class="container mx-auto px-4 flex flex-col items-center justify-center space-y-1">
+            <h2 class="text-xl font-bold text-white mb-1 flex items-center justify-center">
+                <i class="fas fa-lock text-green-900 mr-2"></i>
+                PAGAMENTO SEGURO
+            </h2>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full hover:shadow-2xl transition-all duration-300">
+            <div class="flex justify-center mb-6">
+                <img alt="Logo do PIX, um sistema de pagamento instantâneo criado pelo Banco Central do Brasil" class="h-16 hover:scale-105 transition-transform duration-300" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg/2560px-Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg.png"/>
+            </div>
+
+            <div class="space-y-4">
+                <div class="text-center">
+                    <p class="text-black">
+                        Prezado <span class="text-black"><b>{{ customer_name }}</b>, finalize sua compra agora mesmo. Efetue o pagamento via PIX e garanta seu produto.</span>
+                    </p>
+                </div>
+
+                <div class="bg-teal-50 p-4 rounded-lg hover:shadow-md transition-all duration-300">
+                    <div class="flex flex-col items-center justify-center mb-4">
+                        <span class="text-[#2FBDAE] text-sm text-center">Aproveite a segurança e rapidez do pagamento via PIX. Seu pedido será processado imediatamente após a confirmação do pagamento.</span>
+                    </div>
+                    <p class="font-bold text-sm text-[#2FBDAE] font-medium mb-2 text-center">
+                        Copie o código Pix abaixo:
+                    </p>
+                    <textarea class="w-full h-20 p-3 bg-white rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-700 font-mono text-sm shadow-inner" id="pixCode" readonly>{{ pix_code }}</textarea>
+                    <p class="text-xs text-teal-600 mt-2 text-center">
+                        <i class="fas fa-lock mr-1"></i>
+                        Transação 100% segura e verificada pelo Banco do Brasil
+                    </p>
+                </div>
+
+                <button class="w-full bg-green-700 hover:bg-green-800 transform transition-all duration-200 ease-in-out hover:scale-[1.02] text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 shadow-md hover:shadow-lg" onclick="copiarPixCode()">
+                    <i class="fas fa-copy"></i>
+                    <span>Copiar Código PIX</span>
+                </button>
+                <br>
+
+                <div class="flex justify-center mt-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg/1200px-Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg.png" alt="Logo PIX" class="h-8"/>
+                </div>
+
+                <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg p-6 space-y-4 shadow-sm">
+                    <div class="space-y-3 w-full">
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-teal-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">1</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Copie o código PIX</p>
+                                <p class="text-gray-500 text-xs">Clique no botão acima para copiar automaticamente</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-teal-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">2</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Abra seu banco</p>
+                                <p class="text-gray-500 text-xs">Acesse o aplicativo do seu banco preferido</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-teal-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">3</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Selecione PIX Copia e Cola</p>
+                                <p class="text-gray-500 text-xs">Encontre a opção PIX > Pix Copia e Cola</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start step-animation hover:bg-white/50 p-2 rounded-lg">
+                            <div class="bg-teal-600 text-white rounded-lg w-8 h-8 flex items-center justify-center flex-shrink-0 shadow-lg">4</div>
+                            <div class="ml-3">
+                                <p class="text-gray-700 font-medium text-sm">Confirme o pagamento</p>
+                                <p class="text-gray-500 text-xs">Cole o código e confirme a transação</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white py-4 mt-8 border-t border-gray-200">
+        <div class="flex justify-center mt-4">
+            <img src="https://veritaz.com.br/wp-content/uploads/2017/09/Banco_Central_do_Brasil_logo-1.png" alt="Logo do Banco Central do Brasil" class="h-12"/>
+        </div>
+    </footer>
+
+    <div class="backdrop" id="backdrop"></div>
+
+    <div class="toast" id="toast">
+        <div class="flex flex-col items-center justify-center space-y-4">
+            <div>
+                <i class="fas fa-check-circle text-teal-500 text-3xl"></i>
+                <p class="text-lg font-semibold mt-2">Código PIX copiado com sucesso!</p>
+                <p class="text-sm text-gray-600">Seu pedido será processado assim que o pagamento for confirmado.</p>
+            </div>
+            <div class="animate-spin">
+                <i class="fas fa-spinner text-teal-500 text-3xl"></i>
+            </div>
+            <p class="text-sm text-gray-600">Assim que efetuar o pagamento, retorne a esta página para acompanhar o status do seu pedido.</p>
+        </div>
+        <div class="hidden" id="payment-confirmation">
+            <p class="text-lg font-semibold mt-2">O pagamento já foi realizado?</p>
+            <br>
+            <button onclick="agradecerPagamento()" class="mt-4 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg">Sim, já foi pago</button>
+        </div>
+    </div>
+
+    <script>
+        function startTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+            const interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    display.textContent = "00:00";
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            const nineMinutes = 60 * 9;
+            const display = document.querySelector('#countdown');
+            if (display) {
+                startTimer(nineMinutes, display);
+            }
+        };
+
+        function copiarPixCode() {
+            var pixCode = document.getElementById("pixCode");
+            pixCode.select();
+            
+            try {
+                navigator.clipboard.writeText(pixCode.value).then(function() {
+                    mostrarToast();
+                }).catch(function() {
+                    document.execCommand('copy');
+                    mostrarToast();
+                });
+            } catch (err) {
+                document.execCommand('copy');
+                mostrarToast();
+            }
+            
+            window.getSelection().removeAllRanges();
+        }
+
+        function mostrarToast() {
+            var toast = document.getElementById("toast");
+            var backdrop = document.getElementById("backdrop");
+            toast.className = "toast show";
+            backdrop.className = "backdrop show";
+            setTimeout(function(){ 
+                document.getElementById("payment-confirmation").classList.remove("hidden");
+                document.querySelector(".animate-spin").classList.add("hidden");
+                document.querySelector(".toast .flex-col").classList.add("hidden");
+            }, 30000);
+        }
+
+        function agradecerPagamento() {
+            var toast = document.getElementById("toast");
+            toast.innerHTML = `
+                <div class="flex flex-col items-center justify-center space-y-4">
+                    <div>
+                        <i class="fas fa-check-circle text-teal-500 text-3xl"></i>
+                        <p class="text-lg font-semibold mt-2">Obrigado pelo pagamento!</p>
+                        <p class="text-sm text-gray-600">Seu pedido será processado em breve.</p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
