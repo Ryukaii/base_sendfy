@@ -96,6 +96,37 @@ def logout():
     flash('You have been logged out', 'success')
     return redirect(url_for('login'))
 
+# Added missing routes
+@app.route('/sms')
+@login_required
+def sms():
+    return render_template('sms.html')
+
+@app.route('/campaigns')
+@login_required
+def campaigns():
+    return render_template('campaigns.html')
+
+@app.route('/integrations')
+@login_required
+def integrations():
+    return render_template('integrations.html')
+
+@app.route('/analytics')
+@login_required
+def analytics():
+    # Add analytics data
+    stats = {
+        'total_messages': 0,
+        'success_rate': 0,
+        'manual_messages': 0,
+        'campaign_messages': 0,
+        'messages_by_status': [],
+        'messages_by_event': [],
+        'recent_activity': []
+    }
+    return render_template('analytics.html', **stats)
+
 # Admin routes
 @app.route('/admin')
 @login_required
@@ -210,4 +241,11 @@ def internal_error(error):
     }), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Try different ports if 5000 is in use
+    ports = [5000, 3000, 8080]
+    for port in ports:
+        try:
+            app.run(host='0.0.0.0', port=port, debug=True)
+            break
+        except OSError:
+            continue

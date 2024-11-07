@@ -1,4 +1,3 @@
-// Carregar campanhas e integrações existentes
 async function loadCampaigns() {
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'text-center py-4';
@@ -25,14 +24,12 @@ async function loadCampaigns() {
             })
         ]);
         
-        // Preencher dropdown de integrações
         const integrationSelect = document.getElementById('integrationId');
         integrationSelect.innerHTML = `<option value="">Selecione uma Integração</option>` + 
             integrationsResponse.map(integration => 
                 `<option value="${integration.id}">${integration.name}</option>`
             ).join('');
         
-        // Exibir campanhas
         list.innerHTML = '';
         
         if (campaignsResponse.length === 0) {
@@ -89,17 +86,12 @@ async function loadCampaigns() {
     }
 }
 
-// Manipular criação/atualização de campanha
 document.getElementById('campaignForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const submitButton = e.target.querySelector('button[type="submit"]');
     const originalText = submitButton.innerHTML;
     submitButton.disabled = true;
-    submitButton.innerHTML = `
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        Salvando...
-    `;
     
     const formData = {
         name: document.getElementById('campaignName').value,
@@ -127,40 +119,25 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
             body: JSON.stringify(formData)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            const data = await response.json();
             throw new Error(data.error || 'Erro ao salvar campanha');
         }
         
-        const toastDiv = document.createElement('div');
-        toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
-        toastDiv.style.zIndex = '5';
-        toastDiv.innerHTML = `
-            <div class="toast align-items-center text-bg-success border-0" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fas fa-check-circle me-2"></i>
-                        Campanha ${campaignId ? 'atualizada' : 'criada'} com sucesso!
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(toastDiv);
-        const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'));
-        toast.show();
-        
+        showToast('success', `Campanha ${campaignId ? 'atualizada' : 'criada'} com sucesso!`);
         resetForm();
         loadCampaigns();
     } catch (error) {
         console.error('Erro ao salvar campanha:', error);
+        const errorMessage = error.response ? error.response.data.error : error.message;
         const errorDiv = document.createElement('div');
         errorDiv.className = 'alert alert-danger mt-3';
         errorDiv.innerHTML = `
             <i class="fas fa-exclamation-circle me-2"></i>
-            ${error.message}
+            ${errorMessage}
         `;
-        e.target.appendChild(errorDiv);
+        document.getElementById('campaignForm').appendChild(errorDiv);
         setTimeout(() => errorDiv.remove(), 5000);
     } finally {
         submitButton.disabled = false;
@@ -168,20 +145,17 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
     }
 });
 
-// Resetar formulário para modo de criação
 function resetForm() {
     const form = document.getElementById('campaignForm');
     form.reset();
     delete form.dataset.campaignId;
     document.getElementById('integrationId').disabled = false;
-    document.querySelector('button[type="submit"]').textContent = 'Criar Campanha';
+    document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
     
-    // Remover mensagens de erro existentes
     const errorDivs = form.querySelectorAll('.alert-danger');
     errorDivs.forEach(div => div.remove());
 }
 
-// Carregar dados da campanha para edição
 async function editCampaign(campaignId) {
     try {
         const response = await fetch('/api/campaigns');
@@ -211,11 +185,10 @@ async function editCampaign(campaignId) {
         form.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
         console.error('Erro ao carregar campanha para edição:', error);
-        alert(`Erro ao carregar dados da campanha: ${error.message}`);
+        showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);
     }
 }
 
-// Excluir campanha
 async function deleteCampaign(campaignId) {
     if (!confirm('Tem certeza que deseja excluir esta campanha?')) {
         return;
@@ -255,15 +228,13 @@ async function deleteCampaign(campaignId) {
     } catch (error) {
         console.error('Erro ao excluir campanha:', error);
         campaignCard.innerHTML = originalContent;
-        alert(`Erro ao excluir campanha: ${error.message}`);
+        showToast('error', `Erro ao excluir campanha: ${error.message}`);
     }
 }
 
-// Carregar dados quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
     loadCampaigns();
     
-    // Adicionar manipulador do botão cancelar
     const cancelButton = document.createElement('button');
     cancelButton.type = 'button';
     cancelButton.className = 'btn btn-secondary ms-2';
