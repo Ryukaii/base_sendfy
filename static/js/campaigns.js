@@ -1,3 +1,30 @@
+function showToast(type, message) {
+    const toastDiv = document.createElement('div');
+    toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
+    toastDiv.style.zIndex = '5';
+    toastDiv.innerHTML = `
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toastDiv);
+    const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'), {
+        delay: 3000
+    });
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastDiv.addEventListener('hidden.bs.toast', () => {
+        toastDiv.remove();
+    });
+}
+
 async function loadCampaigns() {
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'text-center py-4';
@@ -130,15 +157,7 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         loadCampaigns();
     } catch (error) {
         console.error('Erro ao salvar campanha:', error);
-        const errorMessage = error.response ? error.response.data.error : error.message;
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'alert alert-danger mt-3';
-        errorDiv.innerHTML = `
-            <i class="fas fa-exclamation-circle me-2"></i>
-            ${errorMessage}
-        `;
-        document.getElementById('campaignForm').appendChild(errorDiv);
-        setTimeout(() => errorDiv.remove(), 5000);
+        showToast('error', error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = originalText;
