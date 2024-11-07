@@ -159,5 +159,121 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139145851', 'number': '5511950398217', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-07 02:50:51",
+    "phone": "+5561982132603",
+    "message": "oi",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-07 02:50:52",
+    "phone": "5561982132603",
+    "message": "oi",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146290', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-07 02:52:42",
+    "phone": "5561982132603",
+    "message": "deddde",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146373', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 02:52:42",
+    "phone": "5561982132603",
+    "message": "deddde, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/dedddeeddd/f4495a30",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146374', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 02:52:42",
+    "phone": "5561982132603",
+    "message": "deddde",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146375', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 02:54:22",
+    "phone": "5511986402650",
+    "message": "Jailton",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146427', 'number': '5511986402650', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 02:54:22",
+    "phone": "5511986402650",
+    "message": "Jailton, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/JailtonSantosCosta/b86d2420",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146426', 'number': '5511986402650', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 02:54:22",
+    "phone": "5511986402650",
+    "message": "Jailton",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146425', 'number': '5511986402650', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 03:02:16",
+    "phone": "5571986601303",
+    "message": "RENATO, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/RENATOALISSONSOUZAPINTO/7c9582b5",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146652', 'number': '5571986601303', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 03:02:16",
+    "phone": "5571986601303",
+    "message": "RENATO",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146650', 'number': '5571986601303', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 03:03:11",
+    "phone": "5577991014469",
+    "message": "Jo\u00e3o",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146672', 'number': '5577991014469', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 03:03:11",
+    "phone": "5577991014469",
+    "message": "Jo\u00e3o, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/JooBatistacoelhodeLima/be38a4f2",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146673', 'number': '5577991014469', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-07 03:03:11",
+    "phone": "5577991014469",
+    "message": "Jo\u00e3o",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146671', 'number': '5577991014469', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
   }
 ]
