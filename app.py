@@ -15,10 +15,12 @@ from celery_worker import send_sms_task
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# Setup login manager
+# Setup login manager with improved configuration
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.login_message = 'Por favor, faça login para acessar esta página.'
+login_manager.login_message_category = 'warning'
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +41,7 @@ def ensure_data_files():
             with open(file_path, 'w') as f:
                 json.dump([], f)
 
-# Ensure data files exist at startup
+# Call at startup
 ensure_data_files()
 
 def handle_api_error(message, status_code=400):
@@ -68,6 +70,20 @@ def calculate_delay_seconds(amount, unit):
         'days': 86400
     }
     return amount * multipliers.get(unit, 60)
+
+# Error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', error='Página não encontrada'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('error.html', error='Erro interno do servidor'), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.error(f'Unhandled exception: {str(e)}')
+    return render_template('error.html', error='Erro inesperado'), 500
 
 # Routes
 @app.route('/')
@@ -499,125 +515,45 @@ def webhook_handler(webhook_path):
             c for c in campaigns 
             if c['integration_id'] == integration['id'] 
             and c['event_type'].lower() == status
-            and c['user_id'] == user.id
         ]
         
         if not matching_campaigns:
-            logger.warning(f"No campaigns found for integration {integration['id']} and status {status}")
-            return jsonify({
-                'success': True,
-                'message': 'No matching campaigns found for this event type'
-            })
+            logger.warning(f"No matching campaigns found for integration {integration['id']} and status {status}")
+            return jsonify({'success': True, 'message': 'No matching campaigns'})
             
-        transaction_id = str(uuid.uuid4())[:8]
-        customer_data = webhook_data.get('customer', {})
-        
-        transaction = {
-            'transaction_id': transaction_id,
-            'customer_name': customer_data.get('name', ''),
-            'customer_phone': customer_data.get('phone', ''),
-            'customer_email': customer_data.get('email', ''),
-            'product_name': webhook_data.get('product_name', ''),
-            'total_price': webhook_data.get('total_price', '0.00'),
-            'pix_code': webhook_data.get('pix_code', ''),
-            'status': status,
-            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        with open(TRANSACTIONS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            transactions = json.load(f)
-            transactions.append(transaction)
-            f.seek(0)
-            json.dump(transactions, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        success_count = 0
         for campaign in matching_campaigns:
-            for message in campaign.get('messages', []):
+            for message in campaign['messages']:
                 if not message.get('enabled', True):
                     continue
                     
-                if not user.has_sufficient_credits(1):
-                    logger.warning(f"User {user.id} has insufficient credits for campaign {campaign['id']}")
-                    continue
-                    
-                full_name = customer_data.get('name', '')
-                first_name = full_name.split()[0] if full_name else ''
-                phone = customer_data.get('phone', '')
-                if not phone.startswith('+55'):
-                    phone = f'+55{phone}'
-                
-                formatted_message = message['template']
-                formatted_message = formatted_message.replace('{customer.first_name}', first_name)
-                formatted_message = formatted_message.replace('{total_price}', webhook_data.get('total_price', ''))
-                
-                if status == 'pending':
-                    url_safe_name = re.sub(r'[^a-zA-Z0-9]', '', customer_data.get('name', ''))
-                    payment_url = f"{request.host_url}payment/{url_safe_name}/{transaction_id}"
-                    formatted_message = formatted_message.replace('{link_pix}', payment_url)
-                
-                delay = message.get('delay', {})
-                delay_seconds = calculate_delay_seconds(
-                    amount=delay.get('amount', 0),
-                    unit=delay.get('unit', 'minutes')
+                delay = calculate_delay_seconds(
+                    message['delay'].get('amount', 0),
+                    message['delay'].get('unit', 'minutes')
                 )
                 
-                if user.deduct_credits(1):
-                    send_sms_task.apply_async(
-                        args=[phone, formatted_message, campaign['event_type']],
-                        countdown=delay_seconds
-                    )
-                    success_count += 1
-                    logger.info(f"SMS queued for campaign {campaign['id']}")
-                    
-                    with open(SMS_HISTORY_FILE, 'r+') as f:
-                        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-                        history = json.load(f)
-                        history.append({
-                            'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                            'phone': phone,
-                            'message': formatted_message,
-                            'type': 'campaign',
-                            'status': 'pending',
-                            'user_id': user.id,
-                            'campaign_id': campaign['id'],
-                            'delay_seconds': delay_seconds
-                        })
-                        f.seek(0)
-                        json.dump(history, f, indent=2)
-                        f.truncate()
-                        fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                # Schedule SMS
+                with open(SCHEDULED_SMS_FILE, 'r+') as f:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                    scheduled_sms = json.load(f)
+                    scheduled_sms.append({
+                        'id': str(uuid.uuid4()),
+                        'phone': webhook_data.get('customer', {}).get('phone'),
+                        'message': message['template'],
+                        'send_at': (datetime.datetime.now() + datetime.timedelta(seconds=delay)).strftime('%Y-%m-%d %H:%M:%S'),
+                        'campaign_id': campaign['id'],
+                        'user_id': user.id,
+                        'status': 'pending'
+                    })
+                    f.seek(0)
+                    json.dump(scheduled_sms, f, indent=2)
+                    f.truncate()
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
         
         return jsonify({
             'success': True,
-            'message': f'Webhook processed successfully. Queued {success_count} messages.',
-            'transaction_id': transaction_id
+            'message': 'Webhook processed successfully'
         })
         
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
-        return handle_api_error('Error processing webhook')
-
-@app.route('/payment/<customer_name>/<transaction_id>')
-def payment(customer_name, transaction_id):
-    try:
-        with open(TRANSACTIONS_FILE, 'r') as f:
-            transactions = json.load(f)
-            transaction = next((t for t in transactions if t['transaction_id'] == transaction_id), None)
-            
-        if not transaction:
-            return render_template('error.html', error='Transaction not found')
-            
-        return render_template('payment.html',
-            customer_name=transaction['customer_name'],
-            pix_code=transaction['pix_code']
-        )
-    except Exception as e:
-        logger.error(f"Error loading payment page: {str(e)}")
-        return render_template('error.html', error='Error loading payment page')
-
-if __name__ == '__main__':
-    ensure_data_files()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+        return handle_api_error('Failed to process webhook')
