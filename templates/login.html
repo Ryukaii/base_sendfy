@@ -20,7 +20,7 @@
                         {% endif %}
                     {% endwith %}
                     
-                    <form method="POST" action="{{ url_for('login') }}">
+                    <form method="POST" action="{{ url_for('login') }}" class="needs-validation" novalidate>
                         <div class="mb-4">
                             <label for="username" class="form-label">Usuário</label>
                             <div class="input-group">
@@ -30,6 +30,9 @@
                                 <input type="text" class="form-control bg-dark border-secondary text-light" 
                                        id="username" name="username" required
                                        placeholder="Digite seu usuário" autofocus>
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor, digite seu usuário
                             </div>
                         </div>
                         <div class="mb-4">
@@ -41,6 +44,9 @@
                                 <input type="password" class="form-control bg-dark border-secondary text-light" 
                                        id="password" name="password" required
                                        placeholder="Digite sua senha">
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor, digite sua senha
                             </div>
                         </div>
                         <div class="d-grid gap-3">
@@ -59,4 +65,23 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
 {% endblock %}

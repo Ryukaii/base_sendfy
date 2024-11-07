@@ -88,5 +88,41 @@
     "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
     "user_id": "1",
     "status": "pending"
+  },
+  {
+    "id": "6042bf32-6ad2-4b00-b69b-49b2d66db3f6",
+    "phone": "+5524992623624",
+    "message": "FRANCISCO, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/FRANCISCOCLUDIOGUIMARES/5886b74a",
+    "send_at": "2024-11-07 15:01:34",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "393a27fa-9839-4458-8cc1-440ddcab99f2",
+    "phone": "+5524992623624",
+    "message": "FRANCISCO, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/FRANCISCOCLUDIOGUIMARES/3f46a894",
+    "send_at": "2024-11-07 15:01:34",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "4779292e-69fc-4b71-a3c4-1cb86529e903",
+    "phone": "+5527997204547",
+    "message": "Robson, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/RobsondosSantosSilvaMotta/fd112005",
+    "send_at": "2024-11-07 15:02:25",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "bba01d3e-6290-4ce4-8c42-e9e3713345ab",
+    "phone": "+5527997204547",
+    "message": "Robson, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/RobsondosSantosSilvaMotta/5191c482",
+    "send_at": "2024-11-07 15:02:25",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
   }
 ]

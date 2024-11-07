@@ -505,5 +505,59 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139221653', 'number': '5563992795514', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": "pending",
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-07 15:00:34",
+    "phone": "+5524992623624",
+    "message": "FRANCISCO, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/FRANCISCOCLUDIOGUIMARES/5886b74a",
+    "type": "campaign",
+    "status": "scheduled",
+    "user_id": "1",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b"
+  },
+  {
+    "timestamp": "2024-11-07 15:00:34",
+    "phone": "+5524992623624",
+    "message": "FRANCISCO, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/FRANCISCOCLUDIOGUIMARES/3f46a894",
+    "type": "campaign",
+    "status": "scheduled",
+    "user_id": "1",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b"
+  },
+  {
+    "timestamp": "2024-11-07 15:01:25",
+    "phone": "+5527997204547",
+    "message": "Robson, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/RobsondosSantosSilvaMotta/fd112005",
+    "type": "campaign",
+    "status": "scheduled",
+    "user_id": "1",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b"
+  },
+  {
+    "timestamp": "2024-11-07 15:01:25",
+    "phone": "+5527997204547",
+    "message": "Robson, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/RobsondosSantosSilvaMotta/5191c482",
+    "type": "campaign",
+    "status": "scheduled",
+    "user_id": "1",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b"
+  },
+  {
+    "timestamp": "2024-11-07 15:01:34",
+    "phone": "5524992623624",
+    "message": "FRANCISCO, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/FRANCISCOCLUDIOGUIMARES/5886b74a",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139222042', 'number': '5524992623624', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "pending",
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-07 15:01:35",
+    "phone": "5524992623624",
+    "message": "FRANCISCO, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/FRANCISCOCLUDIOGUIMARES/3f46a894",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139222043', 'number': '5524992623624', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": "pending",
+    "event_type": "manual"
   }
 ]
