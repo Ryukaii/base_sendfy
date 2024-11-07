@@ -190,6 +190,38 @@ def campaigns():
 def integrations():
     return render_template('integrations.html')
 
+@app.route('/api/campaigns', methods=['GET'])
+@login_required
+def get_campaigns():
+    try:
+        # Get only campaigns for current user
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_campaigns = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_campaigns = [c for c in all_campaigns if c.get('user_id') == current_user.id]
+        return jsonify(user_campaigns)
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return handle_api_error('Failed to load campaigns')
+
+@app.route('/api/integrations', methods=['GET'])
+@login_required
+def get_integrations():
+    try:
+        # Get only integrations for current user
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_integrations = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_integrations = [i for i in all_integrations if i.get('user_id') == current_user.id]
+        return jsonify(user_integrations)
+    except Exception as e:
+        logger.error(f"Error loading integrations: {str(e)}")
+        return handle_api_error('Failed to load integrations')
+
 # Admin routes
 @app.route('/admin')
 @login_required

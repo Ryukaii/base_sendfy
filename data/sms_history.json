@@ -115,5 +115,22 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139144092', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "approved"
+  },
+  {
+    "timestamp": "2024-11-07 02:04:25",
+    "phone": "+5561982132603",
+    "message": "gt",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-07 02:04:26",
+    "phone": "5561982132603",
+    "message": "gt",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139144352', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
   }
 ]
