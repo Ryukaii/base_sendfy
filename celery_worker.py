@@ -4,15 +4,24 @@ import json
 import os
 import re
 from datetime import datetime
+import logging
 
-# Initialize Celery
+# Initialize logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize Celery with environment-aware configuration
+redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 celery = Celery('sms_tasks',
-                broker='redis://localhost:6379/0',
-                backend='redis://localhost:6379/0')
+                broker=redis_url,
+                backend=redis_url)
 
 # SMS API Configuration
 SMS_API_ENDPOINT = "https://api.smsdev.com.br/v1/send"
 SMS_API_KEY = os.environ.get('SMSDEV_API_KEY')
+
+if not SMS_API_KEY:
+    raise ValueError("SMSDEV_API_KEY environment variable is not set")
 
 def format_phone_number(phone):
     """Format Brazilian phone number to international format"""
@@ -34,6 +43,7 @@ def format_phone_number(phone):
     return numbers
 
 def log_sms_attempt(campaign_id, phone, message, status, api_response, event_type):
+    """Log SMS sending attempt to history file"""
     try:
         with open('data/sms_history.json', 'r') as f:
             history = json.load(f)
@@ -56,12 +66,17 @@ def log_sms_attempt(campaign_id, phone, message, status, api_response, event_typ
         json.dump(history, f, indent=2)
 
 @celery.task(bind=True, max_retries=3)
-def send_sms_task(self, phone, message, operator="claro", campaign_id=None, event_type="manual"):
+def send_sms_task(self, phone, message, campaign_id=None, event_type="manual"):
+    """Celery task for sending SMS messages"""
     try:
+        logger.info(f"Sending SMS to {phone}: {message}")
+        
         # Format phone number
         try:
             formatted_phone = format_phone_number(phone)
+            logger.info(f"Formatted phone number: {formatted_phone}")
         except ValueError as e:
+            logger.error(f"Phone number formatting error: {str(e)}")
             log_sms_attempt(
                 campaign_id=campaign_id,
                 phone=phone,
@@ -84,6 +99,8 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
             "ref": campaign_id or "manual_send"
         }
         
+        logger.info(f"Sending request to SMS API: {SMS_API_ENDPOINT}")
+        
         # Send SMS
         response = requests.post(
             SMS_API_ENDPOINT,
@@ -94,6 +111,7 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
         
         # Parse response
         api_response = response.json()
+        logger.info(f"SMS API Response: {api_response}")
         
         # Check if the message was sent successfully
         # SMS Dev returns 'situacao': 'OK' for success
@@ -109,12 +127,18 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
             event_type=event_type
         )
         
+        if success:
+            logger.info(f"SMS sent successfully to {formatted_phone}")
+        else:
+            logger.error(f"Failed to send SMS: {api_response.get('erro', 'Unknown error')}")
+        
         return {
             'success': success,
             'message': api_response.get('retorno', 'SMS sent successfully') if success else api_response.get('erro', 'Failed to send SMS')
         }
         
     except requests.exceptions.RequestException as e:
+        logger.error(f"SMS API request failed: {str(e)}")
         log_sms_attempt(
             campaign_id=campaign_id,
             phone=formatted_phone if 'formatted_phone' in locals() else phone,
@@ -127,4 +151,5 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
         # Retry the task with exponential backoff
         retry_count = self.request.retries
         backoff = 60 * (2 ** retry_count)  # 60s, 120s, 240s
+        logger.info(f"Retrying SMS task in {backoff} seconds (attempt {retry_count + 1}/3)")
         raise self.retry(exc=e, countdown=backoff)
