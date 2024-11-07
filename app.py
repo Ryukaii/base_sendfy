@@ -7,7 +7,7 @@ import datetime
 import re
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.users import User
 from celery_worker import send_sms_task
@@ -38,6 +38,9 @@ def ensure_data_files():
         if not os.path.exists(file_path):
             with open(file_path, 'w') as f:
                 json.dump([], f)
+
+# Ensure data files exist at startup
+ensure_data_files()
 
 def handle_api_error(message, status_code=400):
     return jsonify({
@@ -123,12 +126,12 @@ def integrations_page():
 @login_required
 def get_integrations():
     try:
+        ensure_data_files()
         with open(INTEGRATIONS_FILE, 'r') as f:
             fcntl.flock(f.fileno(), fcntl.LOCK_EX)
             all_integrations = json.load(f)
             fcntl.flock(f.fileno(), fcntl.LOCK_UN)
             
-        # Only return integrations for current user
         user_integrations = [
             integration for integration in all_integrations 
             if integration.get('user_id') == current_user.id
@@ -137,12 +140,13 @@ def get_integrations():
         
     except Exception as e:
         logger.error(f"Error loading integrations: {str(e)}")
-        return handle_api_error('Failed to load integrations')
+        return jsonify([])
 
 @app.route('/api/integrations', methods=['POST'])
 @login_required
 def create_integration():
     try:
+        ensure_data_files()
         data = request.get_json()
         if not data or 'name' not in data:
             return handle_api_error('Integration name is required')
@@ -182,7 +186,6 @@ def delete_integration(integration_id):
             fcntl.flock(f.fileno(), fcntl.LOCK_EX)
             integrations = json.load(f)
             
-            # Only delete if integration belongs to current user
             integrations = [
                 i for i in integrations 
                 if i['id'] != integration_id or i.get('user_id') != current_user.id
@@ -201,6 +204,96 @@ def delete_integration(integration_id):
     except Exception as e:
         logger.error(f"Error deleting integration: {str(e)}")
         return handle_api_error('Failed to delete integration')
+
+@app.route('/campaigns')
+@login_required
+def campaigns_page():
+    return render_template('campaigns.html')
+
+@app.route('/api/campaigns', methods=['GET'])
+@login_required
+def get_campaigns():
+    try:
+        ensure_data_files()
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_campaigns = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_campaigns = [
+            campaign for campaign in all_campaigns 
+            if campaign.get('user_id') == current_user.id
+        ]
+        return jsonify(user_campaigns)
+        
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return jsonify([])
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        ensure_data_files()
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'messages']):
+            return handle_api_error('Missing required fields')
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'messages': data['messages'],
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign created successfully',
+            'campaign': campaign
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Failed to create campaign')
+
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+@login_required
+def delete_campaign(campaign_id):
+    try:
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            
+            campaigns = [
+                c for c in campaigns 
+                if c['id'] != campaign_id or c.get('user_id') != current_user.id
+            ]
+            
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign deleted successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return handle_api_error('Failed to delete campaign')
 
 @app.route('/sms')
 @login_required
@@ -257,96 +350,6 @@ def send_sms():
         logger.error(f"Error sending SMS: {str(e)}")
         current_user.add_credits(1)
         return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
-
-@app.route('/campaigns')
-@login_required
-def campaigns_page():
-    return render_template('campaigns.html')
-
-@app.route('/api/campaigns', methods=['GET'])
-@login_required
-def get_campaigns():
-    try:
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            all_campaigns = json.load(f)
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        # Only return campaigns for current user
-        user_campaigns = [
-            campaign for campaign in all_campaigns 
-            if campaign.get('user_id') == current_user.id
-        ]
-        return jsonify(user_campaigns)
-        
-    except Exception as e:
-        logger.error(f"Error loading campaigns: {str(e)}")
-        return handle_api_error('Failed to load campaigns')
-
-@app.route('/api/campaigns', methods=['POST'])
-@login_required
-def create_campaign():
-    try:
-        data = request.get_json()
-        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'messages']):
-            return handle_api_error('Missing required fields')
-            
-        campaign = {
-            'id': str(uuid.uuid4()),
-            'name': data['name'],
-            'integration_id': data['integration_id'],
-            'event_type': data['event_type'],
-            'messages': data['messages'],
-            'user_id': current_user.id,
-            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        with open(CAMPAIGNS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            campaigns.append(campaign)
-            f.seek(0)
-            json.dump(campaigns, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({
-            'success': True,
-            'message': 'Campaign created successfully',
-            'campaign': campaign
-        })
-        
-    except Exception as e:
-        logger.error(f"Error creating campaign: {str(e)}")
-        return handle_api_error('Failed to create campaign')
-
-@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
-@login_required
-def delete_campaign(campaign_id):
-    try:
-        with open(CAMPAIGNS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            
-            # Only delete if campaign belongs to current user
-            campaigns = [
-                c for c in campaigns 
-                if c['id'] != campaign_id or c.get('user_id') != current_user.id
-            ]
-            
-            f.seek(0)
-            json.dump(campaigns, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({
-            'success': True,
-            'message': 'Campaign deleted successfully'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error deleting campaign: {str(e)}")
-        return handle_api_error('Failed to delete campaign')
 
 @app.route('/sms-history')
 @login_required
