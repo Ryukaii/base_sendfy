@@ -109,6 +109,63 @@ def logout():
 def sms():
     return render_template('sms.html')
 
+@app.route('/api/send-sms', methods=['POST'])
+@login_required
+def send_sms():
+    try:
+        # Check if user has enough credits
+        if not current_user.has_sufficient_credits(1):
+            return handle_api_error('Créditos insuficientes para enviar SMS')
+            
+        data = request.get_json()
+        if not data or not all(k in data for k in ['phone', 'message']):
+            return handle_api_error('Número de telefone e mensagem são obrigatórios')
+        
+        # Format phone number
+        phone = data['phone']
+        if not phone.startswith('+55'):
+            phone = f'+55{phone}'
+        
+        # Deduct credits before sending
+        if not current_user.deduct_credits(1):
+            return handle_api_error('Falha ao deduzir créditos')
+            
+        # Queue SMS task
+        task = send_sms_task.delay(
+            phone=phone,
+            message=data['message'],
+            event_type='manual'
+        )
+        
+        # Log SMS in history
+        with open(SMS_HISTORY_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            history = json.load(f)
+            history.append({
+                'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'phone': phone,
+                'message': data['message'],
+                'type': 'manual',
+                'status': 'pending',
+                'user_id': current_user.id
+            })
+            f.seek(0)
+            json.dump(history, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        
+        return jsonify({
+            'success': True,
+            'message': 'SMS enviado com sucesso',
+            'credits_remaining': current_user.credits
+        })
+        
+    except Exception as e:
+        logger.error(f"Error sending SMS: {str(e)}")
+        # Refund credit if SMS failed to queue
+        current_user.add_credits(1)
+        return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
+
 @app.route('/sms-history')
 @login_required
 def sms_history():
