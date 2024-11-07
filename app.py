@@ -32,7 +32,7 @@ TRANSACTIONS_FILE = 'data/transactions.json'
 def ensure_data_files():
     if not os.path.exists('data'):
         os.makedirs('data')
-    for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE]:
+    for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, TRANSACTIONS_FILE]:
         if not os.path.exists(file_path):
             with open(file_path, 'w') as f:
                 json.dump([], f)
@@ -173,6 +173,127 @@ def send_sms():
         # Refund credit if SMS failed to queue
         current_user.add_credits(1)
         return handle_api_error('Failed to send SMS. Please try again.')
+
+# Webhook handler
+@app.route('/webhook/<path:webhook_path>', methods=['POST'])
+def webhook_handler(webhook_path):
+    try:
+        webhook_data = request.get_json()
+        logger.debug(f"Received webhook data: {webhook_data}")
+        
+        # Find integration with matching webhook URL
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+            integration = next((i for i in integrations if webhook_path in i['webhook_url']), None)
+        
+        if not integration:
+            logger.error(f"No integration found for webhook path: {webhook_path}")
+            return handle_api_error('Integration not found', 404)
+            
+        # Get user who owns the integration
+        user = User.get(integration['user_id'])
+        if not user:
+            logger.error(f"User not found for integration {integration['id']}")
+            return handle_api_error('Integration owner not found', 404)
+            
+        # Load campaigns for this integration
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            campaigns = json.load(f)
+            
+        # Get status from webhook data
+        status = webhook_data.get('status', 'pending').lower()
+        
+        # Find matching campaigns for this status
+        matching_campaigns = [
+            c for c in campaigns 
+            if c['integration_id'] == integration['id'] 
+            and c['event_type'].lower() == status
+            and c['user_id'] == user.id
+        ]
+        
+        if not matching_campaigns:
+            logger.warning(f"No campaigns found for integration {integration['id']} and status {status}")
+            return jsonify({
+                'success': True,
+                'message': 'No matching campaigns found for this event type'
+            })
+
+        # Create transaction record
+        transaction_id = str(uuid.uuid4())[:8]
+        customer_data = webhook_data.get('customer', {})
+        
+        transaction = {
+            'transaction_id': transaction_id,
+            'customer_name': customer_data.get('name', ''),
+            'customer_phone': customer_data.get('phone', ''),
+            'customer_email': customer_data.get('email', ''),
+            'product_name': webhook_data.get('product_name', ''),
+            'total_price': webhook_data.get('total_price', '0.00'),
+            'pix_code': webhook_data.get('pix_code', ''),
+            'status': status,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # Save transaction
+        with open(TRANSACTIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            transactions = json.load(f)
+            transactions.append(transaction)
+            f.seek(0)
+            json.dump(transactions, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
+        success_count = 0
+        # Send SMS for each matching campaign
+        for campaign in matching_campaigns:
+            try:
+                if not user.has_sufficient_credits(1):
+                    logger.warning(f"User {user.id} has insufficient credits for campaign {campaign['id']}")
+                    continue
+                    
+                # Get first name
+                full_name = customer_data.get('name', '')
+                first_name = full_name.split()[0] if full_name else ''
+                
+                # Format phone number
+                phone = customer_data.get('phone', '')
+                if not phone.startswith('+55'):
+                    phone = f'+55{phone}'
+                
+                # Format message
+                message = campaign['message_template']
+                message = message.replace('{customer.first_name}', first_name)
+                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
+                
+                # Add PIX link only for pending status
+                if status == 'pending':
+                    message = message.replace('{link_pix}', f"{request.host_url}payment/{transaction_id}")
+                
+                # Deduct credit and send SMS
+                if user.deduct_credits(1):
+                    send_sms_task.delay(
+                        phone=phone,
+                        message=message,
+                        event_type=campaign['event_type']
+                    )
+                    success_count += 1
+                    logger.info(f"SMS queued for campaign {campaign['id']}")
+                
+            except Exception as e:
+                logger.error(f"Error sending SMS for campaign {campaign['id']}: {str(e)}")
+                # Refund credit if SMS failed to queue
+                user.add_credits(1)
+
+        return jsonify({
+            'success': True,
+            'message': f'Webhook processed successfully. Sent {success_count} messages',
+            'transaction_id': transaction_id
+        })
+
+    except Exception as e:
+        logger.error(f"Error processing webhook: {str(e)}")
+        return handle_api_error('Error processing webhook')
 
 # Campaign API Routes
 @app.route('/api/campaigns', methods=['GET'])
@@ -417,6 +538,29 @@ def manage_credits(user_id):
     except Exception as e:
         logger.error(f"Error managing credits: {str(e)}")
         return handle_api_error(f'Error managing credits: {str(e)}')
+
+# Payment page route
+@app.route('/payment/<transaction_id>')
+def payment_page(transaction_id):
+    try:
+        with open(TRANSACTIONS_FILE, 'r') as f:
+            transactions = json.load(f)
+            transaction = next((t for t in transactions if t['transaction_id'] == transaction_id), None)
+            
+        if not transaction:
+            return render_template('error.html', error={
+                'code': 404,
+                'description': 'Transaction not found'
+            }), 404
+            
+        return render_template('payment.html', **transaction)
+        
+    except Exception as e:
+        logger.error(f"Error loading payment page: {str(e)}")
+        return render_template('error.html', error={
+            'code': 500,
+            'description': 'Error loading payment page'
+        }), 500
 
 # Error handlers
 @app.errorhandler(404)
