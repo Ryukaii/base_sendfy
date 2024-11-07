@@ -30,5 +30,12 @@
     "webhook_url": "/webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc",
     "user_id": "2",
     "created_at": "2024-11-07 02:27:25"
+  },
+  {
+    "id": "332624a9-f07f-4f83-8c99-43f979bbc81c",
+    "name": "VEGA PENDENTE",
+    "webhook_url": "/webhook/8161ba61-0a29-4862-95ce-fbfac9a366e2",
+    "user_id": "1",
+    "created_at": "2024-11-07 13:31:36"
   }
 ]
