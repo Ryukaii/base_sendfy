@@ -52,5 +52,14 @@
     "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
     "user_id": "1",
     "status": "pending"
+  },
+  {
+    "id": "2747991a-b49f-4ec5-8dfe-2539afae0ce8",
+    "phone": "+5521982305516",
+    "message": "Leandro, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/LeandroLopesSantos/6279ec6c",
+    "send_at": "2024-11-07 21:01:27",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
   }
 ]

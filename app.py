@@ -1,4 +1,244 @@
-[Previous content up to line 490...]
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+import json
+import os
+import fcntl
+import datetime
+import uuid
+import re
+import logging
+from models.users import User, ensure_users_file
+from celery_worker import send_sms_task
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+app.secret_key = os.urandom(24)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Por favor, faça login para acessar esta página.'
+login_manager.login_message_category = 'warning'
+
+# File paths
+INTEGRATIONS_FILE = 'data/integrations.json'
+CAMPAIGNS_FILE = 'data/campaigns.json'
+TRANSACTIONS_FILE = 'data/transactions.json'
+SMS_HISTORY_FILE = 'data/sms_history.json'
+SCHEDULED_SMS_FILE = 'data/scheduled_sms.json'
+
+def ensure_data_files():
+    if not os.path.exists('data'):
+        os.makedirs('data')
+    for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, TRANSACTIONS_FILE, SMS_HISTORY_FILE, SCHEDULED_SMS_FILE]:
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+
+# Call at startup
+ensure_data_files()
+ensure_users_file()
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+def handle_api_error(message, code=400):
+    return jsonify({'error': message}), code
+
+def calculate_delay_seconds(amount, unit):
+    """Calculate delay in seconds based on amount and unit"""
+    multipliers = {
+        'minutes': 60,
+        'hours': 3600,
+        'days': 86400
+    }
+    return amount * multipliers.get(unit, 60)
+
+# Routes
+@app.route('/')
+def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = User.get_by_username(username)
+        if user and user.check_password(password):
+            login_user(user)
+            return redirect(url_for('index'))
+            
+        flash('Usuário ou senha inválidos', 'danger')
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if User.get_by_username(username):
+            flash('Nome de usuário já existe', 'danger')
+            return render_template('register.html')
+            
+        user = User.create(username=username, password=password)
+        if user:
+            login_user(user)
+            return redirect(url_for('index'))
+            
+        flash('Erro ao criar usuário', 'danger')
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash('Acesso negado', 'danger')
+        return redirect(url_for('index'))
+        
+    users = User.get_all()
+    
+    # Calculate statistics
+    with open(SMS_HISTORY_FILE, 'r') as f:
+        history = json.load(f)
+    
+    with open(CAMPAIGNS_FILE, 'r') as f:
+        campaigns = json.load(f)
+    
+    stats = {
+        'total_users': len(users),
+        'total_sms': len(history),
+        'active_campaigns': len([c for c in campaigns if c.get('user_id') == current_user.id]),
+        'success_rate': round(
+            (len([h for h in history if h.get('status') == 'success']) / len(history) * 100)
+            if history else 0
+        )
+    }
+    
+    return render_template('admin/dashboard.html', users=users, stats=stats)
+
+@app.route('/api/users', methods=['POST'])
+@login_required
+def create_user():
+    if not current_user.is_admin:
+        return handle_api_error('Unauthorized', 403)
+        
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['username', 'password']):
+            return handle_api_error('Username and password are required')
+        
+        user = User.create(
+            username=data['username'],
+            password=data['password'],
+            is_admin=data.get('is_admin', False),
+            credits=data.get('credits', 0)
+        )
+        
+        if not user:
+            return handle_api_error('Failed to create user')
+            
+        return jsonify({
+            'success': True,
+            'message': 'User created successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating user: {str(e)}")
+        return handle_api_error(f'Error creating user: {str(e)}')
+
+@app.route('/api/users/<user_id>', methods=['DELETE'])
+@login_required
+def delete_user(user_id):
+    if not current_user.is_admin:
+        return handle_api_error('Unauthorized', 403)
+        
+    try:
+        if current_user.id == user_id:
+            return handle_api_error('Cannot delete your own account')
+        
+        success = User.delete(user_id)
+        if not success:
+            return handle_api_error('Failed to delete user')
+            
+        return jsonify({
+            'success': True,
+            'message': 'User deleted successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error deleting user: {str(e)}")
+        return handle_api_error(f'Error deleting user: {str(e)}')
+
+@app.route('/api/users/<user_id>/credits', methods=['POST'])
+@login_required
+def manage_credits(user_id):
+    if not current_user.is_admin:
+        return handle_api_error('Unauthorized', 403)
+        
+    try:
+        data = request.get_json()
+        if not data or 'amount' not in data or 'operation' not in data:
+            return handle_api_error('Amount and operation are required')
+        
+        user = User.get(user_id)
+        if not user:
+            return handle_api_error('User not found', 404)
+            
+        amount = int(data['amount'])
+        operation = data['operation']
+        
+        if operation == 'add':
+            success = user.add_credits(amount)
+        elif operation == 'remove':
+            success = user.deduct_credits(amount)
+        else:
+            return handle_api_error('Invalid operation')
+            
+        if not success:
+            return handle_api_error('Failed to update credits')
+            
+        return jsonify({
+            'success': True,
+            'message': f'Credits {"added to" if operation == "add" else "removed from"} user successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error managing credits: {str(e)}")
+        return handle_api_error(f'Error managing credits: {str(e)}')
+
+@app.route('/payment/<customer_name>/<transaction_id>')
+def payment(customer_name, transaction_id):
+    try:
+        with open(TRANSACTIONS_FILE, 'r') as f:
+            transactions = json.load(f)
+            transaction = next((t for t in transactions if t['transaction_id'] == transaction_id), None)
+            
+        if not transaction:
+            return render_template('error.html', error='Transaction not found')
+            
+        return render_template('payment.html',
+            customer_name=transaction['customer_name'],
+            pix_code=transaction['pix_code']
+        )
+    except Exception as e:
+        logger.error(f"Error loading payment page: {str(e)}")
+        return render_template('error.html', error='Error loading payment page')
 
 @app.route('/webhook/<path:webhook_path>', methods=['POST'])
 def webhook_handler(webhook_path):
@@ -181,4 +421,4 @@ def webhook_handler(webhook_path):
         return handle_api_error('Error processing webhook')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
