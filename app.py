@@ -133,6 +133,47 @@ def analytics():
     }
     return render_template('analytics.html', **stats)
 
+# SMS API Route
+@app.route('/api/send-sms', methods=['POST'])
+@login_required
+def send_sms():
+    try:
+        # Check if user has enough credits
+        if not current_user.has_sufficient_credits(1):
+            return handle_api_error('Insufficient credits to send SMS')
+            
+        data = request.get_json()
+        if not data or not all(k in data for k in ['phone', 'message']):
+            return handle_api_error('Phone number and message are required')
+        
+        # Format phone number
+        phone = data['phone']
+        if not phone.startswith('+55'):
+            phone = f'+55{phone}'
+        
+        # Deduct credits before sending
+        if not current_user.deduct_credits(1):
+            return handle_api_error('Failed to deduct credits')
+            
+        # Queue SMS task
+        task = send_sms_task.delay(
+            phone=phone,
+            message=data['message'],
+            event_type='manual'
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'SMS queued successfully',
+            'credits_remaining': current_user.credits
+        })
+        
+    except Exception as e:
+        logger.error(f"Error sending SMS: {str(e)}")
+        # Refund credit if SMS failed to queue
+        current_user.add_credits(1)
+        return handle_api_error('Failed to send SMS. Please try again.')
+
 # Campaign API Routes
 @app.route('/api/campaigns', methods=['GET'])
 @login_required
