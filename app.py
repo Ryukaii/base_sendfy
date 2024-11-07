@@ -206,6 +206,50 @@ def get_campaigns():
         logger.error(f"Error loading campaigns: {str(e)}")
         return handle_api_error('Failed to load campaigns')
 
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'message_template']):
+            return handle_api_error('Missing required fields')
+            
+        # Verify integration belongs to user
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+            integration = next((i for i in integrations if i['id'] == data['integration_id']), None)
+            
+        if not integration or integration.get('user_id') != current_user.id:
+            return handle_api_error('Invalid integration ID')
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign created successfully',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Failed to create campaign')
+
 @app.route('/api/integrations', methods=['GET'])
 @login_required
 def get_integrations():
@@ -221,6 +265,40 @@ def get_integrations():
     except Exception as e:
         logger.error(f"Error loading integrations: {str(e)}")
         return handle_api_error('Failed to load integrations')
+
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def create_integration():
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data:
+            return handle_api_error('Integration name is required')
+            
+        integration = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations.append(integration)
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration created successfully',
+            'integration': integration
+        })
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}")
+        return handle_api_error('Failed to create integration')
 
 # Admin routes
 @app.route('/admin')
