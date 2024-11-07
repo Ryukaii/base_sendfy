@@ -26,14 +26,6 @@ function showToast(type, message) {
 
 async function loadCampaigns() {
     const list = document.getElementById('campaignsList');
-    list.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Carregando...</span>
-            </div>
-            <p class="mt-2">Carregando campanhas...</p>
-        </div>
-    `;
     
     try {
         const [campaignsResponse, integrationsResponse] = await Promise.all([
@@ -41,13 +33,18 @@ async function loadCampaigns() {
             fetch('/api/integrations')
         ]);
         
-        const campaigns = await campaignsResponse.json();
-        const integrations = await integrationsResponse.json();
+        if (!campaignsResponse.ok || !integrationsResponse.ok) {
+            throw new Error('Failed to load data from server');
+        }
         
-        // Update integration select even if empty
+        const campaigns = await campaignsResponse.json() || [];
+        const integrations = await integrationsResponse.json() || [];
+        
+        // Update integration select
         const integrationSelect = document.getElementById('integrationId');
         integrationSelect.innerHTML = '<option value="">Selecione uma Integração</option>';
-        if (integrations && Array.isArray(integrations)) {
+        
+        if (Array.isArray(integrations)) {
             integrations.forEach(integration => {
                 integrationSelect.innerHTML += `
                     <option value="${integration.id}">${integration.name}</option>
@@ -55,10 +52,10 @@ async function loadCampaigns() {
             });
         }
         
+        // Clear and update campaigns list
         list.innerHTML = '';
         
-        // Handle empty campaigns list
-        if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
+        if (!Array.isArray(campaigns) || campaigns.length === 0) {
             list.innerHTML = `
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle me-2"></i>
@@ -69,7 +66,9 @@ async function loadCampaigns() {
         }
         
         campaigns.forEach(campaign => {
-            const integration = integrations.find(i => i.id === campaign.integration_id);
+            const integration = Array.isArray(integrations) ? 
+                integrations.find(i => i.id === campaign.integration_id) : null;
+                
             const div = document.createElement('div');
             div.className = 'card mb-3';
             div.innerHTML = `
@@ -83,7 +82,7 @@ async function loadCampaigns() {
                                 <strong>Mensagens:</strong><br>
                             </p>
                             <div class="messages-list">
-                                ${campaign.messages.map((msg, idx) => `
+                                ${(campaign.messages || []).map((msg, idx) => `
                                     <div class="message-item mb-2 p-2 border rounded">
                                         <div class="d-flex justify-content-between">
                                             <strong>Mensagem #${idx + 1}</strong>
@@ -98,7 +97,9 @@ async function loadCampaigns() {
                                     </div>
                                 `).join('')}
                             </div>
-                            <p class="card-text mt-2"><small class="text-muted">Criada em: ${campaign.created_at}</small></p>
+                            <p class="card-text mt-2">
+                                <small class="text-muted">Criada em: ${campaign.created_at}</small>
+                            </p>
                         </div>
                         <div class="d-flex flex-column gap-2">
                             <button class="btn btn-sm btn-danger" onclick="deleteCampaign('${campaign.id}')">
