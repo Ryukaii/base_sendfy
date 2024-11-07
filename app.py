@@ -13,7 +13,7 @@ from models.users import User
 from celery_worker import send_sms_task
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = 'sendfy-secure-key-2024'  # Fixed secret key for session persistence
 
 # Setup login manager
 login_manager = LoginManager()
@@ -34,10 +34,36 @@ SCHEDULED_SMS_FILE = 'data/scheduled_sms.json'
 def ensure_data_files():
     if not os.path.exists('data'):
         os.makedirs('data')
-    for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, TRANSACTIONS_FILE, SMS_HISTORY_FILE, SCHEDULED_SMS_FILE]:
+    data_files = {
+        INTEGRATIONS_FILE: [],
+        CAMPAIGNS_FILE: [],
+        TRANSACTIONS_FILE: [],
+        SMS_HISTORY_FILE: [],
+        SCHEDULED_SMS_FILE: []
+    }
+    for file_path, default_data in data_files.items():
         if not os.path.exists(file_path):
             with open(file_path, 'w') as f:
-                json.dump([], f)
+                json.dump(default_data, f)
+
+def safe_read_json(file_path):
+    try:
+        if not os.path.exists(file_path):
+            return []
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Error reading {file_path}: {e}")
+        return []
+
+def safe_write_json(file_path, data):
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+        return True
+    except Exception as e:
+        logger.error(f"Error writing to {file_path}: {e}")
+        return False
 
 def handle_api_error(message, status_code=400):
     return jsonify({
@@ -57,6 +83,10 @@ def admin_required(f):
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
+@app.route('/health')
+def health_check():
+    return jsonify({'status': 'healthy'})
 
 # Routes
 @app.route('/')
@@ -464,4 +494,7 @@ def payment(customer_name, transaction_id):
 
 if __name__ == '__main__':
     ensure_data_files()
+    # Initialize admin user if not exists
+    from init_admin import init_admin
+    init_admin()
     app.run(host='0.0.0.0', port=5000, debug=True)
