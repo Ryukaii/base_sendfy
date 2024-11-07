@@ -58,5 +58,14 @@
     "message_template": "{customer.first_name}, aprovado lindo",
     "user_id": "2",
     "created_at": "2024-11-07 01:54:29"
+  },
+  {
+    "id": "e660e722-48f2-42e0-827f-76d3bf19d0b5",
+    "name": "VEGA",
+    "integration_id": "d8feda24-fc7b-4ee3-b729-79bcbeec50e0",
+    "event_type": "approved",
+    "message_template": "{customer.first_name}",
+    "user_id": "2",
+    "created_at": "2024-11-07 02:17:27"
   }
 ]

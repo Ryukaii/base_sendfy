@@ -250,6 +250,28 @@ def create_campaign():
         logger.error(f"Error creating campaign: {str(e)}")
         return handle_api_error('Failed to create campaign')
 
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+@login_required
+def delete_campaign(campaign_id):
+    try:
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            # Only delete if campaign belongs to current user
+            campaigns = [c for c in campaigns if c['id'] != campaign_id or c.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return handle_api_error('Failed to delete campaign')
+
 @app.route('/api/integrations', methods=['GET'])
 @login_required
 def get_integrations():
@@ -299,6 +321,28 @@ def create_integration():
     except Exception as e:
         logger.error(f"Error creating integration: {str(e)}")
         return handle_api_error('Failed to create integration')
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+@login_required
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            # Only delete if integration belongs to current user
+            integrations = [i for i in integrations if i['id'] != integration_id or i.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}")
+        return handle_api_error('Failed to delete integration')
 
 # Admin routes
 @app.route('/admin')
