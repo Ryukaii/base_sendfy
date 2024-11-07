@@ -58,6 +58,15 @@ def admin_required(f):
 def load_user(user_id):
     return User.get(user_id)
 
+# New function for delay calculation
+def calculate_delay_seconds(amount, unit):
+    multipliers = {
+        'minutes': 60,
+        'hours': 3600,
+        'days': 86400
+    }
+    return amount * multipliers.get(unit, 60)
+
 # Routes
 @app.route('/')
 def index():
@@ -167,6 +176,43 @@ def send_sms():
         # Refund credit if SMS failed to queue
         current_user.add_credits(1)
         return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'messages']):
+            return handle_api_error('Missing required fields')
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'messages': data['messages'],
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign created successfully',
+            'campaign': campaign
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Failed to create campaign')
 
 @app.route('/sms-history')
 @login_required
@@ -393,7 +439,10 @@ def webhook_handler(webhook_path):
         success_count = 0
         # Send SMS for each matching campaign
         for campaign in matching_campaigns:
-            try:
+            for message in campaign.get('messages', []):
+                if not message.get('enabled', True):
+                    continue
+                    
                 if not user.has_sufficient_credits(1):
                     logger.warning(f"User {user.id} has insufficient credits for campaign {campaign['id']}")
                     continue
@@ -408,35 +457,35 @@ def webhook_handler(webhook_path):
                     phone = f'+55{phone}'
                 
                 # Format message
-                message = campaign['message_template']
-                message = message.replace('{customer.first_name}', first_name)
-                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
+                formatted_message = message['template']
+                formatted_message = formatted_message.replace('{customer.first_name}', first_name)
+                formatted_message = formatted_message.replace('{total_price}', webhook_data.get('total_price', ''))
                 
                 # Add PIX link only for pending status
                 if status == 'pending':
                     # Format customer name for URL (remove spaces, special chars)
                     url_safe_name = re.sub(r'[^a-zA-Z0-9]', '', customer_data.get('name', ''))
                     payment_url = f"{request.host_url}payment/{url_safe_name}/{transaction_id}"
-                    message = message.replace('{link_pix}', payment_url)
+                    formatted_message = formatted_message.replace('{link_pix}', payment_url)
                 
                 # Deduct credit and send SMS
                 if user.deduct_credits(1):
-                    send_sms_task.delay(
-                        phone=phone,
-                        message=message,
-                        event_type=campaign['event_type']
+                    delay = message.get('delay', {})
+                    delay_seconds = calculate_delay_seconds(
+                        amount=delay.get('amount', 0),
+                        unit=delay.get('unit', 'minutes')
+                    )
+                    
+                    send_sms_task.apply_async(
+                        args=[phone, formatted_message, campaign['event_type']],
+                        countdown=delay_seconds
                     )
                     success_count += 1
                     logger.info(f"SMS queued for campaign {campaign['id']}")
                 
-            except Exception as e:
-                logger.error(f"Error sending SMS for campaign {campaign['id']}: {str(e)}")
-                # Refund credit if SMS failed to queue
-                user.add_credits(1)
-                
         return jsonify({
             'success': True,
-            'message': f'Webhook processed successfully. Sent {success_count} messages',
+            'message': f'Webhook processed successfully. Queued {success_count} messages',
             'transaction_id': transaction_id
         })
         

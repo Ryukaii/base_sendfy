@@ -19,25 +19,21 @@ function showToast(type, message) {
     });
     toast.show();
     
-    // Remove toast element after it's hidden
     toastDiv.addEventListener('hidden.bs.toast', () => {
         toastDiv.remove();
     });
 }
 
 async function loadCampaigns() {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'text-center py-4';
-    loadingDiv.innerHTML = `
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Carregando...</span>
-        </div>
-        <p class="mt-2">Carregando campanhas...</p>
-    `;
-    
     const list = document.getElementById('campaignsList');
-    list.innerHTML = '';
-    list.appendChild(loadingDiv);
+    list.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando campanhas...</p>
+        </div>
+    `;
     
     try {
         const [campaignsResponse, integrationsResponse] = await Promise.all([
@@ -50,7 +46,7 @@ async function loadCampaigns() {
                 return res.json();
             })
         ]);
-        
+
         const integrationSelect = document.getElementById('integrationId');
         integrationSelect.innerHTML = `<option value="">Selecione uma Integração</option>` + 
             integrationsResponse.map(integration => 
@@ -81,17 +77,30 @@ async function loadCampaigns() {
                             <p class="card-text">
                                 <strong>Integração:</strong> ${integration ? integration.name : 'Desconhecida'}<br>
                                 <strong>Tipo de Evento:</strong> ${campaign.event_type}<br>
-                                <strong>Modelo de Mensagem:</strong><br>
-                                <code class="d-block p-2 bg-dark rounded mt-2">${campaign.message_template}</code>
+                                <strong>Mensagens:</strong><br>
                             </p>
-                            <p class="card-text"><small class="text-muted">Criada em: ${campaign.created_at}</small></p>
+                            <div class="messages-list">
+                                ${campaign.messages.map((msg, idx) => `
+                                    <div class="message-item mb-2 p-2 border rounded">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>Mensagem #${idx + 1}</strong>
+                                            <span class="badge ${msg.enabled ? 'bg-success' : 'bg-secondary'}">
+                                                ${msg.enabled ? 'Ativo' : 'Inativo'}
+                                            </span>
+                                        </div>
+                                        <div class="text-muted small">
+                                            Atraso: ${msg.delay.amount} ${msg.delay.unit}
+                                        </div>
+                                        <code class="d-block p-2 bg-dark rounded mt-2">${msg.template}</code>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <p class="card-text mt-2"><small class="text-muted">Criada em: ${campaign.created_at}</small></p>
                         </div>
                         <div class="d-flex flex-column gap-2">
-                            <button class="btn btn-sm btn-primary" onclick="editCampaign('${campaign.id}')">
-                                <i class="fas fa-edit me-1"></i> Editar
-                            </button>
                             <button class="btn btn-sm btn-danger" onclick="deleteCampaign('${campaign.id}')">
-                                <i class="fas fa-trash me-1"></i> Excluir
+                                <i class="fas fa-trash me-1"></i>
+                                Excluir
                             </button>
                         </div>
                     </div>
@@ -106,7 +115,8 @@ async function loadCampaigns() {
                 <i class="fas fa-exclamation-circle me-2"></i>
                 Erro ao carregar campanhas e integrações: ${error.message}
                 <button class="btn btn-outline-danger btn-sm ms-3" onclick="loadCampaigns()">
-                    <i class="fas fa-sync-alt me-1"></i> Tentar novamente
+                    <i class="fas fa-sync-alt me-1"></i>
+                    Tentar novamente
                 </button>
             </div>
         `;
@@ -120,26 +130,28 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
     const originalText = submitButton.innerHTML;
     submitButton.disabled = true;
     
+    const messages = [];
+    for (let i = 1; i <= 4; i++) {
+        messages.push({
+            enabled: document.getElementById(`messageEnabled${i}`).checked,
+            template: document.getElementById(`messageTemplate${i}`).value,
+            delay: {
+                amount: parseInt(document.getElementById(`delayAmount${i}`).value) || 0,
+                unit: document.getElementById(`delayUnit${i}`).value
+            }
+        });
+    }
+    
     const formData = {
         name: document.getElementById('campaignName').value,
         integration_id: document.getElementById('integrationId').value,
         event_type: document.getElementById('eventType').value,
-        message_template: document.getElementById('messageTemplate').value
+        messages: messages
     };
     
-    const campaignId = e.target.dataset.campaignId;
-    let url = '/api/campaigns';
-    let method = 'POST';
-    
-    if (campaignId) {
-        url += `/${campaignId}`;
-        method = 'PUT';
-        delete formData.integration_id;
-    }
-    
     try {
-        const response = await fetch(url, {
-            method: method,
+        const response = await fetch('/api/campaigns', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -152,7 +164,7 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
             throw new Error(data.error || 'Erro ao salvar campanha');
         }
         
-        showToast('success', `Campanha ${campaignId ? 'atualizada' : 'criada'} com sucesso!`);
+        showToast('success', 'Campanha criada com sucesso!');
         resetForm();
         loadCampaigns();
     } catch (error) {
@@ -167,45 +179,23 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
 function resetForm() {
     const form = document.getElementById('campaignForm');
     form.reset();
-    delete form.dataset.campaignId;
-    document.getElementById('integrationId').disabled = false;
-    document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
     
-    const errorDivs = form.querySelectorAll('.alert-danger');
-    errorDivs.forEach(div => div.remove());
+    // Reset all message fields
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById(`messageEnabled${i}`).checked = true;
+        document.getElementById(`delayAmount${i}`).value = '0';
+        document.getElementById(`delayUnit${i}`).value = 'minutes';
+        document.getElementById(`messageTemplate${i}`).value = '';
+    }
 }
 
-async function editCampaign(campaignId) {
-    try {
-        const response = await fetch('/api/campaigns');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const campaigns = await response.json();
-        const campaign = campaigns.find(c => c.id === campaignId);
-        
-        if (!campaign) {
-            throw new Error('Campanha não encontrada');
-        }
-        
-        const form = document.getElementById('campaignForm');
-        form.dataset.campaignId = campaignId;
-        
-        document.getElementById('campaignName').value = campaign.name;
-        document.getElementById('integrationId').value = campaign.integration_id;
-        document.getElementById('integrationId').disabled = true;
-        document.getElementById('eventType').value = campaign.event_type;
-        document.getElementById('messageTemplate').value = campaign.message_template;
-        
-        document.querySelector('button[type="submit"]').innerHTML = `
-            <i class="fas fa-save me-1"></i>
-            Atualizar Campanha
-        `;
-        
-        form.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-        console.error('Erro ao carregar campanha para edição:', error);
-        showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);
-    }
+function insertVariable(variable, targetId) {
+    const textarea = document.getElementById(targetId);
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + variable + text.substring(end);
+    textarea.focus();
 }
 
 async function deleteCampaign(campaignId) {
@@ -244,23 +234,15 @@ async function deleteCampaign(campaignId) {
             resetForm();
             loadCampaigns();
         }, 300);
+        
+        showToast('success', 'Campanha excluída com sucesso!');
     } catch (error) {
         console.error('Erro ao excluir campanha:', error);
         campaignCard.innerHTML = originalContent;
-        showToast('error', `Erro ao excluir campanha: ${error.message}`);
+        showToast('error', error.message);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadCampaigns();
-    
-    const cancelButton = document.createElement('button');
-    cancelButton.type = 'button';
-    cancelButton.className = 'btn btn-secondary ms-2';
-    cancelButton.innerHTML = '<i class="fas fa-times me-1"></i> Cancelar';
-    cancelButton.onclick = resetForm;
-    
-    const submitButton = document.querySelector('button[type="submit"]');
-    submitButton.innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
-    submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
 });
