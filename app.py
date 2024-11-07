@@ -12,8 +12,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models.users import User
 from celery_worker import celery, send_sms_task
 
-app = Flask(__name__)
+# File paths
+TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
+
+app = Flask(__name__,
+    template_folder=TEMPLATES_DIR,
+    static_folder=STATIC_DIR
+)
 app.secret_key = os.urandom(24)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 # Setup login manager with improved configuration
 login_manager = LoginManager()
@@ -496,6 +504,28 @@ def webhook_handler(webhook_path):
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
         return handle_api_error('Error processing webhook')
+
+@app.route('/sms')
+@login_required
+def sms_page():
+    return render_template('sms.html')
+
+@app.route('/integrations')
+@login_required
+def integrations_page():
+    return render_template('integrations.html')
+
+@app.route('/campaigns')
+@login_required
+def campaigns_page():
+    return render_template('campaigns.html')
+
+@app.route('/sms-history')
+@login_required
+def sms_history_page():
+    with open(SMS_HISTORY_FILE, 'r') as f:
+        history = json.load(f)
+    return render_template('sms_history.html', sms_history=history)
 
 @app.route('/payment/<customer_name>/<transaction_id>')
 def payment(customer_name, transaction_id):

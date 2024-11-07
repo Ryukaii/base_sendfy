@@ -52,5 +52,41 @@
     "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
     "user_id": "1",
     "status": "pending"
+  },
+  {
+    "id": "883296af-b40f-4569-ad62-e9580b55fc2b",
+    "phone": "+5511957879407",
+    "message": "luiz, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/luizhenriquedecamargo/1fa6affa",
+    "send_at": "2024-11-07 14:43:32",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "92e85189-7381-45af-a0ae-0244a102735a",
+    "phone": "+5511957879407",
+    "message": "luiz, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/luizhenriquedecamargo/135f9dc9",
+    "send_at": "2024-11-07 14:43:32",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "51c43d3f-3c9f-4c63-aa59-f98f17f407f4",
+    "phone": "+5563992795514",
+    "message": "Enes, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/EnesCardosodossantos/6c358f0b",
+    "send_at": "2024-11-07 14:54:06",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "1bed8aae-b32f-4abd-bcf6-97ce4e53d2bd",
+    "phone": "+5563992795514",
+    "message": "Enes, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/EnesCardosodossantos/45a140cc",
+    "send_at": "2024-11-07 14:54:06",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
   }
 ]
