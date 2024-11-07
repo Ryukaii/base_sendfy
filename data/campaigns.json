@@ -60,16 +60,16 @@
     "created_at": "2024-11-07 02:28:16"
   },
   {
-    "id": "b50c2b7f-fad7-48f8-8016-326f60902726",
-    "name": "VEGA",
+    "id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "name": "PENDENTE 2",
     "integration_id": "332624a9-f07f-4f83-8c99-43f979bbc81c",
     "event_type": "pending",
     "messages": [
       {
         "enabled": true,
-        "template": "{customer.first_name}, pague o pedido: {link_pix}",
+        "template": "{customer.first_name}, EFETUE O PAGAMENTO DO SEU PEDIDO: {link_pix}",
         "delay": {
-          "amount": 0,
+          "amount": 1,
           "unit": "minutes"
         }
       },
@@ -99,6 +99,6 @@
       }
     ],
     "user_id": "1",
-    "created_at": "2024-11-07 13:32:27"
+    "created_at": "2024-11-07 14:06:01"
   }
 ]

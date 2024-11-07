@@ -7,5 +7,50 @@
     "campaign_id": "b50c2b7f-fad7-48f8-8016-326f60902726",
     "user_id": "1",
     "status": "pending"
+  },
+  {
+    "id": "7e51d1a6-74eb-459a-89db-f578714d5d04",
+    "phone": "+5561982132603",
+    "message": "bbujhu, pague o pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/bbujhujnnin/67e72adf",
+    "send_at": "2024-11-07 14:04:16",
+    "campaign_id": "b50c2b7f-fad7-48f8-8016-326f60902726",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "acaef83b-2e01-4e30-8839-69e505ba16cd",
+    "phone": "+5561982132603",
+    "message": "Teste, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/TestetesteA/0aaf9c3b",
+    "send_at": "2024-11-07 14:08:43",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "c49c4662-e35d-47e6-8eed-b145537eda25",
+    "phone": "+5586998058413",
+    "message": "Wilson, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/WilsonMacedodesousa/92884945",
+    "send_at": "2024-11-07 14:14:32",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "d1023b9a-807c-41b8-ae57-395d7d0a67b7",
+    "phone": "+5561982132603",
+    "message": "Lana, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/LanaDelrei/808d6ce5",
+    "send_at": "2024-11-07 14:16:33",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
+  },
+  {
+    "id": "b404783e-a9c1-4eb1-8951-380f2368f4f9",
+    "phone": "+5561982132603",
+    "message": "Lana, EFETUE O PAGAMENTO DO SEU PEDIDO: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/LanaDelrei/1db344e6",
+    "send_at": "2024-11-07 14:16:33",
+    "campaign_id": "4fb81afd-d947-4459-8f40-36cf7dbe0a4b",
+    "user_id": "1",
+    "status": "pending"
   }
 ]
