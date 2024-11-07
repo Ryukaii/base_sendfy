@@ -37,25 +37,28 @@ async function loadCampaigns() {
     
     try {
         const [campaignsResponse, integrationsResponse] = await Promise.all([
-            fetch('/api/campaigns').then(res => {
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                return res.json();
-            }),
-            fetch('/api/integrations').then(res => {
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                return res.json();
-            })
+            fetch('/api/campaigns'),
+            fetch('/api/integrations')
         ]);
-
+        
+        const campaigns = await campaignsResponse.json();
+        const integrations = await integrationsResponse.json();
+        
+        // Update integration select even if empty
         const integrationSelect = document.getElementById('integrationId');
-        integrationSelect.innerHTML = `<option value="">Selecione uma Integração</option>` + 
-            integrationsResponse.map(integration => 
-                `<option value="${integration.id}">${integration.name}</option>`
-            ).join('');
+        integrationSelect.innerHTML = '<option value="">Selecione uma Integração</option>';
+        if (integrations && Array.isArray(integrations)) {
+            integrations.forEach(integration => {
+                integrationSelect.innerHTML += `
+                    <option value="${integration.id}">${integration.name}</option>
+                `;
+            });
+        }
         
         list.innerHTML = '';
         
-        if (campaignsResponse.length === 0) {
+        // Handle empty campaigns list
+        if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
             list.innerHTML = `
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle me-2"></i>
@@ -65,8 +68,8 @@ async function loadCampaigns() {
             return;
         }
         
-        campaignsResponse.forEach(campaign => {
-            const integration = integrationsResponse.find(i => i.id === campaign.integration_id);
+        campaigns.forEach(campaign => {
+            const integration = integrations.find(i => i.id === campaign.integration_id);
             const div = document.createElement('div');
             div.className = 'card mb-3';
             div.innerHTML = `
