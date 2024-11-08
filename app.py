@@ -293,20 +293,78 @@ def manage_credits(user_id):
         logger.error(f"Error managing credits: {str(e)}")
         return handle_api_error(f'Erro ao gerenciar créditos: {str(e)}')
 
-# Error Handlers
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template('error.html', error={
-        'code': 404,
-        'description': 'Página não encontrada'
-    }), 404
+# Integration API Routes
+@app.route('/api/integrations', methods=['GET'])
+@login_required
+def get_integrations():
+    try:
+        # Get only integrations for current user
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_integrations = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_integrations = [i for i in all_integrations if i.get('user_id') == current_user.id]
+        return jsonify(user_integrations)
+    except Exception as e:
+        logger.error(f"Error loading integrations: {str(e)}")
+        return handle_api_error('Falha ao carregar integrações')
 
-@app.errorhandler(500)
-def internal_error(error):
-    return render_template('error.html', error={
-        'code': 500,
-        'description': 'Erro interno do servidor'
-    }), 500
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def create_integration():
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data:
+            return handle_api_error('Nome da integração é obrigatório')
+            
+        integration = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations.append(integration)
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integração criada com sucesso',
+            'integration': integration
+        })
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}")
+        return handle_api_error('Falha ao criar integração')
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+@login_required
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            # Only delete if integration belongs to current user
+            integrations = [i for i in integrations if i['id'] != integration_id or i.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integração excluída com sucesso'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}")
+        return handle_api_error('Falha ao excluir integração')
 
 # SMS API Routes
 @app.route('/api/send-sms', methods=['POST'])
@@ -382,6 +440,21 @@ def send_sms():
         # Refund credit if SMS failed
         current_user.add_credits(1)
         return handle_api_error('Erro ao enviar SMS. Sistema temporariamente indisponível.')
+
+# Error Handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', error={
+        'code': 404,
+        'description': 'Página não encontrada'
+    }), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('error.html', error={
+        'code': 500,
+        'description': 'Erro interno do servidor'
+    }), 500
 
 if __name__ == '__main__':
     ensure_data_files()
