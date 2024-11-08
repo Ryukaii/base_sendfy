@@ -35,6 +35,6 @@ else
     exit 1
 fi
 
-# Start Gunicorn server
-echo "Starting Gunicorn server..."
-gunicorn app:app --bind 0.0.0.0:8080
+# Start Flask application
+echo "Starting Flask application..."
+python main.py

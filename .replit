@@ -36,7 +36,7 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "./start.sh"
-waitForPort = 8080
+waitForPort = 5000
 
 [[workflows.workflow]]
 name = "Flask Server"
@@ -81,7 +81,3 @@ externalPort = 80
 [[ports]]
 localPort = 6379
 externalPort = 3000
-
-[[ports]]
-localPort = 8080
-externalPort = 8080
