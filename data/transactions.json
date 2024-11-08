@@ -817,16 +817,5 @@
     "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/2cd688c2-a4bf-459b-bd17-5fc4ad5b5a2e5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***63043117",
     "status": "approved",
     "created_at": "2024-11-07 13:25:59"
-  },
-  {
-    "transaction_id": "79901684",
-    "customer_name": "Nome n\u00e3o dispon\u00edvel",
-    "customer_phone": "31997011332",
-    "customer_email": "fagnergoncalves761@gmail.com",
-    "product_name": "",
-    "total_price": "154.20",
-    "pix_code": "00020126850014br.gov.bcb.pix2563pix.voluti.com.br/qr/v3/at/b1d699c5-00fa-4781-82b2-7e9fe56b34cc5204000053039865802BR5925FX_PAGAMENTOS_DIGITAIS_LT6014MPSSA_SENHORA_62070503***6304CD2C",
-    "status": "approved",
-    "created_at": "2024-11-08 14:52:04"
   }
 ]
