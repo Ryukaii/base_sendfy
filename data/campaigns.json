@@ -24,6 +24,24 @@
     "created_at": "2024-11-06 22:52:57"
   },
   {
+    "id": "e756f0c3-fd1c-462c-a59d-c07483adc710",
+    "name": "VEGA",
+    "integration_id": "7512a7b3-294b-45ac-9a13-15a7c28aa30b",
+    "event_type": "pending",
+    "message_template": "{customer.first_name}",
+    "user_id": "1",
+    "created_at": "2024-11-07 01:33:09"
+  },
+  {
+    "id": "ea5c11ad-ea91-4ea4-8745-16aabf496860",
+    "name": "VEGA",
+    "integration_id": "7512a7b3-294b-45ac-9a13-15a7c28aa30b",
+    "event_type": "pending",
+    "message_template": "{customer.first_name}",
+    "user_id": "1",
+    "created_at": "2024-11-07 01:35:23"
+  },
+  {
     "id": "927d22c1-0d1f-4450-a6b0-e40af2a15d39",
     "name": "VEGA",
     "integration_id": "d8feda24-fc7b-4ee3-b729-79bcbeec50e0",
@@ -60,45 +78,12 @@
     "created_at": "2024-11-07 02:28:16"
   },
   {
-    "id": "b50c2b7f-fad7-48f8-8016-326f60902726",
+    "id": "f7631a7c-df15-4053-bba1-02170d30d5de",
     "name": "VEGA",
-    "integration_id": "332624a9-f07f-4f83-8c99-43f979bbc81c",
+    "integration_id": "7512a7b3-294b-45ac-9a13-15a7c28aa30b",
     "event_type": "pending",
-    "messages": [
-      {
-        "enabled": true,
-        "template": "{customer.first_name}, pague o pedido: {link_pix}",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      },
-      {
-        "enabled": false,
-        "template": "",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      },
-      {
-        "enabled": false,
-        "template": "",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      },
-      {
-        "enabled": false,
-        "template": "",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      }
-    ],
+    "message_template": "{customer.first_name}, efetue o pagamento: {link_pix}",
     "user_id": "1",
-    "created_at": "2024-11-07 13:32:27"
+    "created_at": "2024-11-07 02:51:57"
   }
 ]

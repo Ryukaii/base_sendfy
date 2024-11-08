@@ -4,13 +4,13 @@
     "username": "admin",
     "password_hash": "scrypt:32768:8:1$CyhzhFmV8YiYlD0x$a3cb80a195a66b6fda91171fa87a244e5327cebeb69ee647e5e4bb3263e72a3758d4f6ddcf1fe21986e08497f43383a700ea10a46ca3bcfc09761d7ef21517e8",
     "is_admin": true,
-    "credits": 70
+    "credits": 74
   },
   {
     "id": "2",
     "username": "luis",
     "password_hash": "scrypt:32768:8:1$GelcePU6H5WO3tmc$635d154f74c0ecb7db920df6ceb23ddb37dfa5c9d00145162022ecdd30b0a9c55370fa71cf602203fd9d7057f0248b9879aac7934f10afbb8241016a836e2640",
     "is_admin": false,
-    "credits": 5
+    "credits": 0
   }
 ]

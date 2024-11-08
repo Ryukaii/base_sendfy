@@ -1,11 +1,1 @@
-[
-  {
-    "id": "333b8c5a-f9f4-4be3-a2f6-45f182de7af7",
-    "phone": "61982132603",
-    "message": "{customer.first_name}, pague o pedido: {link_pix}",
-    "send_at": "2024-11-07 13:33:38",
-    "campaign_id": "b50c2b7f-fad7-48f8-8016-326f60902726",
-    "user_id": "1",
-    "status": "pending"
-  }
-]
+[]
