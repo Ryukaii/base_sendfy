@@ -32,10 +32,10 @@
     "created_at": "2024-11-07 02:27:25"
   },
   {
-    "id": "332624a9-f07f-4f83-8c99-43f979bbc81c",
-    "name": "VEGA PENDENTE",
-    "webhook_url": "/webhook/8161ba61-0a29-4862-95ce-fbfac9a366e2",
+    "id": "1e2d40f1-a333-440b-b83c-905ef891a176",
+    "name": "teste",
+    "webhook_url": "/webhook/c88b9e1a-c6ec-4dea-b018-2210e41c8440",
     "user_id": "1",
-    "created_at": "2024-11-07 13:31:36"
+    "created_at": "2024-11-08 18:14:00"
   }
 ]
