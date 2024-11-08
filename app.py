@@ -59,13 +59,38 @@ def admin_required(f):
 def load_user(user_id):
     return User.get(user_id)
 
-# Authentication Routes
+# Main Routes
 @app.route('/')
 def index():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
     return render_template('index.html')
 
+@app.route('/sms')
+@login_required
+def sms_page():
+    return render_template('sms.html')
+
+@app.route('/sms-history')
+@login_required
+def sms_history():
+    with open(SMS_HISTORY_FILE, 'r') as f:
+        history = json.load(f)
+    # Filter history for current user
+    user_history = [sms for sms in history if sms.get('user_id') == current_user.id]
+    return render_template('sms_history.html', sms_history=user_history)
+
+@app.route('/campaigns')
+@login_required
+def campaigns_page():
+    return render_template('campaigns.html')
+
+@app.route('/integrations')
+@login_required
+def integrations_page():
+    return render_template('integrations.html')
+
+# Authentication Routes
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -280,7 +305,7 @@ def internal_error(error):
         'description': 'Erro interno do servidor'
     }), 500
 
-# Integration API Routes (From manager's message)
+# Integration API Routes
 @app.route('/api/integrations', methods=['GET'])
 @login_required
 def get_integrations():
@@ -294,7 +319,7 @@ def get_integrations():
         return jsonify(user_integrations)
     except Exception as e:
         logger.error(f"Error loading integrations: {str(e)}")
-        return handle_api_error('Failed to load integrations')
+        return handle_api_error('Falha ao carregar integrações')
 
 @app.route('/api/integrations', methods=['POST'])
 @login_required
@@ -302,7 +327,7 @@ def create_integration():
     try:
         data = request.get_json()
         if not data or 'name' not in data:
-            return handle_api_error('Integration name is required')
+            return handle_api_error('Nome da integração é obrigatório')
             
         integration = {
             'id': str(uuid.uuid4()),
@@ -323,12 +348,12 @@ def create_integration():
             
         return jsonify({
             'success': True,
-            'message': 'Integration created successfully',
+            'message': 'Integração criada com sucesso',
             'integration': integration
         })
     except Exception as e:
         logger.error(f"Error creating integration: {str(e)}")
-        return handle_api_error('Failed to create integration')
+        return handle_api_error('Falha ao criar integração')
 
 @app.route('/api/integrations/<integration_id>', methods=['DELETE'])
 @login_required
@@ -345,11 +370,11 @@ def delete_integration(integration_id):
             
         return jsonify({
             'success': True,
-            'message': 'Integration deleted successfully'
+            'message': 'Integração excluída com sucesso'
         })
     except Exception as e:
         logger.error(f"Error deleting integration: {str(e)}")
-        return handle_api_error('Failed to delete integration')
+        return handle_api_error('Falha ao excluir integração')
 
 if __name__ == '__main__':
     ensure_data_files()
