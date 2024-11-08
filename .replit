@@ -17,10 +17,6 @@ args = "SMS Platform"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Flask Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "Init Admin"
 
 [[workflows.workflow]]
@@ -35,23 +31,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "./start.sh"
-waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Flask Server"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python3 app.py"
-waitForPort = 5000
+args = "bash start.sh"
+waitForPort = 8080
 
 [[workflows.workflow]]
 name = "Init Admin"
@@ -68,7 +49,11 @@ task = "shell.exec"
 args = "python3 init_admin.py"
 
 [deployment]
-run = ["sh", "-c", "./start.sh"]
+run = ["sh", "-c", "bash start.sh"]
+
+[[ports]]
+localPort = 80
+externalPort = 3002
 
 [[ports]]
 localPort = 3000
@@ -81,3 +66,8 @@ externalPort = 80
 [[ports]]
 localPort = 6379
 externalPort = 3000
+exposeLocalhost = true
+
+[[ports]]
+localPort = 8080
+externalPort = 8080

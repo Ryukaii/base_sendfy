@@ -1,0 +1,11 @@
+gunicorn
+celery
+flask
+flask-login
+redis
+requests
+werkzeug
+flask-cors
+gevent
+greenlet
+python-dotenv
