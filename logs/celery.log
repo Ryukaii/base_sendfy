@@ -1,0 +1,44 @@
+[2024-11-08 17:46:22,397: INFO/MainProcess] Connected to redis://localhost:6379/0
+[2024-11-08 17:46:22,406: INFO/MainProcess] mingle: searching for neighbors
+[2024-11-08 17:46:23,416: INFO/MainProcess] mingle: all alone
+[2024-11-08 17:46:23,458: INFO/MainProcess] celery@97b3fd6100b4 ready.
+2024-11-08 17:46:31,854 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.196.111:5000
+2024-11-08 17:46:31,854 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2024-11-08 17:46:31,859 - werkzeug - INFO -  * Restarting with stat
+2024-11-08 17:46:32,240 - werkzeug - WARNING -  * Debugger is active!
+2024-11-08 17:46:32,242 - werkzeug - INFO -  * Debugger PIN: 228-466-317
+2024-11-08 17:46:33,183 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:33] "[33mGET /login HTTP/1.1[0m" 404 -
+2024-11-08 17:46:34,653 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:34] "[33mGET /login HTTP/1.1[0m" 404 -
+2024-11-08 17:46:36,969 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:36] "[33mPOST /webhook/9b35702b-e2dc-4694-a3a4-ba1ff171760d HTTP/1.1[0m" 404 -
+[2024-11-08 17:46:37,373: INFO/MainProcess] Connected to redis://localhost:6379/0
+[2024-11-08 17:46:37,379: INFO/MainProcess] mingle: searching for neighbors
+2024-11-08 17:46:37,822 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:37] "[33mPOST /webhook/ee1ed3c8-6264-41f6-a9ae-0c41e2aefa20 HTTP/1.1[0m" 404 -
+2024-11-08 17:46:38,151 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:38] "[33mPOST /webhook/9b35702b-e2dc-4694-a3a4-ba1ff171760d HTTP/1.1[0m" 404 -
+[2024-11-08 17:46:38,387: INFO/MainProcess] mingle: all alone
+[2024-11-08 17:46:38,400: INFO/MainProcess] celery@97b3fd6100b4 ready.
+2024-11-08 17:46:38,635 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:38] "[33mPOST /webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc HTTP/1.1[0m" 404 -
+2024-11-08 17:46:38,830 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:38] "[33mPOST /webhook/9b35702b-e2dc-4694-a3a4-ba1ff171760d HTTP/1.1[0m" 404 -
+2024-11-08 17:46:39,048 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:39] "[33mPOST /webhook/ee1ed3c8-6264-41f6-a9ae-0c41e2aefa20 HTTP/1.1[0m" 404 -
+2024-11-08 17:46:39,515 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:39] "[33mPOST /webhook/8e1d4001-5e85-4ac1-9979-04469ff84e3c HTTP/1.1[0m" 404 -
+2024-11-08 17:46:39,598 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:39] "[33mPOST /webhook/ee1ed3c8-6264-41f6-a9ae-0c41e2aefa20 HTTP/1.1[0m" 404 -
+2024-11-08 17:46:39,842 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:39] "[33mPOST /webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc HTTP/1.1[0m" 404 -
+2024-11-08 17:46:40,508 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:40] "[33mPOST /webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc HTTP/1.1[0m" 404 -
+2024-11-08 17:46:40,637 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:40] "[33mPOST /webhook/8e1d4001-5e85-4ac1-9979-04469ff84e3c HTTP/1.1[0m" 404 -
+2024-11-08 17:46:41,426 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:46:41] "[33mPOST /webhook/8e1d4001-5e85-4ac1-9979-04469ff84e3c HTTP/1.1[0m" 404 -
+2024-11-08 17:47:07,410 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:07] "[33mPOST /webhook/9b35702b-e2dc-4694-a3a4-ba1ff171760d HTTP/1.1[0m" 404 -
+2024-11-08 17:47:08,224 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:08] "[33mPOST /webhook/ee1ed3c8-6264-41f6-a9ae-0c41e2aefa20 HTTP/1.1[0m" 404 -
+2024-11-08 17:47:08,978 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:08] "[33mPOST /webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc HTTP/1.1[0m" 404 -
+2024-11-08 17:47:09,850 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:09] "[33mPOST /webhook/8e1d4001-5e85-4ac1-9979-04469ff84e3c HTTP/1.1[0m" 404 -
+2024-11-08 17:47:12,594 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:12] "[33mPOST /webhook/9b35702b-e2dc-4694-a3a4-ba1ff171760d HTTP/1.1[0m" 404 -
+2024-11-08 17:47:13,098 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:13] "[33mPOST /webhook/ee1ed3c8-6264-41f6-a9ae-0c41e2aefa20 HTTP/1.1[0m" 404 -
+2024-11-08 17:47:13,835 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:13] "[33mPOST /webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc HTTP/1.1[0m" 404 -
+2024-11-08 17:47:14,261 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:14] "[33mPOST /webhook/8e1d4001-5e85-4ac1-9979-04469ff84e3c HTTP/1.1[0m" 404 -
+2024-11-08 17:47:15,104 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:15] "[33mPOST /webhook/9b35702b-e2dc-4694-a3a4-ba1ff171760d HTTP/1.1[0m" 404 -
+2024-11-08 17:47:15,630 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:15] "[33mPOST /webhook/ee1ed3c8-6264-41f6-a9ae-0c41e2aefa20 HTTP/1.1[0m" 404 -
+2024-11-08 17:47:16,247 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:16] "[33mPOST /webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc HTTP/1.1[0m" 404 -
+2024-11-08 17:47:16,762 - werkzeug - INFO - 172.31.196.111 - - [08/Nov/2024 17:47:16] "[33mPOST /webhook/8e1d4001-5e85-4ac1-9979-04469ff84e3c HTTP/1.1[0m" 404 -
+2024-11-08 17:47:39,706 - werkzeug - INFO -  * Detected change in '/home/runner/SMSWebhookIntegrations/app.py', reloading
+2024-11-08 17:47:39,794 - werkzeug - INFO -  * Restarting with stat

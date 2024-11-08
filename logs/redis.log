@@ -1,0 +1,26 @@
+1568:C 08 Nov 2024 17:46:17.937 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+1569:C 08 Nov 2024 17:46:17.938 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1569:C 08 Nov 2024 17:46:17.938 * Redis version=7.2.4, bits=64, commit=00000000, modified=0, pid=1569, just started
+1569:C 08 Nov 2024 17:46:17.938 * Configuration loaded
+1569:M 08 Nov 2024 17:46:17.940 * monotonic clock: POSIX clock_gettime
+1569:M 08 Nov 2024 17:46:17.941 * Running mode=standalone, port=6379.
+1569:M 08 Nov 2024 17:46:17.957 * Server initialized
+1569:M 08 Nov 2024 17:46:17.960 * Loading RDB produced by version 7.2.4
+1569:M 08 Nov 2024 17:46:17.960 * RDB age 139387 seconds
+1569:M 08 Nov 2024 17:46:17.960 * RDB memory usage when created 1.60 Mb
+1569:M 08 Nov 2024 17:46:17.960 * Done loading RDB, keys loaded: 3, keys expired: 36.
+1569:M 08 Nov 2024 17:46:17.960 * DB loaded from disk: 0.003 seconds
+1569:M 08 Nov 2024 17:46:17.960 * Ready to accept connections tcp
+1660:C 08 Nov 2024 17:46:34.173 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+1661:C 08 Nov 2024 17:46:34.178 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1661:C 08 Nov 2024 17:46:34.179 * Redis version=7.2.4, bits=64, commit=00000000, modified=0, pid=1661, just started
+1661:C 08 Nov 2024 17:46:34.179 * Configuration loaded
+1661:M 08 Nov 2024 17:46:34.180 * monotonic clock: POSIX clock_gettime
+1661:M 08 Nov 2024 17:46:34.180 * Running mode=standalone, port=6379.
+1661:M 08 Nov 2024 17:46:34.215 * Server initialized
+1661:M 08 Nov 2024 17:46:34.229 * Loading RDB produced by version 7.2.4
+1661:M 08 Nov 2024 17:46:34.232 * RDB age 139404 seconds
+1661:M 08 Nov 2024 17:46:34.233 * RDB memory usage when created 1.60 Mb
+1661:M 08 Nov 2024 17:46:34.236 * Done loading RDB, keys loaded: 3, keys expired: 36.
+1661:M 08 Nov 2024 17:46:34.236 * DB loaded from disk: 0.018 seconds
+1661:M 08 Nov 2024 17:46:34.237 * Ready to accept connections tcp
