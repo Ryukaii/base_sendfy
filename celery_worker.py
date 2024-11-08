@@ -5,11 +5,10 @@ import os
 import re
 from datetime import datetime
 
-# Initialize Celery with environment variables for broker/backend
-REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+# Initialize Celery
 celery = Celery('sms_tasks',
-                broker=REDIS_URL,
-                backend=REDIS_URL)
+                broker='redis://localhost:6379/0',
+                backend='redis://localhost:6379/0')
 
 # SMS API Configuration
 SMS_API_ENDPOINT = "https://api.smsdev.com.br/v1/send"
@@ -56,20 +55,8 @@ def log_sms_attempt(campaign_id, phone, message, status, api_response, event_typ
     with open('data/sms_history.json', 'w') as f:
         json.dump(history, f, indent=2)
 
-@celery.task(bind=True, max_retries=3, default_retry_delay=300, soft_time_limit=30)
+@celery.task(bind=True, max_retries=3)
 def send_sms_task(self, phone, message, operator="claro", campaign_id=None, event_type="manual"):
-    if not SMS_API_KEY:
-        error_msg = "SMS_API_KEY not configured"
-        log_sms_attempt(
-            campaign_id=campaign_id,
-            phone=phone,
-            message=message,
-            status='failed',
-            api_response=error_msg,
-            event_type=event_type
-        )
-        raise ValueError(error_msg)
-
     try:
         # Format phone number
         try:
@@ -97,11 +84,11 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
             "ref": campaign_id or "manual_send"
         }
         
-        # Send SMS with proper timeout handling
+        # Send SMS
         response = requests.post(
             SMS_API_ENDPOINT,
             json=sms_data,
-            timeout=(5, 20)  # (connect timeout, read timeout)
+            timeout=10
         )
         response.raise_for_status()
         
@@ -112,63 +99,32 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
         # SMS Dev returns 'situacao': 'OK' for success
         success = api_response.get('situacao') == 'OK'
         
-        if not success:
-            error_msg = api_response.get('erro', 'Unknown error from SMS provider')
-            log_sms_attempt(
-                campaign_id=campaign_id,
-                phone=formatted_phone,
-                message=message,
-                status='failed',
-                api_response=str(api_response),
-                event_type=event_type
-            )
-            # Retry for specific error codes that indicate temporary issues
-            if any(code in str(api_response) for code in ['timeout', 'rate_limit', 'server_error']):
-                raise self.retry(
-                    exc=Exception(error_msg),
-                    countdown=self.request.retries * 300 + 60  # Progressive backoff
-                )
-            return {
-                'success': False,
-                'message': error_msg
-            }
-        
-        # Log successful attempt
+        # Log the attempt
         log_sms_attempt(
             campaign_id=campaign_id,
             phone=formatted_phone,
             message=message,
-            status='success',
+            status='success' if success else 'failed',
             api_response=str(api_response),
             event_type=event_type
         )
         
         return {
-            'success': True,
-            'message': api_response.get('retorno', 'SMS sent successfully')
+            'success': success,
+            'message': api_response.get('retorno', 'SMS sent successfully') if success else api_response.get('erro', 'Failed to send SMS')
         }
         
-    except requests.exceptions.Timeout as e:
-        error_msg = f"Timeout while sending SMS: {str(e)}"
-        log_sms_attempt(
-            campaign_id=campaign_id,
-            phone=formatted_phone if 'formatted_phone' in locals() else phone,
-            message=message,
-            status='failed',
-            api_response=error_msg,
-            event_type=event_type
-        )
-        raise self.retry(exc=e, countdown=self.request.retries * 300 + 60)
-        
     except requests.exceptions.RequestException as e:
-        error_msg = f"Error sending SMS: {str(e)}"
         log_sms_attempt(
             campaign_id=campaign_id,
             phone=formatted_phone if 'formatted_phone' in locals() else phone,
             message=message,
             status='failed',
-            api_response=error_msg,
+            api_response=str(e),
             event_type=event_type
         )
+        
         # Retry the task with exponential backoff
-        raise self.retry(exc=e, countdown=self.request.retries * 300 + 60)
+        retry_count = self.request.retries
+        backoff = 60 * (2 ** retry_count)  # 60s, 120s, 240s
+        raise self.retry(exc=e, countdown=backoff)
