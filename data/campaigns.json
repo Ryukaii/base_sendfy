@@ -100,47 +100,5 @@
     ],
     "user_id": "1",
     "created_at": "2024-11-07 13:32:27"
-  },
-  {
-    "id": "8159496f-ca5e-443b-864c-ed68771815ff",
-    "name": "TESTEEE",
-    "integration_id": "92217aa3-3d4e-449b-9579-b6a850526cf9",
-    "event_type": "pending",
-    "messages": [
-      {
-        "enabled": true,
-        "template": "OI {customer.first_name}",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      },
-      {
-        "enabled": false,
-        "template": "",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      },
-      {
-        "enabled": false,
-        "template": "",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      },
-      {
-        "enabled": false,
-        "template": "",
-        "delay": {
-          "amount": 0,
-          "unit": "minutes"
-        }
-      }
-    ],
-    "user_id": "1",
-    "created_at": "2024-11-08 18:33:42"
   }
 ]
