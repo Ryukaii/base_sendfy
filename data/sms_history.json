@@ -275,5 +275,169 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139146671', 'number': '5577991014469', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-08 19:36:55",
+    "phone": "+5561982132603",
+    "message": "opa",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-08 19:36:56",
+    "phone": "5561982132603",
+    "message": "opa",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681293', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-08 19:37:18",
+    "phone": "+5561982132603",
+    "message": "Oi, pagbr.net",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-08 19:37:19",
+    "phone": "5561982132603",
+    "message": "Oi, pagbr.net",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681312', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-08 19:37:34",
+    "phone": "+5561982132603",
+    "message": "Ola, Pedro",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-08 19:37:35",
+    "phone": "5561982132603",
+    "message": "Ola, Pedro",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681323', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-08 19:37:55",
+    "phone": "+5561982132603",
+    "message": "teste",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-08 19:37:56",
+    "phone": "5561982132603",
+    "message": "teste",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681340', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-08 19:38:38",
+    "phone": "+5561982132603",
+    "message": "Ola, gatenho",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-08 19:38:39",
+    "phone": "5561982132603",
+    "message": "Ola, gatenho",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681374', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-08 19:38:57",
+    "phone": "+5561982132603",
+    "message": "Bom dia!",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-08 19:38:58",
+    "phone": "5561982132603",
+    "message": "Bom dia!",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681450', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-08 19:39:02",
+    "phone": "5511989789866",
+    "message": "ADALDINO",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681468', 'number': '5511989789866', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-08 19:39:02",
+    "phone": "5511989789866",
+    "message": "ADALDINO",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681469', 'number': '5511989789866', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-08 19:39:02",
+    "phone": "5511989789866",
+    "message": "ADALDINO, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/ADALDINODAPAIXAOVEIGADOSSANTOS/403da945",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681470', 'number': '5511989789866', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-08 19:39:05",
+    "phone": "5511989789866",
+    "message": "ADALDINO",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681478', 'number': '5511989789866', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-08 19:39:05",
+    "phone": "5511989789866",
+    "message": "ADALDINO, efetue o pagamento: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/ADALDINODAPAIXAOVEIGADOSSANTOS/8e2a6ed4",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681476', 'number': '5511989789866', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-08 19:40:22",
+    "phone": "+5561982132603",
+    "message": "oi",
+    "type": "manual",
+    "status": "pending",
+    "user_id": "1"
+  },
+  {
+    "timestamp": "2024-11-08 19:40:23",
+    "phone": "5561982132603",
+    "message": "oi",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139681550', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
   }
 ]
