@@ -1,22 +1,21 @@
-from flask_login import UserMixin
+import json
+import os
+import fcntl
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 import logging
-from replit import db
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
-def init_db():
-    """Initialize database collections if they don't exist"""
-    if 'users' not in db:
-        db['users'] = []
-    if 'campaigns' not in db:
-        db['campaigns'] = []
-    if 'integrations' not in db:
-        db['integrations'] = []
-    if 'sms_history' not in db:
-        db['sms_history'] = []
-    if 'transactions' not in db:
-        db['transactions'] = []
+USERS_FILE = 'data/users.json'
+
+def ensure_users_file():
+    if not os.path.exists('data'):
+        os.makedirs('data')
+    if not os.path.exists(USERS_FILE):
+        with open(USERS_FILE, 'w') as f:
+            json.dump([], f)
 
 class User(UserMixin):
     def __init__(self, id, username, password_hash, is_admin=False, credits=0):
@@ -31,7 +30,12 @@ class User(UserMixin):
 
     @staticmethod
     def get(user_id):
-        users = db.get('users', [])
+        ensure_users_file()
+        with open(USERS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            users = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
         user = next((u for u in users if u['id'] == user_id), None)
         if user:
             return User(
@@ -45,7 +49,12 @@ class User(UserMixin):
 
     @staticmethod
     def get_by_username(username):
-        users = db.get('users', [])
+        ensure_users_file()
+        with open(USERS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            users = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
         user = next((u for u in users if u['username'] == username), None)
         if user:
             return User(
@@ -59,44 +68,67 @@ class User(UserMixin):
 
     @staticmethod
     def create(username, password, is_admin=False, credits=0):
-        users = db.get('users', [])
-        
-        # Check if username already exists
-        if any(u['username'] == username for u in users):
-            return None
+        ensure_users_file()
+        with open(USERS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            users = json.load(f)
             
-        user = {
-            'id': str(len(users) + 1),
-            'username': username,
-            'password_hash': generate_password_hash(password),
-            'is_admin': is_admin,
-            'credits': credits
-        }
-        users.append(user)
-        db['users'] = users
-        
-        return User(
-            id=user['id'],
-            username=user['username'],
-            password_hash=user['password_hash'],
-            is_admin=user['is_admin'],
-            credits=user['credits']
-        )
+            # Check if username already exists
+            if any(u['username'] == username for u in users):
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                return None
+                
+            user = {
+                'id': str(len(users) + 1),
+                'username': username,
+                'password_hash': generate_password_hash(password),
+                'is_admin': is_admin,
+                'credits': credits
+            }
+            users.append(user)
+            
+            f.seek(0)
+            json.dump(users, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+            return User(
+                id=user['id'],
+                username=user['username'],
+                password_hash=user['password_hash'],
+                is_admin=user['is_admin'],
+                credits=user['credits']
+            )
 
     @staticmethod
     def delete(user_id):
         try:
-            users = db.get('users', [])
-            users = [u for u in users if u['id'] != user_id]
-            db['users'] = users
-            return True
+            ensure_users_file()
+            with open(USERS_FILE, 'r+') as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                users = json.load(f)
+                
+                # Remove user with matching ID
+                users = [u for u in users if u['id'] != user_id]
+                
+                f.seek(0)
+                json.dump(users, f, indent=2)
+                f.truncate()
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                
+                return True
         except Exception as e:
             logger.error(f"Error deleting user: {str(e)}")
             return False
 
     @staticmethod
     def get_all():
-        users = db.get('users', [])
+        ensure_users_file()
+        with open(USERS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            users = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
         return [User(
             id=u['id'],
             username=u['username'],
@@ -108,15 +140,23 @@ class User(UserMixin):
     def add_credits(self, amount):
         """Add credits to user account"""
         try:
-            users = db.get('users', [])
-            for user in users:
-                if user['id'] == self.id:
-                    user['credits'] = user.get('credits', 0) + amount
-                    self.credits = user['credits']
-                    db['users'] = users
-                    logger.info(f"Added {amount} credits to user {self.username}")
-                    return True
-            return False
+            with open(USERS_FILE, 'r+') as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                users = json.load(f)
+                
+                for user in users:
+                    if user['id'] == self.id:
+                        user['credits'] = user.get('credits', 0) + amount
+                        self.credits = user['credits']
+                        break
+                
+                f.seek(0)
+                json.dump(users, f, indent=2)
+                f.truncate()
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                
+                logger.info(f"Added {amount} credits to user {self.username}")
+                return True
         except Exception as e:
             logger.error(f"Error adding credits: {str(e)}")
             return False
@@ -124,19 +164,28 @@ class User(UserMixin):
     def deduct_credits(self, amount):
         """Deduct credits from user account"""
         try:
-            users = db.get('users', [])
-            for user in users:
-                if user['id'] == self.id:
-                    current_credits = user.get('credits', 0)
-                    if current_credits < amount:
-                        return False
-                    
-                    user['credits'] = current_credits - amount
-                    self.credits = user['credits']
-                    db['users'] = users
-                    logger.info(f"Deducted {amount} credits from user {self.username}")
-                    return True
-            return False
+            with open(USERS_FILE, 'r+') as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                users = json.load(f)
+                
+                for user in users:
+                    if user['id'] == self.id:
+                        current_credits = user.get('credits', 0)
+                        if current_credits < amount:
+                            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                            return False
+                        
+                        user['credits'] = current_credits - amount
+                        self.credits = user['credits']
+                        break
+                
+                f.seek(0)
+                json.dump(users, f, indent=2)
+                f.truncate()
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                
+                logger.info(f"Deducted {amount} credits from user {self.username}")
+                return True
         except Exception as e:
             logger.error(f"Error deducting credits: {str(e)}")
             return False

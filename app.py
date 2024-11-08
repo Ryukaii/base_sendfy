@@ -1,13 +1,15 @@
 import os
+import json
+import uuid
+import fcntl
 import logging
 import datetime
 import re
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from models.users import User, init_db
+from models.users import User
 from celery_worker import send_sms_task
-from replit import db
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -23,6 +25,21 @@ login_manager.login_message_category = 'warning'
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Constants
+INTEGRATIONS_FILE = 'data/integrations.json'
+CAMPAIGNS_FILE = 'data/campaigns.json'
+TRANSACTIONS_FILE = 'data/transactions.json'
+SMS_HISTORY_FILE = 'data/sms_history.json'
+
+def ensure_data_files():
+    """Ensure all required data files exist"""
+    if not os.path.exists('data'):
+        os.makedirs('data')
+    for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, TRANSACTIONS_FILE, SMS_HISTORY_FILE]:
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
 
 def handle_api_error(message, status_code=400):
     """Handle API errors consistently"""
@@ -60,7 +77,8 @@ def sms_page():
 @app.route('/sms-history')
 @login_required
 def sms_history():
-    history = db.get('sms_history', [])
+    with open(SMS_HISTORY_FILE, 'r') as f:
+        history = json.load(f)
     # Filter history for current user
     user_history = [sms for sms in history if sms.get('user_id') == current_user.id]
     return render_template('sms_history.html', sms_history=user_history)
@@ -141,13 +159,16 @@ def admin_dashboard():
     total_sms = sum(user.credits for user in users)
     
     # Calculate SMS statistics
-    history = db.get('sms_history', [])
+    with open(SMS_HISTORY_FILE, 'r') as f:
+        history = json.load(f)
+        
     total_messages = len(history)
     success_messages = len([sms for sms in history if sms.get('status') == 'success'])
     success_rate = int((success_messages / total_messages * 100) if total_messages > 0 else 0)
     
     # Calculate campaign statistics
-    campaigns = db.get('campaigns', [])
+    with open(CAMPAIGNS_FILE, 'r') as f:
+        campaigns = json.load(f)
     active_campaigns = len(campaigns)
     
     # Get recent activity
@@ -334,16 +355,21 @@ def send_sms():
             return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
         
         # Log to SMS history
-        history = db.get('sms_history', [])
-        history.append({
-            'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'phone': phone,
-            'message': data['message'],
-            'type': 'manual',
-            'status': 'pending',
-            'user_id': current_user.id
-        })
-        db['sms_history'] = history
+        with open(SMS_HISTORY_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            history = json.load(f)
+            history.append({
+                'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'phone': phone,
+                'message': data['message'],
+                'type': 'manual',
+                'status': 'pending',
+                'user_id': current_user.id
+            })
+            f.seek(0)
+            json.dump(history, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
         
         return jsonify({
             'success': True,
@@ -358,5 +384,5 @@ def send_sms():
         return handle_api_error('Erro ao enviar SMS. Sistema temporariamente indisponível.')
 
 if __name__ == '__main__':
-    init_db()  # Initialize Replit DB collections
+    ensure_data_files()
     app.run(host='0.0.0.0', port=5000, debug=True)
