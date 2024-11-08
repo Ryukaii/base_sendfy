@@ -76,5 +76,14 @@
     "message_template": "{customer.first_name}, efetue o pagamento: {link_pix}",
     "user_id": "2",
     "created_at": "2024-11-07 02:28:16"
+  },
+  {
+    "id": "48bb8960-6b7c-4f6e-9e14-3098d7ae9750",
+    "name": "VEGA atr",
+    "integration_id": "ffddf9f8-5575-4fa1-bdf2-42005b3135c0",
+    "event_type": "pending",
+    "message_template": "{customer.first_name}, efetue o pagamento {link_pix}",
+    "user_id": "1",
+    "created_at": "2024-11-08 19:59:53"
   }
 ]
