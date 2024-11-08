@@ -6,18 +6,21 @@ import logging
 import datetime
 import re
 from functools import wraps
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from models.users import User
 from celery_worker import send_sms_task
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+app.permanent_session_lifetime = datetime.timedelta(days=7)  # Set session lifetime
 
 # Setup login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.login_message = 'Por favor, faça login para acessar esta página.'
+login_manager.login_message_category = 'warning'
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -47,7 +50,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
-            flash('Admin access required', 'danger')
+            flash('Acesso restrito a administradores', 'danger')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -56,7 +59,7 @@ def admin_required(f):
 def load_user(user_id):
     return User.get(user_id)
 
-# Routes
+# Authentication Routes
 @app.route('/')
 def index():
     if not current_user.is_authenticated:
@@ -65,80 +68,117 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        remember = request.form.get('remember', False)
         
         user = User.get_by_username(username)
         if user and user.check_password(password):
-            login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('index'))
+            login_user(user, remember=remember)
+            session.permanent = True  # Use permanent session
             
-        flash('Invalid username or password', 'danger')
+            flash('Login realizado com sucesso!', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page if next_page else url_for('index'))
+            
+        flash('Usuário ou senha inválidos', 'danger')
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         
         if User.get_by_username(username):
-            flash('Username already exists', 'danger')
+            flash('Nome de usuário já existe', 'danger')
             return render_template('register.html')
             
         user = User.create(username=username, password=password)
         if user:
             login_user(user)
-            flash('Account created successfully!', 'success')
+            session.permanent = True
+            flash('Conta criada com sucesso!', 'success')
             return redirect(url_for('index'))
             
-        flash('Error creating user', 'danger')
+        flash('Erro ao criar usuário', 'danger')
     return render_template('register.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out', 'success')
+    session.clear()
+    flash('Você foi desconectado com sucesso', 'success')
     return redirect(url_for('login'))
 
-# Admin routes
+# Admin Dashboard Routes
 @app.route('/admin')
 @login_required
 @admin_required
 def admin_dashboard():
     users = User.get_all()
     
-    # Calculate stats
+    # Calculate general stats
     total_users = len(users)
     total_sms = sum(user.credits for user in users)
     
-    # Load campaigns for active count
+    # Calculate SMS statistics
+    with open(SMS_HISTORY_FILE, 'r') as f:
+        history = json.load(f)
+        
+    total_messages = len(history)
+    success_messages = len([sms for sms in history if sms.get('status') == 'success'])
+    success_rate = int((success_messages / total_messages * 100) if total_messages > 0 else 0)
+    
+    # Calculate campaign statistics
     with open(CAMPAIGNS_FILE, 'r') as f:
         campaigns = json.load(f)
     active_campaigns = len(campaigns)
     
-    # Load SMS history for success rate
-    with open(SMS_HISTORY_FILE, 'r') as f:
-        history = json.load(f)
-        if history:
-            success_count = len([sms for sms in history if sms.get('status') == 'success'])
-            success_rate = int((success_count / len(history)) * 100) if history else 0
-        else:
-            success_rate = 0
+    # Get recent activity
+    recent_messages = sorted(
+        history, 
+        key=lambda x: x.get('timestamp', ''), 
+        reverse=True
+    )[:10]
     
     stats = {
         'total_users': total_users,
         'total_sms': total_sms,
         'active_campaigns': active_campaigns,
-        'success_rate': success_rate
+        'success_rate': success_rate,
+        'total_messages': total_messages,
+        'success_messages': success_messages
     }
     
-    return render_template('admin/dashboard.html', users=users, stats=stats)
+    return render_template(
+        'admin/dashboard.html',
+        users=users,
+        stats=stats,
+        recent_activity=recent_messages
+    )
 
-# User management API routes
+# User Management API Routes
+@app.route('/api/users', methods=['GET'])
+@login_required
+@admin_required
+def get_users():
+    users = User.get_all()
+    return jsonify([{
+        'id': user.id,
+        'username': user.username,
+        'is_admin': user.is_admin,
+        'credits': user.credits
+    } for user in users])
+
 @app.route('/api/users', methods=['POST'])
 @login_required
 @admin_required
@@ -146,7 +186,7 @@ def create_user():
     try:
         data = request.get_json()
         if not data or not all(k in data for k in ['username', 'password']):
-            return handle_api_error('Username and password are required')
+            return handle_api_error('Nome de usuário e senha são obrigatórios')
         
         user = User.create(
             username=data['username'],
@@ -156,15 +196,16 @@ def create_user():
         )
         
         if not user:
-            return handle_api_error('Failed to create user')
+            return handle_api_error('Falha ao criar usuário')
             
         return jsonify({
             'success': True,
-            'message': 'User created successfully'
+            'message': 'Usuário criado com sucesso'
         })
         
     except Exception as e:
-        return handle_api_error(f'Error creating user: {str(e)}')
+        logger.error(f"Error creating user: {str(e)}")
+        return handle_api_error(f'Erro ao criar usuário: {str(e)}')
 
 @app.route('/api/users/<user_id>', methods=['DELETE'])
 @login_required
@@ -173,19 +214,20 @@ def delete_user(user_id):
     try:
         # Don't allow deleting self
         if current_user.id == user_id:
-            return handle_api_error('Cannot delete your own account')
+            return handle_api_error('Não é possível excluir sua própria conta')
         
         success = User.delete(user_id)
         if not success:
-            return handle_api_error('Failed to delete user')
+            return handle_api_error('Falha ao excluir usuário')
             
         return jsonify({
             'success': True,
-            'message': 'User deleted successfully'
+            'message': 'Usuário excluído com sucesso'
         })
         
     except Exception as e:
-        return handle_api_error(f'Error deleting user: {str(e)}')
+        logger.error(f"Error deleting user: {str(e)}")
+        return handle_api_error(f'Erro ao excluir usuário: {str(e)}')
 
 @app.route('/api/users/<user_id>/credits', methods=['POST'])
 @login_required
@@ -194,11 +236,11 @@ def manage_credits(user_id):
     try:
         data = request.get_json()
         if not data or 'amount' not in data or 'operation' not in data:
-            return handle_api_error('Amount and operation are required')
+            return handle_api_error('Quantidade e operação são obrigatórios')
         
         user = User.get(user_id)
         if not user:
-            return handle_api_error('User not found', 404)
+            return handle_api_error('Usuário não encontrado', 404)
             
         amount = int(data['amount'])
         operation = data['operation']
@@ -208,35 +250,106 @@ def manage_credits(user_id):
         elif operation == 'remove':
             success = user.deduct_credits(amount)
         else:
-            return handle_api_error('Invalid operation')
+            return handle_api_error('Operação inválida')
             
         if not success:
-            return handle_api_error('Failed to update credits')
+            return handle_api_error('Falha ao atualizar créditos')
             
         return jsonify({
             'success': True,
-            'message': f'Credits {"added to" if operation == "add" else "removed from"} user successfully',
+            'message': f'Créditos {"adicionados" if operation == "add" else "removidos"} com sucesso',
             'new_credits': user.credits
         })
         
     except Exception as e:
         logger.error(f"Error managing credits: {str(e)}")
-        return handle_api_error(f'Error managing credits: {str(e)}')
+        return handle_api_error(f'Erro ao gerenciar créditos: {str(e)}')
 
-# Error handlers
+# Error Handlers
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('error.html', error={
         'code': 404,
-        'description': 'Page not found'
+        'description': 'Página não encontrada'
     }), 404
 
 @app.errorhandler(500)
 def internal_error(error):
     return render_template('error.html', error={
         'code': 500,
-        'description': 'Internal server error'
+        'description': 'Erro interno do servidor'
     }), 500
+
+# Integration API Routes (From manager's message)
+@app.route('/api/integrations', methods=['GET'])
+@login_required
+def get_integrations():
+    try:
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_integrations = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_integrations = [i for i in all_integrations if i.get('user_id') == current_user.id]
+        return jsonify(user_integrations)
+    except Exception as e:
+        logger.error(f"Error loading integrations: {str(e)}")
+        return handle_api_error('Failed to load integrations')
+
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def create_integration():
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data:
+            return handle_api_error('Integration name is required')
+            
+        integration = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations.append(integration)
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration created successfully',
+            'integration': integration
+        })
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}")
+        return handle_api_error('Failed to create integration')
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+@login_required
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations = [i for i in integrations if i['id'] != integration_id or i.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}")
+        return handle_api_error('Failed to delete integration')
 
 if __name__ == '__main__':
     ensure_data_files()
