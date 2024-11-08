@@ -33,6 +33,7 @@ TRANSACTIONS_FILE = 'data/transactions.json'
 SMS_HISTORY_FILE = 'data/sms_history.json'
 
 def ensure_data_files():
+    """Ensure all required data files exist"""
     if not os.path.exists('data'):
         os.makedirs('data')
     for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, TRANSACTIONS_FILE, SMS_HISTORY_FILE]:
@@ -41,12 +42,14 @@ def ensure_data_files():
                 json.dump([], f)
 
 def handle_api_error(message, status_code=400):
+    """Handle API errors consistently"""
     return jsonify({
         'success': False,
         'error': message
     }), status_code
 
 def admin_required(f):
+    """Decorator to require admin access"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
@@ -304,6 +307,67 @@ def internal_error(error):
         'code': 500,
         'description': 'Erro interno do servidor'
     }), 500
+
+# API Routes
+@app.route('/api/send-sms', methods=['POST'])
+@login_required
+def send_sms():
+    try:
+        # Check user credits
+        if not current_user.has_sufficient_credits(1):
+            return handle_api_error('Créditos insuficientes para enviar SMS')
+            
+        data = request.get_json()
+        if not data or not all(k in data for k in ['phone', 'message']):
+            return handle_api_error('Número de telefone e mensagem são obrigatórios')
+        
+        # Format phone number
+        phone = data['phone']
+        if not phone.startswith('+55'):
+            phone = f'+55{phone}'
+            
+        # Remove any non-numeric characters except +
+        phone = re.sub(r'[^\d+]', '', phone)
+        
+        # Deduct credits before sending
+        if not current_user.deduct_credits(1):
+            return handle_api_error('Falha ao deduzir créditos')
+            
+        # Queue SMS task
+        task = send_sms_task.delay(
+            phone=phone,
+            message=data['message'],
+            event_type='manual'
+        )
+        
+        # Log to SMS history
+        with open(SMS_HISTORY_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            history = json.load(f)
+            history.append({
+                'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'phone': phone,
+                'message': data['message'],
+                'type': 'manual',
+                'status': 'pending',
+                'user_id': current_user.id
+            })
+            f.seek(0)
+            json.dump(history, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        
+        return jsonify({
+            'success': True,
+            'message': 'SMS enviado com sucesso',
+            'credits_remaining': current_user.credits
+        })
+        
+    except Exception as e:
+        logger.error(f"Error sending SMS: {str(e)}")
+        # Refund credit if SMS failed to queue
+        current_user.add_credits(1)
+        return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
 
 # Integration API Routes
 @app.route('/api/integrations', methods=['GET'])
