@@ -4,7 +4,7 @@ import uuid
 import fcntl
 import logging
 import datetime
-import re  # Added for URL-safe name formatting
+import re
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -38,6 +38,17 @@ def ensure_data_files():
             with open(file_path, 'w') as f:
                 json.dump([], f)
 
+def calculate_success_rate():
+    try:
+        with open(SMS_HISTORY_FILE, 'r') as f:
+            history = json.load(f)
+            if not history:
+                return 0
+            success_count = sum(1 for sms in history if sms.get('status') == 'success')
+            return round((success_count / len(history)) * 100)
+    except Exception:
+        return 0
+
 def handle_api_error(message, status_code=400):
     return jsonify({
         'success': False,
@@ -57,7 +68,95 @@ def admin_required(f):
 def load_user(user_id):
     return User.get(user_id)
 
-# Routes
+# Admin routes
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    try:
+        # Get system stats
+        stats = {
+            'total_users': len(User.get_all()),
+            'total_sms': len(json.load(open(SMS_HISTORY_FILE))),
+            'active_campaigns': len(json.load(open(CAMPAIGNS_FILE))),
+            'success_rate': calculate_success_rate()
+        }
+        return render_template('admin/dashboard.html', stats=stats, users=User.get_all())
+    except Exception as e:
+        logger.error(f"Error loading admin dashboard: {str(e)}")
+        return render_template('error.html', error='Error loading admin dashboard')
+
+@app.route('/api/users', methods=['POST'])
+@admin_required
+def create_user():
+    try:
+        data = request.get_json()
+        if not all(k in data for k in ['username', 'password']):
+            return handle_api_error('Missing required fields')
+            
+        user = User.create(
+            username=data['username'],
+            password=data['password'],
+            is_admin=data.get('is_admin', False),
+            credits=int(data.get('credits', 0))
+        )
+        
+        if not user:
+            return handle_api_error('Username already exists')
+            
+        return jsonify({
+            'success': True,
+            'message': 'User created successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error creating user: {str(e)}")
+        return handle_api_error('Failed to create user')
+
+@app.route('/api/users/<user_id>/credits', methods=['POST'])
+@admin_required
+def manage_credits(user_id):
+    try:
+        data = request.get_json()
+        if not all(k in data for k in ['amount', 'operation']):
+            return handle_api_error('Missing required fields')
+            
+        user = User.get(user_id)
+        if not user:
+            return handle_api_error('User not found')
+            
+        amount = int(data['amount'])
+        if data['operation'] == 'add':
+            success = user.add_credits(amount)
+        else:
+            success = user.deduct_credits(amount)
+            
+        if not success:
+            return handle_api_error('Failed to update credits')
+            
+        return jsonify({
+            'success': True,
+            'message': 'Credits updated successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error managing credits: {str(e)}")
+        return handle_api_error('Failed to update credits')
+
+@app.route('/api/users/<user_id>', methods=['DELETE'])
+@admin_required
+def delete_user(user_id):
+    try:
+        if current_user.id == user_id:
+            return handle_api_error('Cannot delete your own account')
+            
+        if User.delete(user_id):
+            return jsonify({
+                'success': True,
+                'message': 'User deleted successfully'
+            })
+        return handle_api_error('Failed to delete user')
+    except Exception as e:
+        logger.error(f"Error deleting user: {str(e)}")
+        return handle_api_error('Failed to delete user')
+
 @app.route('/')
 def index():
     if not current_user.is_authenticated:
@@ -486,11 +585,6 @@ def payment(customer_name, transaction_id):
         logger.error(f"Error loading payment page: {str(e)}")
         return render_template('error.html', error='Error loading payment page')
 
-# Admin routes
-@app.route('/admin')
-@login_required
-def admin():
-    return render_template('admin/dashboard.html')
-
 if __name__ == '__main__':
+    ensure_data_files()
     app.run(host='0.0.0.0', port=5000, debug=True)
