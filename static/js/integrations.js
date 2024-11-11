@@ -18,7 +18,7 @@ async function loadIntegrations() {
         const response = await fetch('/api/integrations');
         if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.error || `Erro HTTP: ${response.status}`);
+            throw new Error(data.message || `Erro HTTP: ${response.status}`);
         }
         
         const integrations = await response.json();
