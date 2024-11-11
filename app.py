@@ -275,6 +275,133 @@ def delete_integration(integration_id):
         logger.error(f"Error deleting integration: {str(e)}")
         return handle_api_error('Falha ao excluir integração')
 
+# Campaign API Routes
+@app.route('/api/campaigns', methods=['GET'])
+@login_required
+def get_campaigns():
+    try:
+        ensure_data_files()
+        with open(CAMPAIGNS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_campaigns = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        # Filter campaigns for current user
+        user_campaigns = [c for c in all_campaigns if c.get('user_id') == current_user.id]
+        return jsonify(user_campaigns)
+    except Exception as e:
+        logger.error(f"Error loading campaigns: {str(e)}")
+        return handle_api_error('Falha ao carregar campanhas')
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'message_template']):
+            return handle_api_error('Campos obrigatórios faltando')
+            
+        # Verify integration belongs to user
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+            integration = next((i for i in integrations if i['id'] == data['integration_id']), None)
+            
+        if not integration or integration.get('user_id') != current_user.id:
+            return handle_api_error('Integração inválida')
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        ensure_data_files()
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campanha criada com sucesso',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Falha ao criar campanha')
+
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+@login_required
+def delete_campaign(campaign_id):
+    try:
+        ensure_data_files()
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            # Only delete if campaign belongs to current user
+            campaigns = [c for c in campaigns if c['id'] != campaign_id or c.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campanha excluída com sucesso'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return handle_api_error('Falha ao excluir campanha')
+
+@app.route('/api/campaigns/<campaign_id>', methods=['PUT'])
+@login_required
+def update_campaign(campaign_id):
+    try:
+        data = request.get_json()
+        if not data:
+            return handle_api_error('Dados inválidos')
+            
+        ensure_data_files()
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            
+            # Find campaign and verify ownership
+            campaign = next((c for c in campaigns if c['id'] == campaign_id and c.get('user_id') == current_user.id), None)
+            if not campaign:
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                return handle_api_error('Campanha não encontrada', 404)
+            
+            # Update fields
+            campaign.update({
+                'name': data.get('name', campaign['name']),
+                'event_type': data.get('event_type', campaign['event_type']),
+                'message_template': data.get('message_template', campaign['message_template'])
+            })
+            
+            # Save changes
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campanha atualizada com sucesso',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error updating campaign: {str(e)}")
+        return handle_api_error('Falha ao atualizar campanha')
+
 # Error Handlers
 @app.errorhandler(404)
 def page_not_found(e):
