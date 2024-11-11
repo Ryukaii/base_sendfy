@@ -402,6 +402,80 @@ def update_campaign(campaign_id):
         logger.error(f"Error updating campaign: {str(e)}")
         return handle_api_error('Falha ao atualizar campanha')
 
+# SMS API Routes
+@app.route('/api/send-sms', methods=['POST'])
+@login_required
+def send_sms():
+    try:
+        # Check user credits
+        if not current_user.has_sufficient_credits(1):
+            return handle_api_error('Créditos insuficientes para enviar SMS')
+            
+        data = request.get_json()
+        if not data or not all(k in data for k in ['phone', 'message']):
+            return handle_api_error('Número de telefone e mensagem são obrigatórios')
+        
+        # Format phone number
+        phone = data['phone'].strip()
+        phone = re.sub(r'[^\d+]', '', phone)  # Remove non-numeric chars except +
+        
+        # Add country code if missing
+        if not phone.startswith('+55'):
+            phone = f'+55{phone}'
+            
+        # Validate phone number format
+        if not re.match(r'^\+55\d{10,11}$', phone):
+            return handle_api_error('Número de telefone inválido. Use o formato: DDD + número')
+            
+        # Validate message length
+        if len(data['message']) > 160:
+            return handle_api_error('Mensagem muito longa (máximo 160 caracteres)')
+            
+        # Deduct credits before sending
+        if not current_user.deduct_credits(1):
+            return handle_api_error('Erro ao deduzir créditos')
+            
+        try:
+            # Queue SMS task
+            task = send_sms_task.delay(
+                phone=phone,
+                message=data['message'],
+                event_type='manual'
+            )
+            
+            # Log to SMS history
+            with open(SMS_HISTORY_FILE, 'r+') as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                history = json.load(f)
+                history.append({
+                    'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'phone': phone,
+                    'message': data['message'],
+                    'type': 'manual',
+                    'status': 'pending',
+                    'user_id': current_user.id
+                })
+                f.seek(0)
+                json.dump(history, f, indent=2)
+                f.truncate()
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+            return jsonify({
+                'success': True,
+                'message': 'SMS enviado com sucesso',
+                'credits_remaining': current_user.credits
+            })
+            
+        except Exception as e:
+            # Refund credit if SMS failed to queue
+            current_user.add_credits(1)
+            logger.error(f"Error queueing SMS: {str(e)}")
+            return handle_api_error('Erro ao enviar SMS. Sistema temporariamente indisponível.')
+            
+    except Exception as e:
+        logger.error(f"Error in send_sms endpoint: {str(e)}")
+        return handle_api_error('Erro ao processar requisição')
+
 # Error Handlers
 @app.errorhandler(404)
 def page_not_found(e):
