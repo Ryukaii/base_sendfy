@@ -1,4 +1,15 @@
-async function sendSMS(phone, message) {
+// Handle form submission
+document.getElementById('smsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Enviando...`;
+    
+    const phone = document.getElementById('phone').value;
+    const message = document.getElementById('message').value;
+    
     try {
         const response = await fetch('/api/send-sms', {
             method: 'POST',
@@ -15,22 +26,25 @@ async function sendSMS(phone, message) {
         }
         
         showToast('success', 'SMS enviado com sucesso');
-        document.getElementById('smsForm').reset();
+        e.target.reset();
         
-        // Update credits display if available
+        // Update credits display
         if (data.credits_remaining !== undefined) {
-            const creditsElement = document.querySelector('.nav-link span:contains("Créditos:")');
-            if (creditsElement) {
-                creditsElement.textContent = `Créditos: ${data.credits_remaining}`;
+            const creditsSpan = document.querySelector('.nav-link span');
+            if (creditsSpan && creditsSpan.textContent.includes('Créditos:')) {
+                creditsSpan.textContent = `Créditos: ${data.credits_remaining}`;
             }
         }
     } catch (error) {
         console.error('Erro:', error);
         showToast('error', error.message || 'Erro ao enviar SMS. Por favor, tente novamente.');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
     }
-}
+});
 
-// Update showToast function to handle longer messages
+// Update showToast function
 function showToast(type, message) {
     const toastDiv = document.createElement('div');
     toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
@@ -58,26 +72,6 @@ function showToast(type, message) {
         toastDiv.remove();
     });
 }
-
-// Handle form submission
-document.getElementById('smsForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Enviando...`;
-    
-    try {
-        await sendSMS(
-            document.getElementById('phone').value,
-            document.getElementById('message').value
-        );
-    } finally {
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
-    }
-});
 
 // Format phone number as user types
 document.getElementById('phone').addEventListener('input', (e) => {
