@@ -30,5 +30,12 @@
     "webhook_url": "/webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc",
     "user_id": "2",
     "created_at": "2024-11-07 02:27:25"
+  },
+  {
+    "id": "3e1c7eaf-432d-4fca-bc00-47db4828fb84",
+    "name": "PENDENTE",
+    "webhook_url": "/webhook/14fbe77b-1685-4b0a-b49c-1dd0bb3116db",
+    "user_id": "1",
+    "created_at": "2024-11-11 21:37:21"
   }
 ]
