@@ -14,15 +14,23 @@ async function sendSMS(phone, message) {
             throw new Error(data.error || 'Erro ao enviar SMS');
         }
         
-        showToast('success', data.message);
+        showToast('success', 'SMS enviado com sucesso');
         document.getElementById('smsForm').reset();
-        updateCreditsDisplay(data.credits_remaining);
+        
+        // Update credits display if available
+        if (data.credits_remaining !== undefined) {
+            const creditsElement = document.querySelector('.nav-link span:contains("Créditos:")');
+            if (creditsElement) {
+                creditsElement.textContent = `Créditos: ${data.credits_remaining}`;
+            }
+        }
     } catch (error) {
         console.error('Erro:', error);
         showToast('error', error.message || 'Erro ao enviar SMS. Por favor, tente novamente.');
     }
 }
 
+// Update showToast function to handle longer messages
 function showToast(type, message) {
     const toastDiv = document.createElement('div');
     toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
@@ -39,8 +47,9 @@ function showToast(type, message) {
         </div>
     `;
     document.body.appendChild(toastDiv);
+    
     const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'), {
-        delay: 3000
+        delay: 5000 // Increase display time for error messages
     });
     toast.show();
     
@@ -48,13 +57,6 @@ function showToast(type, message) {
     toastDiv.addEventListener('hidden.bs.toast', () => {
         toastDiv.remove();
     });
-}
-
-function updateCreditsDisplay(credits) {
-    const creditsElement = document.querySelector('.nav-link .credits');
-    if (creditsElement) {
-        creditsElement.textContent = credits;
-    }
 }
 
 // Handle form submission
