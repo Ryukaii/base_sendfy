@@ -18,6 +18,13 @@
     "created_at": "2024-11-06 22:07:37"
   },
   {
+    "id": "7512a7b3-294b-45ac-9a13-15a7c28aa30b",
+    "name": "VEGA PENDENTE",
+    "webhook_url": "/webhook/8e1d4001-5e85-4ac1-9979-04469ff84e3c",
+    "user_id": "1",
+    "created_at": "2024-11-07 01:29:54"
+  },
+  {
     "id": "16851e8b-544d-4d90-ba77-f454c23ae6dd",
     "name": "pendente",
     "webhook_url": "/webhook/ee1ed3c8-6264-41f6-a9ae-0c41e2aefa20",
@@ -30,12 +37,5 @@
     "webhook_url": "/webhook/09af1e8a-2b1e-4666-9948-987c6435fdfc",
     "user_id": "2",
     "created_at": "2024-11-07 02:27:25"
-  },
-  {
-    "id": "3e1c7eaf-432d-4fca-bc00-47db4828fb84",
-    "name": "PENDENTE",
-    "webhook_url": "/webhook/14fbe77b-1685-4b0a-b49c-1dd0bb3116db",
-    "user_id": "1",
-    "created_at": "2024-11-11 21:37:21"
   }
 ]
