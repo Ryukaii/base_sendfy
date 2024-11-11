@@ -105,6 +105,21 @@ def logout():
     flash('Você foi desconectado', 'success')
     return redirect(url_for('login'))
 
+@app.route('/sms')
+@login_required
+def sms():
+    return render_template('sms.html')
+
+@app.route('/campaigns')
+@login_required
+def campaigns():
+    return render_template('campaigns.html')
+
+@app.route('/integrations')
+@login_required
+def integrations():
+    return render_template('integrations.html')
+
 def calculate_success_rate(sms_history):
     """Calculate the success rate of SMS messages"""
     if not sms_history:
