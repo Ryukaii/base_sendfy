@@ -539,7 +539,7 @@ def webhook_handler(webhook_path):
                 if status == 'pending':
                     # Format customer name for URL (remove spaces, special chars)
                     url_safe_name = re.sub(r'[^a-zA-Z0-9]', '', customer_data.get('name', ''))
-                    payment_url = f"https://sendfysms.replit.app/payment/{url_safe_name}/{transaction_id}"
+                    payment_url = f"{request.host_url}payment/{url_safe_name}/{transaction_id}"
                     message = message.replace('{link_pix}', payment_url)
                 
                 # Deduct credit and send SMS

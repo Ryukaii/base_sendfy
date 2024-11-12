@@ -1,199 +1,62 @@
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema Futurista</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #0a192f;
-            --secondary-color: #172a45;
-            --accent-color: #64ffda;
-            --text-color: #ccd6f6;
-        }
-        
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
-        
-        .card {
-            background-color: var(--secondary-color);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card-header {
-            background-color: var(--primary-color);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid var(--accent-color);
-        }
-        
-        .card-header h2 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-color);
-        }
-        
-        .card-body {
-            padding: 30px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-        
-        .input-group-text {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent-color);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 40px;
-            border: none;
-            border-radius: 25px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--accent-color);
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: var(--primary-color);
-        }
-        
-        .btn-primary:hover {
-            background-color: #45e0bc;
-        }
-        
-        .btn-outline-primary {
-            background-color: transparent;
-            border: 2px solid var(--accent-color);
-            color: var(--accent-color);
-        }
-        
-        .btn-outline-primary:hover {
-            background-color: var(--accent-color);
-            color: var(--primary-color);
-        }
-        
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            font-weight: 500;
-        }
-        
-        .alert-success {
-            background-color: rgba(40, 167, 69, 0.2);
-            border: 1px solid #28a745;
-            color: #28a745;
-        }
-        
-        .alert-danger {
-            background-color: rgba(220, 53, 69, 0.2);
-            border: 1px solid #dc3545;
-            color: #dc3545;
-        }
-        
-        .btn-close {
-            float: right;
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 1;
-            color: inherit;
-            opacity: 0.5;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
-                <h2>Acesso ao Sistema</h2>
-            </div>
-            <div class="card-body">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card bg-dark border-secondary shadow-lg">
+                <div class="card-header border-secondary text-center py-4">
+                    <h2 class="mb-0">Acesso ao Sistema</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('login') }}">
+                        <div class="mb-4">
+                            <label for="username" class="form-label">Usuário</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark border-secondary text-light" 
+                                       id="username" name="username" required
+                                       placeholder="Digite seu usuário" autofocus>
                             </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-                
-                <form method="POST" action="{{ url_for('login') }}">
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-user"></i>
-                        </span>
-                        <input type="text" class="form-control" id="username" name="username" required placeholder="Digite seu usuário" autofocus>
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-lock"></i>
-                        </span>
-                        <input type="password" class="form-control" id="password" name="password" required placeholder="Digite sua senha">
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Entrar
-                    </button>
-                    <a href="/register" class="btn btn-outline-primary" style="margin-top: 10px;">
-                        <i class="fas fa-user-plus"></i> Criar Conta
-                    </a>
-                </form>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Senha</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control bg-dark border-secondary text-light" 
+                                       id="password" name="password" required
+                                       placeholder="Digite sua senha">
+                            </div>
+                        </div>
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Entrar
+                            </button>
+                            <a href="/register" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>
+                                Criar Conta
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
