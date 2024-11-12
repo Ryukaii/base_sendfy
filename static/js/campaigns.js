@@ -1,21 +1,28 @@
-// Toast Notification Function
 function showToast(type, message) {
     const toastDiv = document.createElement('div');
-    toastDiv.className = 'fixed bottom-4 right-4 z-50 animate-fade-in';
+    toastDiv.className = 'position-fixed bottom-0 end-0 p-3';
+    toastDiv.style.zIndex = '5';
     toastDiv.innerHTML = `
-        <div class="rounded-lg shadow-lg p-4 mb-4 text-sm ${type === 'success' ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-red-900/50 text-red-400 border border-red-700'}">
-            <div class="flex items-center">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
-                ${message}
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>
     `;
     document.body.appendChild(toastDiv);
+    const toast = new bootstrap.Toast(toastDiv.querySelector('.toast'), {
+        delay: 3000
+    });
+    toast.show();
     
-    setTimeout(() => {
-        toastDiv.classList.add('animate-fade-out');
-        setTimeout(() => toastDiv.remove(), 300);
-    }, 3000);
+    // Remove toast element after it's hidden
+    toastDiv.addEventListener('hidden.bs.toast', () => {
+        toastDiv.remove();
+    });
 }
 
 function insertVariableEdit(variable) {
@@ -28,87 +35,74 @@ function insertVariableEdit(variable) {
 }
 
 async function loadCampaigns() {
-    const list = document.getElementById('campaignsList');
-    
-    // Show loading state
-    list.innerHTML = `
-        <div class="bg-surface p-6 rounded-xl border border-surface-light/20 text-center">
-            <div class="inline-block animate-spin">
-                <i class="fas fa-circle-notch text-primary text-xl"></i>
-            </div>
-            <p class="mt-2 text-gray-400">Carregando campanhas...</p>
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'text-center py-4';
+    loadingDiv.innerHTML = `
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
         </div>
+        <p class="mt-2">Carregando campanhas...</p>
     `;
+    
+    const list = document.getElementById('campaignsList');
+    list.innerHTML = '';
+    list.appendChild(loadingDiv);
     
     try {
         const [campaignsResponse, integrationsResponse] = await Promise.all([
-            fetch('/api/campaigns'),
-            fetch('/api/integrations')
-        ]);
-        
-        if (!campaignsResponse.ok || !integrationsResponse.ok) {
-            throw new Error('Erro ao carregar dados');
-        }
-        
-        const [campaigns, integrations] = await Promise.all([
-            campaignsResponse.json(),
-            integrationsResponse.json()
+            fetch('/api/campaigns').then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            }),
+            fetch('/api/integrations').then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
         ]);
         
         const integrationSelect = document.getElementById('integrationId');
-        integrationSelect.innerHTML = `
-            <option value="" class="bg-background text-gray-500">Selecione uma Integração</option>
-            ${integrations.map(integration => 
-                `<option value="${integration.id}" class="bg-background text-white">${integration.name}</option>`
-            ).join('')}
-        `;
+        integrationSelect.innerHTML = `<option value="">Selecione uma Integração</option>` + 
+            integrationsResponse.map(integration => 
+                `<option value="${integration.id}">${integration.name}</option>`
+            ).join('');
         
         list.innerHTML = '';
         
-        if (campaigns.length === 0) {
+        if (campaignsResponse.length === 0) {
             list.innerHTML = `
-                <div class="bg-surface p-6 rounded-xl border border-surface-light/20">
-                    <div class="flex items-center text-gray-400">
-                        <i class="fas fa-info-circle mr-3 text-xl"></i>
-                        <div>
-                            <h4 class="font-medium mb-1">Nenhuma campanha encontrada</h4>
-                            <p class="text-sm">Crie sua primeira campanha usando o formulário acima.</p>
-                        </div>
-                    </div>
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Nenhuma campanha encontrada. Crie sua primeira campanha usando o formulário acima.
                 </div>
             `;
             return;
         }
         
-        campaigns.forEach(campaign => {
-            const integration = integrations.find(i => i.id === campaign.integration_id);
+        campaignsResponse.forEach(campaign => {
+            const integration = integrationsResponse.find(i => i.id === campaign.integration_id);
             const div = document.createElement('div');
-            div.className = 'bg-surface p-6 rounded-xl border border-surface-light/20 hover:shadow-xl transition-all duration-300';
+            div.className = 'card mb-3';
             div.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div class="space-y-4">
-                        <h3 class="text-lg font-medium text-white">${campaign.name}</h3>
-                        <div class="space-y-2">
-                            <p class="text-sm text-gray-400">
-                                <strong class="text-gray-300">Integração:</strong> ${integration ? integration.name : 'Desconhecida'}
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">${campaign.name}</h5>
+                            <p class="card-text">
+                                <strong>Integração:</strong> ${integration ? integration.name : 'Desconhecida'}<br>
+                                <strong>Tipo de Evento:</strong> ${campaign.event_type}<br>
+                                <strong>Modelo de Mensagem:</strong><br>
+                                <code class="d-block p-2 bg-dark rounded mt-2">${campaign.message_template}</code>
                             </p>
-                            <p class="text-sm text-gray-400">
-                                <strong class="text-gray-300">Tipo de Evento:</strong> ${campaign.event_type}
-                            </p>
-                            <div class="mt-3">
-                                <strong class="text-gray-300 text-sm">Modelo de Mensagem:</strong>
-                                <code class="block mt-2 p-3 rounded-lg bg-background text-sm text-gray-300 font-mono">${campaign.message_template}</code>
-                            </div>
+                            <p class="card-text"><small class="text-muted">Criada em: ${campaign.created_at}</small></p>
                         </div>
-                        <p class="text-xs text-gray-500">Criada em: ${campaign.created_at}</p>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <button onclick="editCampaign('${campaign.id}')" class="px-3 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-sm transition-colors">
-                            <i class="fas fa-edit mr-1"></i> Editar
-                        </button>
-                        <button onclick="deleteCampaign('${campaign.id}')" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm transition-colors">
-                            <i class="fas fa-trash mr-1"></i> Excluir
-                        </button>
+                        <div class="d-flex flex-column gap-2">
+                            <button class="btn btn-sm btn-primary" onclick="editCampaign('${campaign.id}')">
+                                <i class="fas fa-edit me-1"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCampaign('${campaign.id}')">
+                                <i class="fas fa-trash me-1"></i> Excluir
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -117,17 +111,12 @@ async function loadCampaigns() {
     } catch (error) {
         console.error('Erro ao carregar dados:', error);
         list.innerHTML = `
-            <div class="bg-red-900/50 border border-red-700 rounded-xl p-6">
-                <div class="flex items-center text-red-400">
-                    <i class="fas fa-exclamation-circle mr-3 text-xl"></i>
-                    <div>
-                        <h4 class="font-medium mb-2">Erro ao carregar campanhas e integrações</h4>
-                        <p class="text-sm mb-3">${error.message}</p>
-                        <button onclick="loadCampaigns()" class="px-4 py-2 bg-red-800 hover:bg-red-700 rounded-lg text-sm transition-colors">
-                            <i class="fas fa-sync-alt mr-2"></i>Tentar novamente
-                        </button>
-                    </div>
-                </div>
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Erro ao carregar campanhas e integrações: ${error.message}
+                <button class="btn btn-outline-danger btn-sm ms-3" onclick="loadCampaigns()">
+                    <i class="fas fa-sync-alt me-1"></i> Tentar novamente
+                </button>
             </div>
         `;
     }
@@ -136,7 +125,7 @@ async function loadCampaigns() {
 async function editCampaign(campaignId) {
     try {
         const response = await fetch('/api/campaigns');
-        if (!response.ok) throw new Error('Erro ao carregar campanha');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const campaigns = await response.json();
         const campaign = campaigns.find(c => c.id === campaignId);
@@ -152,10 +141,10 @@ async function editCampaign(campaignId) {
         document.getElementById('editMessageTemplate').value = campaign.message_template;
         
         // Show modal
-        document.getElementById('editCampaignModal').classList.remove('hidden');
+        new bootstrap.Modal(document.getElementById('editCampaignModal')).show();
     } catch (error) {
         console.error('Erro ao carregar campanha para edição:', error);
-        showToast('error', error.message);
+        showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);
     }
 }
 
@@ -183,7 +172,7 @@ async function updateCampaign() {
         }
         
         // Hide modal
-        document.getElementById('editCampaignModal').classList.add('hidden');
+        bootstrap.Modal.getInstance(document.getElementById('editCampaignModal')).hide();
         
         showToast('success', 'Campanha atualizada com sucesso!');
         loadCampaigns();
@@ -199,10 +188,6 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
     const submitButton = e.target.querySelector('button[type="submit"]');
     const originalText = submitButton.innerHTML;
     submitButton.disabled = true;
-    submitButton.innerHTML = `
-        <i class="fas fa-circle-notch fa-spin mr-2"></i>
-        Criando...
-    `;
     
     const formData = {
         name: document.getElementById('campaignName').value,
@@ -243,15 +228,15 @@ async function deleteCampaign(campaignId) {
         return;
     }
     
-    const campaignCard = document.querySelector(`[onclick="deleteCampaign('${campaignId}')"]`).closest('.bg-surface');
+    const campaignCard = document.querySelector(`[onclick="deleteCampaign('${campaignId}')"]`).closest('.card');
     const originalContent = campaignCard.innerHTML;
     
     campaignCard.innerHTML = `
-        <div class="text-center py-4">
-            <div class="inline-block animate-spin">
-                <i class="fas fa-circle-notch text-red-400 text-xl"></i>
+        <div class="card-body text-center">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">Excluindo...</span>
             </div>
-            <p class="mt-2 text-gray-400">Excluindo campanha...</p>
+            <p class="mt-2">Excluindo campanha...</p>
         </div>
     `;
     
@@ -273,8 +258,6 @@ async function deleteCampaign(campaignId) {
             campaignCard.remove();
             loadCampaigns();
         }, 300);
-        
-        showToast('success', 'Campanha excluída com sucesso!');
     } catch (error) {
         console.error('Erro ao excluir campanha:', error);
         campaignCard.innerHTML = originalContent;

@@ -1,40 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="bg-gradient-to-br from-background-light to-surface p-6 rounded-2xl border border-surface-light/20 shadow-xl">
-        <h2 class="text-2xl font-bold mb-6 text-white">Histórico de SMS</h2>
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead>
-                    <tr class="border-b border-surface-light">
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Data/Hora</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Telefone</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Tipo</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mensagem</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-surface-light">
-                    {% for sms in sms_history %}
-                    <tr class="hover:bg-surface-light/10 transition-colors">
-                        <td class="px-6 py-4 text-sm text-gray-300">{{ sms.timestamp }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-300">{{ sms.phone }}</td>
-                        <td class="px-6 py-4 text-sm">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full {% if sms.type == 'manual' %}bg-blue-900/50 text-blue-400{% else %}bg-purple-900/50 text-purple-400{% endif %}">
-                                {{ 'Manual' if sms.type == 'manual' else 'Campanha' }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full {% if sms.status == 'success' %}bg-green-900/50 text-green-400{% else %}bg-red-900/50 text-red-400{% endif %}">
-                                {{ 'Sucesso' if sms.status == 'success' else 'Falha' }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-300">{{ sms.message }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header border-secondary">
+                    <h2 class="mb-0">Histórico de SMS</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Telefone</th>
+                                    <th>Tipo</th>
+                                    <th>Status</th>
+                                    <th>Mensagem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sms in sms_history %}
+                                <tr>
+                                    <td>{{ sms.timestamp }}</td>
+                                    <td>{{ sms.phone }}</td>
+                                    <td>
+                                        <span class="badge {% if sms.type == 'manual' %}bg-info{% else %}bg-primary{% endif %}">
+                                            {{ 'Manual' if sms.type == 'manual' else 'Campanha' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if sms.status == 'success' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ 'Sucesso' if sms.status == 'success' else 'Falha' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ sms.message }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
