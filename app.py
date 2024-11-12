@@ -422,6 +422,30 @@ def update_campaign(campaign_id):
         logger.error(f"Error updating campaign: {str(e)}")
         return handle_api_error('Failed to update campaign')
 
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+@login_required
+def delete_campaign(campaign_id):
+    try:
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            
+            # Only delete if campaign belongs to current user
+            campaigns = [c for c in campaigns if c['id'] != campaign_id or c.get('user_id') != current_user.id]
+            
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return handle_api_error('Failed to delete campaign')
+
 @app.route('/payment/<customer_name>/<transaction_id>')
 def payment(customer_name, transaction_id):
     try:
