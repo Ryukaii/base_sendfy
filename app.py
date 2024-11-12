@@ -290,11 +290,6 @@ def campaigns():
 def integrations():
     return render_template('integrations.html')
 
-@app.route('/integrations-and-campaigns')
-@login_required
-def integrations_and_campaigns():
-    return render_template('integrations_and_campaigns.html')
-
 @app.route('/api/campaigns', methods=['GET'])
 @login_required
 def get_campaigns():
@@ -310,6 +305,72 @@ def get_campaigns():
     except Exception as e:
         logger.error(f"Error loading campaigns: {str(e)}")
         return handle_api_error('Failed to load campaigns')
+
+@app.route('/api/campaigns', methods=['POST'])
+@login_required
+def create_campaign():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'message_template']):
+            return handle_api_error('Missing required fields')
+            
+        # Verify integration belongs to user
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+            integration = next((i for i in integrations if i['id'] == data['integration_id']), None)
+            
+        if not integration or integration.get('user_id') != current_user.id:
+            return handle_api_error('Invalid integration ID')
+            
+        campaign = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'integration_id': data['integration_id'],
+            'event_type': data['event_type'],
+            'message_template': data['message_template'],
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            campaigns.append(campaign)
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign created successfully',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error creating campaign: {str(e)}")
+        return handle_api_error('Failed to create campaign')
+
+@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
+@login_required
+def delete_campaign(campaign_id):
+    try:
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            # Only delete if campaign belongs to current user
+            campaigns = [c for c in campaigns if c['id'] != campaign_id or c.get('user_id') != current_user.id]
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting campaign: {str(e)}")
+        return handle_api_error('Failed to delete campaign')
 
 @app.route('/api/integrations', methods=['GET'])
 @login_required
@@ -368,10 +429,8 @@ def delete_integration(integration_id):
         with open(INTEGRATIONS_FILE, 'r+') as f:
             fcntl.flock(f.fileno(), fcntl.LOCK_EX)
             integrations = json.load(f)
-            
             # Only delete if integration belongs to current user
             integrations = [i for i in integrations if i['id'] != integration_id or i.get('user_id') != current_user.id]
-            
             f.seek(0)
             json.dump(integrations, f, indent=2)
             f.truncate()
@@ -385,66 +444,128 @@ def delete_integration(integration_id):
         logger.error(f"Error deleting integration: {str(e)}")
         return handle_api_error('Failed to delete integration')
 
-@app.route('/api/campaigns/<campaign_id>', methods=['PUT'])
-@login_required
-def update_campaign(campaign_id):
+@app.route('/webhook/<path:webhook_path>', methods=['POST'])
+def webhook_handler(webhook_path):
     try:
-        data = request.get_json()
-        if not data or not all(k in data for k in ['name', 'event_type', 'message_template']):
-            return handle_api_error('Missing required fields')
+        webhook_data = request.get_json()
+        logger.debug(f"Received webhook data: {webhook_data}")
+        
+        # Find integration with matching webhook URL
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            integrations = json.load(f)
+            integration = next((i for i in integrations if webhook_path in i['webhook_url']), None)
+        
+        if not integration:
+            logger.error(f"No integration found for webhook path: {webhook_path}")
+            return handle_api_error('Integration not found', 404)
             
-        with open(CAMPAIGNS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+        # Get user who owns the integration
+        user = User.get(integration['user_id'])
+        if not user:
+            logger.error(f"User not found for integration {integration['id']}")
+            return handle_api_error('Integration owner not found', 404)
+            
+        # Load campaigns for this integration
+        with open(CAMPAIGNS_FILE, 'r') as f:
             campaigns = json.load(f)
             
-            # Find and update campaign if it belongs to current user
-            campaign = next((c for c in campaigns if c['id'] == campaign_id and c.get('user_id') == current_user.id), None)
-            if not campaign:
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-                return handle_api_error('Campaign not found')
-            
-            # Update fields
-            campaign['name'] = data['name']
-            campaign['event_type'] = data['event_type']
-            campaign['message_template'] = data['message_template']
-            
-            f.seek(0)
-            json.dump(campaigns, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({
-            'success': True,
-            'message': 'Campaign updated successfully',
-            'campaign': campaign
-        })
-    except Exception as e:
-        logger.error(f"Error updating campaign: {str(e)}")
-        return handle_api_error('Failed to update campaign')
+        # Get status from webhook data
+        status = webhook_data.get('status', 'pending').lower()
+        
+        # Find matching campaigns for this status
+        matching_campaigns = [
+            c for c in campaigns 
+            if c['integration_id'] == integration['id'] 
+            and c['event_type'].lower() == status
+            and c['user_id'] == user.id
+        ]
+        
+        if not matching_campaigns:
+            logger.warning(f"No campaigns found for integration {integration['id']} and status {status}")
+            return jsonify({
+                'success': True,
+                'message': 'No matching campaigns found for this event type'
+            })
 
-@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
-@login_required
-def delete_campaign(campaign_id):
-    try:
-        with open(CAMPAIGNS_FILE, 'r+') as f:
+        # Create transaction record
+        transaction_id = str(uuid.uuid4())[:8]
+        customer_data = webhook_data.get('customer', {})
+        
+        transaction = {
+            'transaction_id': transaction_id,
+            'customer_name': customer_data.get('name', ''),
+            'customer_phone': customer_data.get('phone', ''),
+            'customer_email': customer_data.get('email', ''),
+            'product_name': webhook_data.get('product_name', ''),
+            'total_price': webhook_data.get('total_price', '0.00'),
+            'pix_code': webhook_data.get('pix_code', ''),
+            'status': status,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # Save transaction
+        with open(TRANSACTIONS_FILE, 'r+') as f:
             fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            
-            # Only delete if campaign belongs to current user
-            campaigns = [c for c in campaigns if c['id'] != campaign_id or c.get('user_id') != current_user.id]
-            
+            transactions = json.load(f)
+            transactions.append(transaction)
             f.seek(0)
-            json.dump(campaigns, f, indent=2)
+            json.dump(transactions, f, indent=2)
             f.truncate()
             fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
+
+        success_count = 0
+        # Send SMS for each matching campaign
+        for campaign in matching_campaigns:
+            try:
+                if not user.has_sufficient_credits(1):
+                    logger.warning(f"User {user.id} has insufficient credits for campaign {campaign['id']}")
+                    continue
+                    
+                # Get first name
+                full_name = customer_data.get('name', '')
+                first_name = full_name.split()[0] if full_name else ''
+                
+                # Format phone number
+                phone = customer_data.get('phone', '')
+                if not phone.startswith('+55'):
+                    phone = f'+55{phone}'
+                
+                # Format message
+                message = campaign['message_template']
+                message = message.replace('{customer.first_name}', first_name)
+                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
+                
+                # Add PIX link only for pending status
+                if status == 'pending':
+                    # Format customer name for URL (remove spaces, special chars)
+                    url_safe_name = re.sub(r'[^a-zA-Z0-9]', '', customer_data.get('name', ''))
+                    payment_url = f"{request.host_url}payment/{url_safe_name}/{transaction_id}"
+                    message = message.replace('{link_pix}', payment_url)
+                
+                # Deduct credit and send SMS
+                if user.deduct_credits(1):
+                    send_sms_task.delay(
+                        phone=phone,
+                        message=message,
+                        event_type=campaign['event_type']
+                    )
+                    success_count += 1
+                    logger.info(f"SMS queued for campaign {campaign['id']}")
+                
+            except Exception as e:
+                logger.error(f"Error sending SMS for campaign {campaign['id']}: {str(e)}")
+                # Refund credit if SMS failed to queue
+                user.add_credits(1)
+
         return jsonify({
             'success': True,
-            'message': 'Campaign deleted successfully'
+            'message': f'Webhook processed successfully. Sent {success_count} messages',
+            'transaction_id': transaction_id
         })
+
     except Exception as e:
-        logger.error(f"Error deleting campaign: {str(e)}")
-        return handle_api_error('Failed to delete campaign')
+        logger.error(f"Error processing webhook: {str(e)}")
+        return handle_api_error('Error processing webhook')
 
 @app.route('/payment/<customer_name>/<transaction_id>')
 def payment(customer_name, transaction_id):

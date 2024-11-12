@@ -28,7 +28,7 @@
     "name": "VEGA",
     "integration_id": "7512a7b3-294b-45ac-9a13-15a7c28aa30b",
     "event_type": "pending",
-    "message_template": "{customer.first_name} efetue o pagamento {link_pix}",
+    "message_template": "{customer.first_name}",
     "user_id": "1",
     "created_at": "2024-11-07 01:33:09"
   },

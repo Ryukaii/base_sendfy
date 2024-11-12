@@ -2,57 +2,59 @@
 
 {% block content %}
 <div class="container">
-    <div class="auth-form">
-        <div class="card">
-            <div class="card-header text-center py-4">
-                <h2 class="mb-0">Acesso ao Sistema</h2>
-            </div>
-            <div class="card-body p-4">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card bg-dark border-secondary shadow-lg">
+                <div class="card-header border-secondary text-center py-4">
+                    <h2 class="mb-0">Acesso ao Sistema</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('login') }}">
+                        <div class="mb-4">
+                            <label for="username" class="form-label">Usuário</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark border-secondary text-light" 
+                                       id="username" name="username" required
+                                       placeholder="Digite seu usuário" autofocus>
                             </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-                
-                <form method="POST" action="{{ url_for('login') }}">
-                    <div class="mb-4">
-                        <label for="username" class="form-label">Usuário</label>
-                        <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-user"></i>
-                            </span>
-                            <input type="text" class="form-control" 
-                                   id="username" name="username" required
-                                   placeholder="Digite seu usuário" autofocus>
                         </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Senha</label>
-                        <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-lock"></i>
-                            </span>
-                            <input type="password" class="form-control" 
-                                   id="password" name="password" required
-                                   placeholder="Digite sua senha">
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Senha</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control bg-dark border-secondary text-light" 
+                                       id="password" name="password" required
+                                       placeholder="Digite sua senha">
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-grid gap-3">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt me-2"></i>
-                            Entrar
-                        </button>
-                        <a href="/register" class="btn btn-outline-primary">
-                            <i class="fas fa-user-plus me-2"></i>
-                            Criar Conta
-                        </a>
-                    </div>
-                </form>
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Entrar
+                            </button>
+                            <a href="/register" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>
+                                Criar Conta
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
