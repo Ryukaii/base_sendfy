@@ -1,21 +1,27 @@
 /* Custom styles */
 :root {
-    --card-hover-transform: translateY(-5px);
-    --card-transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    --primary-color: #2563eb;
+    --secondary-color: #1e40af;
+    --success-color: #059669;
+    --danger-color: #dc2626;
+    --background-color: #0f172a;
+    --card-bg: #1e293b;
+    --border-color: #334155;
 }
 
 body {
+    background: var(--background-color);
+    font-family: 'Inter', sans-serif;
     min-height: 100vh;
-    background-color: var(--bs-dark) !important;
-    color: var(--bs-light) !important;
+    color: #fff;
 }
 
 /* Navbar Styles */
 .navbar {
     box-shadow: 0 2px 8px rgba(0,0,0,.2);
     padding: 1rem 0;
-    background-color: var(--bs-dark) !important;
-    border-bottom: 1px solid var(--bs-gray-800);
+    background-color: rgba(15,23,42,0.8) !important;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .navbar-logo {
@@ -28,6 +34,15 @@ body {
 .navbar-brand {
     font-weight: 600;
     font-size: 1.5rem;
+}
+
+.navbar-brand img {
+    height: 40px;
+    transition: transform 0.2s;
+}
+
+.navbar-brand img:hover {
+    transform: scale(1.05);
 }
 
 .nav-link {
@@ -60,15 +75,15 @@ body {
 
 /* Card Styles */
 .card {
-    transition: var(--card-transition);
-    border: 1px solid var(--bs-gray-800);
-    background-color: var(--bs-dark);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
     margin-bottom: 1.5rem;
 }
 
 .card:hover {
-    transform: var(--card-hover-transform);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.3)!important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
 .card-header {
@@ -83,17 +98,17 @@ body {
 
 /* Form Styles */
 .form-control, .form-select {
-    background-color: var(--bs-gray-900);
-    border: 1px solid var(--bs-gray-700);
-    color: var(--bs-light);
-    transition: all 0.2s ease-in-out;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+    color: #fff;
 }
 
 .form-control:focus, .form-select:focus {
-    background-color: var(--bs-gray-800);
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
-    color: var(--bs-light);
+    background: var(--background-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+    color: #fff;
 }
 
 .input-group-text {
@@ -109,29 +124,36 @@ body {
 
 /* Button Styles */
 .btn {
-    padding: 0.5rem 1.5rem;
+    transition: all 0.2s;
     font-weight: 500;
-    transition: all 0.2s ease-in-out;
+    padding: 0.5rem 1.25rem;
     border-width: 2px;
 }
 
 .btn-primary {
-    box-shadow: 0 4px 6px rgba(var(--bs-primary-rgb), 0.2);
+    background: var(--primary-color);
+    border: none;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(var(--bs-primary-rgb), 0.3);
+    background: var(--secondary-color);
+    transform: translateY(-1px);
 }
 
 /* Table Styles */
 .table {
     color: var(--bs-light);
     margin-bottom: 0;
+    border-color: var(--border-color);
+    color: #fff;
 }
 
 .table > :not(caption) > * > * {
     border-bottom-color: var(--bs-gray-800);
+}
+
+.table th {
+    border-bottom-width: 2px;
 }
 
 .table-dark {
@@ -141,16 +163,12 @@ body {
 
 /* Modal Styles */
 .modal-content {
-    background-color: var(--bs-dark);
-    border: 1px solid var(--bs-gray-800);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
 }
 
-.modal-header {
-    border-bottom: 1px solid var(--bs-gray-800);
-}
-
-.modal-footer {
-    border-top: 1px solid var(--bs-gray-800);
+.modal-header, .modal-footer {
+    border-color: var(--border-color);
 }
 
 /* Alert Styles */
@@ -165,6 +183,39 @@ body {
 .badge {
     padding: 0.5em 0.8em;
     font-weight: 500;
+}
+
+/* Loading animations */
+.loading-skeleton {
+    animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: var(--border-color);
+    }
+    100% {
+        background-color: var(--card-bg);
+    }
+}
+
+/* Fade transitions */
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity 200ms ease-in;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
 }
 
 /* Responsive Adjustments */
@@ -197,4 +248,36 @@ body {
     .table-responsive {
         margin: 0 -1rem;
     }
+}
+
+/* Admin dashboard specific styles */
+.stats-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(37,99,235,0.1) 100%);
+    border: 1px solid rgba(37,99,235,0.2);
+}
+
+.stats-card:hover {
+    border-color: var(--primary-color);
+}
+
+.stats-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(37,99,235,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.stats-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.stats-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.875rem;
 }
