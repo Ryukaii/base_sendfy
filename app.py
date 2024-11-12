@@ -161,40 +161,7 @@ def delete_user(user_id):
 def index():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
-        
-    try:
-        # Load SMS history
-        with open(SMS_HISTORY_FILE, 'r') as f:
-            all_history = json.load(f)
-            sms_history = [
-                sms for sms in all_history 
-                if sms.get('user_id') == current_user.id
-            ]
-            sms_history.reverse()  # Most recent first
-            sms_history = sms_history[:10]  # Only show last 10
-            
-        # Load campaigns
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            all_campaigns = json.load(f)
-            user_campaigns = [
-                c for c in all_campaigns 
-                if c.get('user_id') == current_user.id
-            ]
-            
-        # Calculate statistics
-        sms_total = len([sms for sms in all_history if sms.get('user_id') == current_user.id])
-        success_rate = calculate_success_rate()
-        campaigns_total = len(user_campaigns)
-        
-        return render_template('index.html',
-            sms_history=sms_history,
-            sms_total=sms_total,
-            success_rate=success_rate,
-            campaigns_total=campaigns_total
-        )
-    except Exception as e:
-        logger.error(f"Error loading dashboard: {str(e)}")
-        return render_template('error.html', error='Error loading dashboard')
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
