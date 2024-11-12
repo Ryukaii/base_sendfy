@@ -1,118 +1,175 @@
-{% extends "base.html" %}
+import React from 'react';
+import { Card } from '@/components/ui/card';
 
-{% block content %}
-<div class="container mx-auto px-4 pt-12 pb-12">
-    <div class="text-center mb-12">
-        <h1 class="text-5xl font-bold mb-2">SendFy</h1>
-        <div class="flex justify-center items-center gap-20 mt-8 nav-container relative">
-            <div class="purple-backdrop"></div>
-            <a href="/sms" class="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(147,51,234,0.3)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.5)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
-                <div class="relative flex items-center justify-center w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl opacity-100 transition-opacity duration-500"></div>
-                    <i class="fas fa-paper-plane text-white text-2xl transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
-                </div>
+export default function Dashboard() {
+  return (
+    <div className="min-h-screen text-white">
+      <div className="container mx-auto px-4 pt-12 pb-12">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold mb-2">SendFy</h1>
+          <div className="flex justify-center items-center gap-20 mt-8 nav-container relative">
+            <div className="purple-backdrop"></div>
+            <a href="/dashboard" className="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(147,51,234,0.3)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.5)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
+              <div className="relative flex items-center justify-center w-full h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl opacity-100 transition-opacity duration-500"></div>
+                <i className="fas fa-tachometer-alt text-white text-2xl transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
+              </div>
             </a>
-            <a href="/integrations-and-campaigns" class="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
-                <div class="relative flex items-center justify-center w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <i class="fas fa-cogs text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
-                </div>
+            <a href="/automations" className="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
+              <div className="relative flex items-center justify-center w-full h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <i className="fas fa-robot text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
+              </div>
             </a>
-            <a href="/sms-history" class="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
-                <div class="relative flex items-center justify-center w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <i class="fas fa-history text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
-                </div>
+            <a href="/history" className="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
+              <div className="relative flex items-center justify-center w-full h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <i className="fas fa-list text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
+              </div>
             </a>
-            {% if current_user.is_admin %}
-            <a href="/admin" class="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
-                <div class="relative flex items-center justify-center w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <i class="fas fa-user-shield text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
-                </div>
+            <a href="/admin" className="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
+              <div className="relative flex items-center justify-center w-full h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <i className="fas fa-user-shield text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
+              </div>
             </a>
-            {% endif %}
-            <a href="/logout" class="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
-                <div class="relative flex items-center justify-center w-full h-full">
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <i class="fas fa-sign-out-alt text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
-                </div>
+            <a href="/logout" className="nav-item group w-20 h-20 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 ease-out bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:from-gray-700/80 hover:to-gray-800/80 border border-gray-700/30 backdrop-blur-lg shadow-[0_8px_16px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_30px_rgba(147,51,234,0.3)] transform perspective-1000 hover:rotate-[10deg] hover:scale-110">
+              <div className="relative flex items-center justify-center w-full h-full">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <i className="fas fa-sign-out-alt text-gray-200 text-2xl group-hover:text-white transition-all duration-500 transform group-hover:scale-110 relative z-10"></i>
+              </div>
             </a>
+          </div>
         </div>
-    </div>
-    <div class="dashboard-container">
-        <div class="grid grid-cols-3 gap-6">
-            <div class="panel h-[180px] flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-bl-full"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-600/10 to-transparent rounded-tr-full"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                            <i class="fas fa-chart-line text-purple-400 text-sm"></i>
-                        </div>
-                        <span class="text-xs font-semibold tracking-wider text-gray-400">VENDAS DO DIA</span>
-                    </div>
-                </div>
-                <div class="flex justify-between items-end flex-1">
-                    <div>
-                        <div class="text-3xl font-bold text-purple-400">{{ daily_sales_amount }}</div>
-                        <div class="flex items-center mt-2 space-x-2">
-                            <div class="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">{{ daily_sales_count }} vendas</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="panel h-[180px] flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-bl-full"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-600/10 to-transparent rounded-tr-full"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                            <i class="fas fa-sms text-purple-400 text-sm"></i>
-                        </div>
-                        <span class="text-xs font-semibold tracking-wider text-gray-400">SMS ENVIADOS</span>
-                    </div>
-                </div>
-                <div class="flex justify-between items-end flex-1">
-                    <div>
-                        <div class="text-3xl font-bold text-purple-400">{{ total_sms }}</div>
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <div class="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">{{ successful_sms }} sucesso</div>
-                            <div class="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">{{ failed_sms }} falhas</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="panel h-[180px] flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-bl-full"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-600/10 to-transparent rounded-tr-full"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                            <i class="fas fa-dollar-sign text-purple-400 text-sm"></i>
-                        </div>
-                        <span class="text-xs font-semibold tracking-wider text-gray-400">CRÉDITOS SMS</span>
-                    </div>
-                </div>
-                <div class="flex justify-between items-end flex-1">
-                    <div>
-                        <div class="text-3xl font-bold text-purple-400">{{ total_credits }}</div>
-                        <div class="flex items-center mt-2">
-                            <div class="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">{{ available_credits }} disponíveis</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<style>
-    body { font-family: 'Familjen Grotesk', sans-serif; background-color: #0A051A; }
-    .purple-backdrop { position: absolute; width: 600px; height: 200px; background: radial-gradient(circle, rgba(147, 51, 234, 0.3) 0%, rgba(147, 51, 234, 0) 70%); border-radius: 100%; z-index: -1; top: 50%; left: 50%; transform: translate(-50%, -50%); filter: blur(40px); pointer-events: none; }
-    .nav-item { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 1; }
-    .nav-item::before { content: ''; position: absolute; inset: -1px; background: linear-gradient(45deg, rgba(147, 51, 234, 0.3), rgba(147, 51, 234, 0)); border-radius: inherit; z-index: -1; transition: opacity 0.5s ease; opacity: 0; }
-    .nav-item:hover::before { opacity: 1; }
-    .panel { background: rgba(17, 17, 23, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(147, 51, 234, 0.1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
-</style>
-{% endblock %}
+        <div className="dashboard-container">
+          <div className="grid grid-cols-3 gap-6">
+            <div className="panel h-[180px] flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-bl-full"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-600/10 to-transparent rounded-tr-full"></div>
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <i className="fas fa-chart-line text-purple-400 text-sm"></i>
+                  </div>
+                  <span className="text-xs font-semibold tracking-wider text-gray-400">VENDAS DO DIA</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-end flex-1">
+                <div>
+                  <div className="text-3xl font-bold text-purple-400">R$ 24.580</div>
+                  <div className="flex items-center mt-2 space-x-2">
+                    <div className="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">245 vendas</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="panel h-[180px] flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-bl-full"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-600/10 to-transparent rounded-tr-full"></div>
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <i className="fas fa-sms text-purple-400 text-sm"></i>
+                  </div>
+                  <span className="text-xs font-semibold tracking-wider text-gray-400">SMS ENVIADOS</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-end flex-1">
+                <div>
+                  <div className="text-3xl font-bold text-purple-400">1.234</div>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div className="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">856 abertos</div>
+                    <div className="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">54 falhas</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="panel h-[180px] flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-bl-full"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-600/10 to-transparent rounded-tr-full"></div>
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <i className="fas fa-dollar-sign text-purple-400 text-sm"></i>
+                  </div>
+                  <span className="text-xs font-semibold tracking-wider text-gray-400">CRÉDITOS SMS</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-end flex-1">
+                <div>
+                  <div className="text-3xl font-bold text-purple-400">15.000</div>
+                  <div className="flex items-center mt-2">
+                    <div className="px-2 py-1 rounded-md bg-purple-500/10 text-purple-400 text-xs">13.766 disponíveis</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="panel mt-8 relative group" style={{height: '600px', overflowY: 'auto'}}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-bl-full"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-600/10 to-transparent rounded-tr-full"></div>
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                  <i className="fas fa-history text-purple-400 text-sm"></i>
+                </div>
+                <span className="text-xs font-semibold tracking-wider text-gray-400">HISTÓRICO DE SMS</span>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {[...Array(5)].map((_, index) => (
+                <div key={index} className="bg-gray-800 rounded-lg p-4 shadow-md">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
+                        <i className="fas fa-user text-purple-400"></i>
+                      </div>
+                      <span className="font-semibold text-purple-400">ID#{12345 + index}</span>
+                    </div>
+                    <span className="text-xs text-gray-400">Há {index + 1} dias, {10 + index}:20</span>
+                  </div>
+                  <p className="text-sm text-gray-300">
+                    {index % 2 === 0 
+                      ? `Seu pagamento de R$ ${150 + (index * 10)},00 foi confirmado. Obrigado!`
+                      : `Promoção exclusiva: ${50 - (index * 5)}% de desconto em todos os produtos. Válido apenas hoje!`
+                    }
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .purple-backdrop {
+          position: absolute;
+          width: 600px;
+          height: 200px;
+          background: radial-gradient(circle, rgba(147, 51, 234, 0.3) 0%, rgba(147, 51, 234, 0) 70%);
+          border-radius: 100%;
+          z-index: -1;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          filter: blur(40px);
+          pointer-events: none;
+        }
+        .panel {
+          background: rgba(17, 17, 23, 0.95);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(147, 51, 234, 0.1);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+          border-radius: 15px;
+          padding: 20px;
+        }
+      `}</style>
+    </div>
+  );
+}
