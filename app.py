@@ -68,39 +68,6 @@ def admin_required(f):
 def load_user(user_id):
     return User.get(user_id)
 
-@app.route('/')
-def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-        
-    # Load SMS history
-    with open(SMS_HISTORY_FILE, 'r') as f:
-        sms_history = json.load(f)
-    
-    # Calculate SMS stats
-    total_sms = len(sms_history)
-    successful_sms = sum(1 for sms in sms_history if sms.get('status') == 'success')
-    failed_sms = total_sms - successful_sms
-    
-    # Calculate sales stats
-    with open(TRANSACTIONS_FILE, 'r') as f:
-        transactions = json.load(f)
-        
-    today = datetime.datetime.now().strftime('%Y-%m-%d')
-    daily_sales = [t for t in transactions if t.get('created_at', '').startswith(today)]
-    daily_sales_count = len(daily_sales)
-    daily_sales_amount = sum(float(t.get('total_price', 0)) for t in daily_sales)
-    
-    return render_template('index.html',
-        total_sms=total_sms,
-        successful_sms=successful_sms,
-        failed_sms=failed_sms,
-        daily_sales_count=daily_sales_count,
-        daily_sales_amount=f"R$ {daily_sales_amount:,.2f}",
-        total_credits=current_user.credits,
-        available_credits=current_user.credits
-    )
-
 # Admin routes
 @app.route('/admin')
 @admin_required
@@ -189,6 +156,12 @@ def delete_user(user_id):
     except Exception as e:
         logger.error(f"Error deleting user: {str(e)}")
         return handle_api_error('Failed to delete user')
+
+@app.route('/')
+def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
