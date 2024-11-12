@@ -311,7 +311,79 @@ def get_campaigns():
         logger.error(f"Error loading campaigns: {str(e)}")
         return handle_api_error('Failed to load campaigns')
 
-# (Rest of the code continues exactly the same as in the original file)
+@app.route('/api/integrations', methods=['GET'])
+@login_required
+def get_integrations():
+    try:
+        # Get only integrations for current user
+        with open(INTEGRATIONS_FILE, 'r') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            all_integrations = json.load(f)
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        user_integrations = [i for i in all_integrations if i.get('user_id') == current_user.id]
+        return jsonify(user_integrations)
+    except Exception as e:
+        logger.error(f"Error loading integrations: {str(e)}")
+        return handle_api_error('Failed to load integrations')
+
+@app.route('/api/integrations', methods=['POST'])
+@login_required
+def create_integration():
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data:
+            return handle_api_error('Integration name is required')
+            
+        integration = {
+            'id': str(uuid.uuid4()),
+            'name': data['name'],
+            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
+            'user_id': current_user.id,
+            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            integrations.append(integration)
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration created successfully',
+            'integration': integration
+        })
+    except Exception as e:
+        logger.error(f"Error creating integration: {str(e)}")
+        return handle_api_error('Failed to create integration')
+
+@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
+@login_required
+def delete_integration(integration_id):
+    try:
+        with open(INTEGRATIONS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            integrations = json.load(f)
+            
+            # Only delete if integration belongs to current user
+            integrations = [i for i in integrations if i['id'] != integration_id or i.get('user_id') != current_user.id]
+            
+            f.seek(0)
+            json.dump(integrations, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Integration deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting integration: {str(e)}")
+        return handle_api_error('Failed to delete integration')
 
 @app.route('/payment/<customer_name>/<transaction_id>')
 def payment(customer_name, transaction_id):
