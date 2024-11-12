@@ -1,23 +1,14 @@
 from celery import Celery
-from celery.exceptions import MaxRetriesExceededError
 import requests
 import json
 import os
 import re
-import logging
 from datetime import datetime
-from tenacity import retry, stop_after_attempt, wait_exponential
-
-logger = logging.getLogger(__name__)
 
 # Initialize Celery
 celery = Celery('sms_tasks',
                 broker='redis://localhost:6379/0',
                 backend='redis://localhost:6379/0')
-
-# Configure Celery connection retry settings
-celery.conf.broker_connection_retry_on_startup = True
-celery.conf.broker_connection_max_retries = 10
 
 # SMS API Configuration
 SMS_API_ENDPOINT = "https://api.smsdev.com.br/v1/send"
@@ -65,7 +56,6 @@ def log_sms_attempt(campaign_id, phone, message, status, api_response, event_typ
         json.dump(history, f, indent=2)
 
 @celery.task(bind=True, max_retries=3)
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
 def send_sms_task(self, phone, message, operator="claro", campaign_id=None, event_type="manual"):
     try:
         # Format phone number
@@ -125,17 +115,16 @@ def send_sms_task(self, phone, message, operator="claro", campaign_id=None, even
         }
         
     except requests.exceptions.RequestException as e:
-        logger.error(f"SMS API error: {str(e)}")
-        try:
-            self.retry(countdown=2 ** self.request.retries)
-        except MaxRetriesExceededError:
-            return {
-                'success': False,
-                'error': f'Failed to send SMS after retries: {str(e)}'
-            }
-    except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        return {
-            'success': False,
-            'error': f'Unexpected error: {str(e)}'
-        }
+        log_sms_attempt(
+            campaign_id=campaign_id,
+            phone=formatted_phone if 'formatted_phone' in locals() else phone,
+            message=message,
+            status='failed',
+            api_response=str(e),
+            event_type=event_type
+        )
+        
+        # Retry the task with exponential backoff
+        retry_count = self.request.retries
+        backoff = 60 * (2 ** retry_count)  # 60s, 120s, 240s
+        raise self.retry(exc=e, countdown=backoff)
