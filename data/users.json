@@ -4,7 +4,7 @@
     "username": "admin",
     "password_hash": "scrypt:32768:8:1$CyhzhFmV8YiYlD0x$a3cb80a195a66b6fda91171fa87a244e5327cebeb69ee647e5e4bb3263e72a3758d4f6ddcf1fe21986e08497f43383a700ea10a46ca3bcfc09761d7ef21517e8",
     "is_admin": true,
-    "credits": 87
+    "credits": 86
   },
   {
     "id": "2",
