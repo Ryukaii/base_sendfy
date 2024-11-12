@@ -385,6 +385,43 @@ def delete_integration(integration_id):
         logger.error(f"Error deleting integration: {str(e)}")
         return handle_api_error('Failed to delete integration')
 
+@app.route('/api/campaigns/<campaign_id>', methods=['PUT'])
+@login_required
+def update_campaign(campaign_id):
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ['name', 'event_type', 'message_template']):
+            return handle_api_error('Missing required fields')
+            
+        with open(CAMPAIGNS_FILE, 'r+') as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            campaigns = json.load(f)
+            
+            # Find and update campaign if it belongs to current user
+            campaign = next((c for c in campaigns if c['id'] == campaign_id and c.get('user_id') == current_user.id), None)
+            if not campaign:
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                return handle_api_error('Campaign not found')
+            
+            # Update fields
+            campaign['name'] = data['name']
+            campaign['event_type'] = data['event_type']
+            campaign['message_template'] = data['message_template']
+            
+            f.seek(0)
+            json.dump(campaigns, f, indent=2)
+            f.truncate()
+            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign updated successfully',
+            'campaign': campaign
+        })
+    except Exception as e:
+        logger.error(f"Error updating campaign: {str(e)}")
+        return handle_api_error('Failed to update campaign')
+
 @app.route('/payment/<customer_name>/<transaction_id>')
 def payment(customer_name, transaction_id):
     try:
