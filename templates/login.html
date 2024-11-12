@@ -1,62 +1,72 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-6">
-            <div class="card bg-dark border-secondary shadow-lg">
-                <div class="card-header border-secondary text-center py-4">
-                    <h2 class="mb-0">Acesso ao Sistema</h2>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Logo and Title -->
+        <div class="text-center">
+            <img src="https://i.ibb.co/ZgfsXMc/CAC-12-1-removebg-preview.png" alt="SendFy" class="mx-auto h-24 w-auto hover:scale-105 transition-all duration-300">
+            <h2 class="mt-6 text-3xl font-bold text-white">
+                Bem-vindo de volta
+            </h2>
+            <p class="mt-2 text-sm text-gray-400">
+                Acesse sua conta para continuar
+            </p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="rounded-lg p-4 mb-4 text-sm {% if category == 'success' %}bg-green-900/50 text-green-400 border border-green-700{% else %}bg-red-900/50 text-red-400 border border-red-700{% endif %}">
+                        <div class="flex items-center">
+                            <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} mr-2"></i>
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
+        <form class="mt-8 space-y-6" method="POST" action="{{ url_for('login') }}">
+            <div class="rounded-md shadow-sm space-y-4">
+                <div class="group relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-gray-500 group-focus-within:text-primary-light transition-colors"></i>
+                    </div>
+                    <input id="username" name="username" type="text" required 
+                           class="appearance-none relative block w-full pl-10 pr-3 py-3 bg-background-light border border-surface-light placeholder-gray-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary-light transition-all"
+                           placeholder="Nome de usuário">
                 </div>
-                <div class="card-body p-4">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    
-                    <form method="POST" action="{{ url_for('login') }}">
-                        <div class="mb-4">
-                            <label for="username" class="form-label">Usuário</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary">
-                                    <i class="fas fa-user"></i>
-                                </span>
-                                <input type="text" class="form-control bg-dark border-secondary text-light" 
-                                       id="username" name="username" required
-                                       placeholder="Digite seu usuário" autofocus>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="form-label">Senha</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-dark border-secondary">
-                                    <i class="fas fa-lock"></i>
-                                </span>
-                                <input type="password" class="form-control bg-dark border-secondary text-light" 
-                                       id="password" name="password" required
-                                       placeholder="Digite sua senha">
-                            </div>
-                        </div>
-                        <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>
-                                Entrar
-                            </button>
-                            <a href="/register" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-user-plus me-2"></i>
-                                Criar Conta
-                            </a>
-                        </div>
-                    </form>
+                <div class="group relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-500 group-focus-within:text-primary-light transition-colors"></i>
+                    </div>
+                    <input id="password" name="password" type="password" required
+                           class="appearance-none relative block w-full pl-10 pr-3 py-3 bg-background-light border border-surface-light placeholder-gray-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary-light transition-all"
+                           placeholder="Senha">
                 </div>
             </div>
-        </div>
+
+            <div class="flex flex-col gap-3">
+                <button type="submit" 
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light transform transition-all hover:scale-[1.02] hover:-translate-y-0.5">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-sign-in-alt text-primary-light group-hover:text-white transition-colors"></i>
+                    </span>
+                    Entrar
+                </button>
+                
+                <a href="/register" 
+                   class="group relative w-full flex justify-center py-3 px-4 border border-surface-light text-sm font-medium rounded-lg text-white hover:bg-surface-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-surface-light transform transition-all hover:scale-[1.02]">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-user-plus text-gray-500 group-hover:text-white transition-colors"></i>
+                    </span>
+                    Criar Nova Conta
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
