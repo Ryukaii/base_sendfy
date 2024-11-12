@@ -49,38 +49,6 @@ def calculate_success_rate():
     except Exception:
         return 0
 
-def get_dashboard_stats():
-    try:
-        # Load transactions
-        with open(TRANSACTIONS_FILE, 'r') as f:
-            transactions = json.load(f)
-            today = datetime.datetime.now().strftime('%Y-%m-%d')
-            today_transactions = [t for t in transactions if t.get('created_at', '').startswith(today)]
-            total_sales = sum(float(t.get('total_price', 0)) for t in today_transactions)
-            
-        # Load SMS history
-        with open(SMS_HISTORY_FILE, 'r') as f:
-            sms_history = json.load(f)
-            total_sms = len(sms_history)
-            failed_sms = sum(1 for sms in sms_history if sms.get('status') != 'success')
-            
-        return {
-            'total_sales': total_sales,
-            'total_transactions': len(today_transactions),
-            'total_sms': total_sms,
-            'failed_sms': failed_sms,
-            'success_rate': calculate_success_rate()
-        }
-    except Exception as e:
-        logger.error(f"Error calculating dashboard stats: {str(e)}")
-        return {
-            'total_sales': 0,
-            'total_transactions': 0,
-            'total_sms': 0,
-            'failed_sms': 0,
-            'success_rate': 0
-        }
-
 def handle_api_error(message, status_code=400):
     return jsonify({
         'success': False,
@@ -100,6 +68,7 @@ def admin_required(f):
 def load_user(user_id):
     return User.get(user_id)
 
+# Admin routes
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
@@ -192,7 +161,7 @@ def delete_user(user_id):
 def index():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
-    return render_template('index.html', stats=get_dashboard_stats())
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
