@@ -1,145 +1,143 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
+<div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Integrations Section -->
-        <div class="col-md-6 border-end border-secondary">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2>Nova Integração</h2>
-                </div>
-                <div class="card-body">
-                    <form id="integrationForm" method="POST">
-                        <div class="mb-3">
-                            <label for="integrationName" class="form-label">Nome da Integração</label>
-                            <input type="text" class="form-control" id="integrationName" name="name" required
-                                   placeholder="Ex: Minha Loja Virtual">
-                            <div class="form-text">Um nome para identificar esta integração</div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>
-                            Criar Integração
-                        </button>
-                    </form>
-                </div>
+        <div class="space-y-6">
+            <div class="bg-gradient-to-br from-background-light to-surface p-6 rounded-2xl border border-surface-light/20 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <h2 class="text-2xl font-bold mb-4 text-white">Nova Integração</h2>
+                <form id="integrationForm" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Nome da Integração</label>
+                        <input type="text" class="w-full bg-background border border-surface-light rounded-lg p-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               id="integrationName" name="name" required placeholder="Ex: Minha Loja Virtual">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5">
+                        <i class="fas fa-plus mr-2"></i>Criar Integração
+                    </button>
+                </form>
             </div>
-
-            <div id="integrationsList">
-                <!-- Lista de integrações será carregada via JavaScript -->
+            <div id="integrationsList" class="space-y-4">
+                <!-- Lista de integrações via JavaScript -->
             </div>
         </div>
 
         <!-- Campaigns Section -->
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2>Criar Campanha</h2>
-                </div>
-                <div class="card-body">
-                    <form id="campaignForm">
-                        <div class="mb-3">
-                            <label class="form-label">Nome da Campanha</label>
-                            <input type="text" class="form-control" id="campaignName" required>
+        <div class="space-y-6">
+            <div class="bg-gradient-to-br from-background-light to-surface p-6 rounded-2xl border border-surface-light/20 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <h2 class="text-2xl font-bold mb-4 text-white">Criar Campanha</h2>
+                <form id="campaignForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Nome da Campanha</label>
+                        <input type="text" class="w-full bg-background border border-surface-light rounded-lg p-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                               id="campaignName" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Integração</label>
+                        <select class="w-full bg-background border border-surface-light rounded-lg p-3 text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                id="integrationId" required>
+                            <!-- Será preenchido por JavaScript -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Tipo de Evento</label>
+                        <select class="w-full bg-background border border-surface-light rounded-lg p-3 text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                id="eventType" required>
+                            <option value="pending">Venda Pendente</option>
+                            <option value="approved">Venda Aprovada</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Modelo de Mensagem</label>
+                        <textarea class="w-full bg-background border border-surface-light rounded-lg p-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                                  id="messageTemplate" rows="3" required></textarea>
+                        <small class="block mt-1 text-xs text-gray-500">
+                            Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
+                            Acesse sua página de pagamento: {link_pix}
+                        </small>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Variáveis Disponíveis:</label>
+                        <div class="space-y-2">
+                            <button type="button" class="w-full px-4 py-2 bg-background border border-surface-light rounded-lg text-sm text-gray-300 hover:bg-surface-light transition-all" onclick="insertVariable('{customer.first_name}')">
+                                <i class="fas fa-user mr-2"></i>Nome do Cliente (Primeiro Nome)
+                            </button>
+                            <button type="button" class="w-full px-4 py-2 bg-background border border-surface-light rounded-lg text-sm text-gray-300 hover:bg-surface-light transition-all" onclick="insertVariable('{total_price}')">
+                                <i class="fas fa-tags mr-2"></i>Valor Total
+                            </button>
+                            <button type="button" class="w-full px-4 py-2 bg-background border border-surface-light rounded-lg text-sm text-gray-300 hover:bg-surface-light transition-all" onclick="insertVariable('{link_pix}')">
+                                <i class="fas fa-link mr-2"></i>Link Página de Pagamento PIX
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Integração</label>
-                            <select class="form-control" id="integrationId" required>
-                                <!-- Será preenchido por JavaScript -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Evento</label>
-                            <select class="form-control" id="eventType" required>
-                                <option value="pending">Venda Pendente</option>
-                                <option value="approved">Venda Aprovada</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Modelo de Mensagem</label>
-                            <textarea class="form-control" id="messageTemplate" rows="3" required></textarea>
-                            <small class="text-muted">
-                                Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
-                                Acesse sua página de pagamento: {link_pix}
-                            </small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Variáveis Disponíveis:</label>
-                            <div class="btn-group-vertical w-100">
-                                <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{customer.first_name}')">
-                                    <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
-                                </button>
-                                <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{total_price}')">
-                                    <i class="fas fa-tags me-2"></i>Valor Total
-                                </button>
-                                <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{link_pix}')">
-                                    <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
-                                </button>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Criar Campanha</button>
-                    </form>
-                </div>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5">
+                        <i class="fas fa-plus mr-2"></i>Criar Campanha
+                    </button>
+                </form>
             </div>
-
-            <div id="campaignsList">
-                <!-- Lista de campanhas será carregada via JavaScript -->
+            <div id="campaignsList" class="space-y-4">
+                <!-- Lista de campanhas via JavaScript -->
             </div>
         </div>
     </div>
 </div>
 
 <!-- Edit Campaign Modal -->
-<div class="modal fade" id="editCampaignModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title">Editar Campanha</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+<div id="editCampaignModal" class="fixed inset-0 bg-black bg-opacity-50 hidden" aria-hidden="true">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-surface p-6 rounded-2xl border border-surface-light/20 shadow-2xl w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Editar Campanha</h3>
+                <button type="button" class="text-gray-400 hover:text-white" onclick="this.closest('#editCampaignModal').classList.add('hidden')">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <form id="editCampaignForm">
-                    <input type="hidden" id="editCampaignId">
-                    <div class="mb-3">
-                        <label class="form-label">Nome da Campanha</label>
-                        <input type="text" class="form-control bg-dark border-secondary text-light" id="editCampaignName" required>
+            <form id="editCampaignForm" class="space-y-4">
+                <input type="hidden" id="editCampaignId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Nome da Campanha</label>
+                    <input type="text" class="w-full bg-background border border-surface-light rounded-lg p-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                           id="editCampaignName" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Tipo de Evento</label>
+                    <select class="w-full bg-background border border-surface-light rounded-lg p-3 text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                            id="editEventType" required>
+                        <option value="pending">Venda Pendente</option>
+                        <option value="approved">Venda Aprovada</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Modelo de Mensagem</label>
+                    <textarea class="w-full bg-background border border-surface-light rounded-lg p-3 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                              id="editMessageTemplate" rows="3" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Variáveis Disponíveis:</label>
+                    <div class="space-y-2">
+                        <button type="button" class="w-full px-4 py-2 bg-background border border-surface-light rounded-lg text-sm text-gray-300 hover:bg-surface-light transition-all" onclick="insertVariableEdit('{customer.first_name}')">
+                            <i class="fas fa-user mr-2"></i>Nome do Cliente (Primeiro Nome)
+                        </button>
+                        <button type="button" class="w-full px-4 py-2 bg-background border border-surface-light rounded-lg text-sm text-gray-300 hover:bg-surface-light transition-all" onclick="insertVariableEdit('{total_price}')">
+                            <i class="fas fa-tags mr-2"></i>Valor Total
+                        </button>
+                        <button type="button" class="w-full px-4 py-2 bg-background border border-surface-light rounded-lg text-sm text-gray-300 hover:bg-surface-light transition-all" onclick="insertVariableEdit('{link_pix}')">
+                            <i class="fas fa-link mr-2"></i>Link Página de Pagamento PIX
+                        </button>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tipo de Evento</label>
-                        <select class="form-control bg-dark border-secondary text-light" id="editEventType" required>
-                            <option value="pending">Venda Pendente</option>
-                            <option value="approved">Venda Aprovada</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Modelo de Mensagem</label>
-                        <textarea class="form-control bg-dark border-secondary text-light" id="editMessageTemplate" rows="3" required></textarea>
-                        <small class="text-muted">
-                            Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
-                            Acesse sua página de pagamento: {link_pix}
-                        </small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Variáveis Disponíveis:</label>
-                        <div class="btn-group-vertical w-100">
-                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariableEdit('{customer.first_name}')">
-                                <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
-                            </button>
-                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariableEdit('{total_price}')">
-                                <i class="fas fa-tags me-2"></i>Valor Total
-                            </button>
-                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariableEdit('{link_pix}')">
-                                <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="updateCampaign()">Atualizar</button>
-            </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" class="px-4 py-2 border border-surface-light rounded-lg text-sm text-white hover:bg-surface-light transition-all" 
+                            onclick="this.closest('#editCampaignModal').classList.add('hidden')">
+                        Cancelar
+                    </button>
+                    <button type="button" class="px-4 py-2 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary text-white rounded-lg text-sm transition-all" 
+                            onclick="updateCampaign()">
+                        Atualizar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -149,6 +147,15 @@
 <script>
 function insertVariable(variable) {
     const textarea = document.getElementById('messageTemplate');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + variable + text.substring(end);
+    textarea.focus();
+}
+
+function insertVariableEdit(variable) {
+    const textarea = document.getElementById('editMessageTemplate');
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const text = textarea.value;
