@@ -25,6 +25,15 @@ function showToast(type, message) {
     });
 }
 
+function insertVariableEdit(variable) {
+    const textarea = document.getElementById('editMessageTemplate');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + variable + text.substring(end);
+    textarea.focus();
+}
+
 async function loadCampaigns() {
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'text-center py-4';
@@ -113,6 +122,66 @@ async function loadCampaigns() {
     }
 }
 
+async function editCampaign(campaignId) {
+    try {
+        const response = await fetch('/api/campaigns');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const campaigns = await response.json();
+        const campaign = campaigns.find(c => c.id === campaignId);
+        
+        if (!campaign) {
+            throw new Error('Campanha não encontrada');
+        }
+        
+        // Fill modal form
+        document.getElementById('editCampaignId').value = campaignId;
+        document.getElementById('editCampaignName').value = campaign.name;
+        document.getElementById('editEventType').value = campaign.event_type;
+        document.getElementById('editMessageTemplate').value = campaign.message_template;
+        
+        // Show modal
+        new bootstrap.Modal(document.getElementById('editCampaignModal')).show();
+    } catch (error) {
+        console.error('Erro ao carregar campanha para edição:', error);
+        showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);
+    }
+}
+
+async function updateCampaign() {
+    const campaignId = document.getElementById('editCampaignId').value;
+    const formData = {
+        name: document.getElementById('editCampaignName').value,
+        event_type: document.getElementById('editEventType').value,
+        message_template: document.getElementById('editMessageTemplate').value
+    };
+    
+    try {
+        const response = await fetch(`/api/campaigns/${campaignId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Erro ao atualizar campanha');
+        }
+        
+        // Hide modal
+        bootstrap.Modal.getInstance(document.getElementById('editCampaignModal')).hide();
+        
+        showToast('success', 'Campanha atualizada com sucesso!');
+        loadCampaigns();
+    } catch (error) {
+        console.error('Erro ao atualizar campanha:', error);
+        showToast('error', error.message);
+    }
+}
+
 document.getElementById('campaignForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -127,19 +196,9 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         message_template: document.getElementById('messageTemplate').value
     };
     
-    const campaignId = e.target.dataset.campaignId;
-    let url = '/api/campaigns';
-    let method = 'POST';
-    
-    if (campaignId) {
-        url += `/${campaignId}`;
-        method = 'PUT';
-        delete formData.integration_id;
-    }
-    
     try {
-        const response = await fetch(url, {
-            method: method,
+        const response = await fetch('/api/campaigns', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -149,11 +208,11 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Erro ao salvar campanha');
+            throw new Error(data.error || 'Erro ao criar campanha');
         }
         
-        showToast('success', `Campanha ${campaignId ? 'atualizada' : 'criada'} com sucesso!`);
-        resetForm();
+        showToast('success', 'Campanha criada com sucesso!');
+        e.target.reset();
         loadCampaigns();
     } catch (error) {
         console.error('Erro ao salvar campanha:', error);
@@ -163,50 +222,6 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         submitButton.innerHTML = originalText;
     }
 });
-
-function resetForm() {
-    const form = document.getElementById('campaignForm');
-    form.reset();
-    delete form.dataset.campaignId;
-    document.getElementById('integrationId').disabled = false;
-    document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
-    
-    const errorDivs = form.querySelectorAll('.alert-danger');
-    errorDivs.forEach(div => div.remove());
-}
-
-async function editCampaign(campaignId) {
-    try {
-        const response = await fetch('/api/campaigns');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const campaigns = await response.json();
-        const campaign = campaigns.find(c => c.id === campaignId);
-        
-        if (!campaign) {
-            throw new Error('Campanha não encontrada');
-        }
-        
-        const form = document.getElementById('campaignForm');
-        form.dataset.campaignId = campaignId;
-        
-        document.getElementById('campaignName').value = campaign.name;
-        document.getElementById('integrationId').value = campaign.integration_id;
-        document.getElementById('integrationId').disabled = true;
-        document.getElementById('eventType').value = campaign.event_type;
-        document.getElementById('messageTemplate').value = campaign.message_template;
-        
-        document.querySelector('button[type="submit"]').innerHTML = `
-            <i class="fas fa-save me-1"></i>
-            Atualizar Campanha
-        `;
-        
-        form.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-        console.error('Erro ao carregar campanha para edição:', error);
-        showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);
-    }
-}
 
 async function deleteCampaign(campaignId) {
     if (!confirm('Tem certeza que deseja excluir esta campanha?')) {
@@ -241,26 +256,15 @@ async function deleteCampaign(campaignId) {
         
         setTimeout(() => {
             campaignCard.remove();
-            resetForm();
             loadCampaigns();
         }, 300);
     } catch (error) {
         console.error('Erro ao excluir campanha:', error);
         campaignCard.innerHTML = originalContent;
-        showToast('error', `Erro ao excluir campanha: ${error.message}`);
+        showToast('error', error.message);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadCampaigns();
-    
-    const cancelButton = document.createElement('button');
-    cancelButton.type = 'button';
-    cancelButton.className = 'btn btn-secondary ms-2';
-    cancelButton.innerHTML = '<i class="fas fa-times me-1"></i> Cancelar';
-    cancelButton.onclick = resetForm;
-    
-    const submitButton = document.querySelector('button[type="submit"]');
-    submitButton.innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
-    submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
 });
