@@ -59,66 +59,6 @@
         <div id="campaignsList"></div>
     </div>
 </div>
-
-<!-- Edit Campaign Modal -->
-<div class="modal fade" id="editCampaignModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title">Editar Campanha</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editCampaignForm">
-                    <input type="hidden" id="editCampaignId">
-                    <div class="mb-3">
-                        <label class="form-label">Nome da Campanha</label>
-                        <input type="text" class="form-control bg-dark border-secondary text-light" 
-                               id="editCampaignName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tipo de Evento</label>
-                        <select class="form-control bg-dark border-secondary text-light" 
-                                id="editEventType" required>
-                            <option value="pending">Venda Pendente</option>
-                            <option value="approved">Venda Aprovada</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Modelo de Mensagem</label>
-                        <textarea class="form-control bg-dark border-secondary text-light" 
-                                  id="editMessageTemplate" rows="3" required></textarea>
-                        <small class="text-muted">
-                            Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
-                            Acesse sua página de pagamento: {link_pix}
-                        </small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Variáveis Disponíveis:</label>
-                        <div class="btn-group-vertical w-100">
-                            <button type="button" class="btn btn-outline-primary mb-2" 
-                                    onclick="insertVariableToEdit('{customer.first_name}')">
-                                <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
-                            </button>
-                            <button type="button" class="btn btn-outline-primary mb-2" 
-                                    onclick="insertVariableToEdit('{total_price}')">
-                                <i class="fas fa-tags me-2"></i>Valor Total
-                            </button>
-                            <button type="button" class="btn btn-outline-primary mb-2" 
-                                    onclick="insertVariableToEdit('{link_pix}')">
-                                <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="updateCampaign()">Salvar</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
