@@ -515,7 +515,7 @@ def webhook_handler(webhook_path):
                 message = message.replace('{total_price}', webhook_data.get('total_price', ''))
                 
                 if status == 'pending':
-                    payment_url = f"{request.host_url}payment/{full_name}/{transaction_id}"
+                    payment_url = f"{request.host_url}{transaction_id}"
                     message = message.replace('{link_pix}', payment_url)
                 
                 # Deduct credit and queue SMS with delay
@@ -542,6 +542,21 @@ def webhook_handler(webhook_path):
         logger.error(f"Error processing webhook: {str(e)}")
         db.session.rollback()
         return handle_api_error('Error processing webhook')
+
+@app.route('/<transaction_id>')
+def payment(transaction_id):
+    try:
+        transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
+        if not transaction:
+            return render_template('error.html', error='Transação não encontrada')
+            
+        return render_template('payment.html', 
+            customer_name=transaction.customer_name,
+            pix_code=transaction.pix_code
+        )
+    except Exception as e:
+        logger.error(f"Error loading payment page: {str(e)}")
+        return render_template('error.html', error='Error loading payment page')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
