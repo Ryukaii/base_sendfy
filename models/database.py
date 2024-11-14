@@ -22,6 +22,26 @@ class User(db.Model, UserMixin):
 
     def has_sufficient_credits(self, amount):
         return self.credits >= amount
+    
+    def add_credits(self, amount):
+        try:
+            self.credits += amount
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            return False
+
+    def deduct_credits(self, amount):
+        try:
+            if self.credits < amount:
+                return False
+            self.credits -= amount
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            return False
 
 class Integration(db.Model):
     __tablename__ = 'integrations'
