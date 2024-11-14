@@ -4,6 +4,7 @@ import uuid
 import fcntl
 import logging
 import datetime
+import re
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -22,19 +23,34 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-# Initialize database tables
+# Initialize database tables and create admin user
 with app.app_context():
     db.create_all()
-    print("Database tables created successfully")
+    
+    # Create default admin user
+    admin = User.query.filter_by(username='admin').first()
+    if not admin:
+        admin = User()
+        admin.username = 'admin'
+        admin.set_password('admin123')
+        admin.is_admin = True
+        admin.credits = 100
+        db.session.add(admin)
+        db.session.commit()
+        print("Default admin user created")
 
 # Setup login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'  # type: ignore
+login_manager.login_view = 'login'
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 def handle_api_error(message, status_code=400):
     return jsonify({
@@ -51,9 +67,70 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+# Authentication routes
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            flash('Username and password are required', 'danger')
+            return render_template('login.html')
+        
+        logger.info(f"Login attempt for user: {username}")
+        user = User.query.filter_by(username=username).first()
+        
+        if user and user.check_password(password):
+            logger.info("Login successful")
+            login_user(user)
+            flash('Login successful!', 'success')
+            return redirect(url_for('index'))
+            
+        logger.warning("Invalid login attempt")
+        flash('Invalid username or password', 'danger')
+        
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            flash('Username and password are required', 'danger')
+            return render_template('register.html')
+            
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists', 'danger')
+            return render_template('register.html')
+            
+        user = User()
+        user.username = username
+        user.set_password(password)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        login_user(user)
+        flash('Account created successfully!', 'success')
+        return redirect(url_for('index'))
+            
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out', 'success')
+    return redirect(url_for('login'))
 
 # Admin routes
 @app.route('/admin')
@@ -80,6 +157,13 @@ def calculate_success_rate():
         return round((success_count / total) * 100)
     except Exception:
         return 0
+
+# Main routes
+@app.route('/')
+def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    return render_template('index.html')
 
 @app.route('/api/users', methods=['POST'])
 @admin_required
@@ -159,75 +243,6 @@ def delete_user(user_id):
     except Exception as e:
         logger.error(f"Error deleting user: {str(e)}")
         return handle_api_error('Failed to delete user')
-
-@app.route('/')
-def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-    return render_template('index.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        if not username or not password:
-            flash('Username and password are required', 'danger')
-            return render_template('login.html')
-        
-        logger.info(f"Login attempt for user: {username}")
-        user = User.query.filter_by(username=username).first()
-        
-        if user:
-            logger.info("User found in database")
-            if user.check_password(str(password)):
-                logger.info("Password correct")
-                login_user(user)
-                flash('Login successful!', 'success')
-                return redirect(url_for('index'))
-            else:
-                logger.info("Password incorrect")
-        else:
-            logger.info("User not found in database")
-            
-        flash('Invalid username or password', 'danger')
-        
-    return render_template('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        if not username or not password:
-            flash('Username and password are required', 'danger')
-            return render_template('register.html')
-            
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'danger')
-            return render_template('register.html')
-            
-        user = User()
-        user.username = username
-        user.password_hash = generate_password_hash(str(password))
-        
-        db.session.add(user)
-        db.session.commit()
-        
-        login_user(user)
-        flash('Account created successfully!', 'success')
-        return redirect(url_for('index'))
-            
-    return render_template('register.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out', 'success')
-    return redirect(url_for('login'))
 
 @app.route('/sms')
 @login_required
