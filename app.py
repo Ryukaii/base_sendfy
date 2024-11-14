@@ -345,6 +345,8 @@ def create_campaign():
         campaign.integration_id = data['integration_id']
         campaign.event_type = data['event_type']
         campaign.message_template = data['message_template']
+        campaign.delay_amount = data.get('delay_amount', 0)
+        campaign.delay_unit = data.get('delay_unit', 'minutes')
         campaign.user_id = current_user.id
         
         db.session.add(campaign)
@@ -472,43 +474,24 @@ def webhook_handler(webhook_path):
         
         transaction = Transaction(
             transaction_id=transaction_id,
-            customer_name=customer_data.get('name', ''),
-            customer_phone=customer_data.get('phone', ''),
-            customer_email=customer_data.get('email', ''),
-            product_name=webhook_data.get('product_name', ''),
-            total_price=webhook_data.get('total_price', '0.00'),
-            pix_code=webhook_data.get('pix_code', ''),
+            customer_name=customer_data.get('name'),
+            customer_phone=customer_data.get('phone'),
+            customer_email=customer_data.get('email'),
+            product_name=webhook_data.get('product_name'),
+            total_price=webhook_data.get('total_price'),
             status=status
         )
         db.session.add(transaction)
-        db.session.commit()
-
+        
         success_count = 0
-        # Send SMS for each matching campaign
+        
+        # Calculate delay in seconds based on campaign settings
         for campaign in matching_campaigns:
             try:
                 if not user.has_sufficient_credits(1):
                     logger.warning(f"User {user.id} has insufficient credits for campaign {campaign.id}")
                     continue
                     
-                # Get first name
-                full_name = customer_data.get('name', '')
-                first_name = full_name.split()[0] if full_name else ''
-                
-                # Format phone number
-                phone = customer_data.get('phone', '')
-                if not phone.startswith('+55'):
-                    phone = f'+55{phone}'
-                
-                # Format message
-                message = campaign.message_template
-                message = message.replace('{customer.first_name}', first_name)
-                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
-                
-                # Add PIX link only for pending status
-                if status == 'pending':
-                    message = message.replace('{link_pix}', f"{request.host_url}payment/{customer_data.get('name', 'cliente')}/{transaction_id}")
-                
                 # Calculate delay in seconds
                 delay_seconds = 0
                 if campaign.delay_amount and campaign.delay_unit:
@@ -519,45 +502,46 @@ def webhook_handler(webhook_path):
                     elif campaign.delay_unit == 'days':
                         delay_seconds = campaign.delay_amount * 86400
                 
-                # Deduct credit and send SMS
+                # Format message and phone number
+                full_name = customer_data.get('name', '')
+                first_name = full_name.split()[0] if full_name else ''
+                
+                phone = customer_data.get('phone', '')
+                if not phone.startswith('+55'):
+                    phone = f'+55{phone}'
+                
+                message = campaign.message_template
+                message = message.replace('{customer.first_name}', first_name)
+                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
+                
+                if status == 'pending':
+                    payment_url = f"{request.host_url}payment/{full_name}/{transaction_id}"
+                    message = message.replace('{link_pix}', payment_url)
+                
+                # Deduct credit and queue SMS with delay
                 if user.deduct_credits(1):
-                    # Add delay to task
                     send_sms_task.apply_async(
                         args=[phone, message, campaign.event_type],
                         countdown=delay_seconds
                     )
                     success_count += 1
-                    logger.info(f"SMS queued for campaign {campaign.id}")
-                
+                    logger.info(f"SMS queued for campaign {campaign.id} with {delay_seconds}s delay")
+                    
             except Exception as e:
-                logger.error(f"Error sending SMS for campaign {campaign.id}: {str(e)}")
-                # Refund credit if SMS failed to queue
-                user.add_credits(1)
-
+                logger.error(f"Error processing campaign {campaign.id}: {str(e)}")
+                continue
+        
+        db.session.commit()
+        
         return jsonify({
             'success': True,
-            'message': f'Webhook processed successfully. Sent {success_count} messages',
-            'transaction_id': transaction_id
+            'message': f'Processed {success_count} campaigns successfully'
         })
         
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
+        db.session.rollback()
         return handle_api_error('Error processing webhook')
 
-@app.route('/payment/<transaction_id>')
-def payment_page(transaction_id):
-    try:
-        transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
-        if not transaction:
-            return render_template('error.html', error='Transação não encontrada')
-            
-        return render_template('payment.html', 
-            customer_name=transaction.customer_name,
-            pix_code=transaction.pix_code
-        )
-    except Exception as e:
-        logger.error(f"Error loading payment page: {str(e)}")
-        return render_template('error.html', error='Error loading payment page')
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)

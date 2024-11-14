@@ -265,5 +265,32 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139967625', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "pending"
+  },
+  {
+    "timestamp": "2024-11-14 00:39:55",
+    "phone": "5561982132603",
+    "message": "Opa",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139967811', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-14 00:42:00",
+    "phone": "5561982132603",
+    "message": "Luk, esse e um teste http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/Luk Lima/756133b0",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139967885', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-14 00:42:26",
+    "phone": "5518981181487",
+    "message": "Rogerio, esse e um teste http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/payment/Rogerio goes torcato/b9042e54",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139967903', 'number': '5518981181487', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
   }
 ]
