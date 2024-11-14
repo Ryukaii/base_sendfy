@@ -4,7 +4,6 @@ import uuid
 import fcntl
 import logging
 import datetime
-import re
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -31,7 +30,7 @@ with app.app_context():
 # Setup login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'login'  # type: ignore
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -94,12 +93,11 @@ def create_user():
         if existing_user:
             return handle_api_error('Username already exists')
             
-        user = User(
-            username=data['username'],
-            password_hash=generate_password_hash(data['password']),
-            is_admin=data.get('is_admin', False),
-            credits=int(data.get('credits', 0))
-        )
+        user = User()
+        user.username = data['username']
+        user.password_hash = generate_password_hash(str(data['password']))
+        user.is_admin = data.get('is_admin', False)
+        user.credits = int(data.get('credits', 0))
         
         db.session.add(user)
         db.session.commit()
@@ -174,13 +172,27 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
+        if not username or not password:
+            flash('Username and password are required', 'danger')
+            return render_template('login.html')
+        
+        logger.info(f"Login attempt for user: {username}")
         user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
-            login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('index'))
+        
+        if user:
+            logger.info("User found in database")
+            if user.check_password(str(password)):
+                logger.info("Password correct")
+                login_user(user)
+                flash('Login successful!', 'success')
+                return redirect(url_for('index'))
+            else:
+                logger.info("Password incorrect")
+        else:
+            logger.info("User not found in database")
             
         flash('Invalid username or password', 'danger')
+        
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -189,14 +201,18 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         
+        if not username or not password:
+            flash('Username and password are required', 'danger')
+            return render_template('register.html')
+            
         if User.query.filter_by(username=username).first():
             flash('Username already exists', 'danger')
             return render_template('register.html')
             
-        user = User(
-            username=username,
-            password_hash=generate_password_hash(password)
-        )
+        user = User()
+        user.username = username
+        user.password_hash = generate_password_hash(str(password))
+        
         db.session.add(user)
         db.session.commit()
         

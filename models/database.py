@@ -25,7 +25,7 @@ class Integration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     webhook_url = db.Column(db.String(200), unique=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Updated foreign key
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user = db.relationship('User', backref=db.backref('integrations', lazy=True))
 
@@ -45,7 +45,7 @@ class Campaign(db.Model):
     integration_id = db.Column(db.Integer, db.ForeignKey('integrations.id'), nullable=False)
     event_type = db.Column(db.String(50), nullable=False)
     message_template = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Updated foreign key
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user = db.relationship('User', backref=db.backref('campaigns', lazy=True))
     integration = db.relationship('Integration', backref=db.backref('campaigns', lazy=True))
@@ -81,6 +81,6 @@ class SMSHistory(db.Model):
     message = db.Column(db.Text, nullable=False)
     type = db.Column(db.String(20), nullable=False)
     status = db.Column(db.String(20), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Updated foreign key
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user = db.relationship('User', backref=db.backref('sms_history', lazy=True))
