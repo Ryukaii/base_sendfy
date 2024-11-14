@@ -471,14 +471,14 @@ def webhook_handler(webhook_path):
         # Create transaction record
         transaction_id = str(uuid.uuid4())[:8]
         customer_data = webhook_data.get('customer', {})
-        
         transaction = Transaction(
             transaction_id=transaction_id,
-            customer_name=customer_data.get('name'),
-            customer_phone=customer_data.get('phone'),
-            customer_email=customer_data.get('email'),
-            product_name=webhook_data.get('product_name'),
-            total_price=webhook_data.get('total_price'),
+            customer_name=customer_data.get('name', ''),
+            customer_phone=customer_data.get('phone', ''),
+            customer_email=customer_data.get('email', ''),
+            product_name=webhook_data.get('product_name', ''),
+            total_price=webhook_data.get('total_price', '0.00'),
+            pix_code=webhook_data.get('pix_code', ''),  # Ensure this is being passed
             status=status
         )
         db.session.add(transaction)
@@ -546,17 +546,23 @@ def webhook_handler(webhook_path):
 @app.route('/<transaction_id>')
 def payment(transaction_id):
     try:
+        # Get transaction from database
         transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
+        
         if not transaction:
-            return render_template('error.html', error='Transação não encontrada')
+            return render_template('error.html', error='Transaction not found')
+        
+        # Ensure pix_code exists
+        if not transaction.pix_code:
+            return render_template('error.html', error='PIX code not available')
             
-        return render_template('payment.html', 
+        return render_template('payment.html',
             customer_name=transaction.customer_name,
             pix_code=transaction.pix_code
         )
     except Exception as e:
         logger.error(f"Error loading payment page: {str(e)}")
-        return render_template('error.html', error='Error loading payment page')
+        return render_template('error.html', error='Error loading payment details')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

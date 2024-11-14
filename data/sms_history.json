@@ -319,5 +319,32 @@
     "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139968131', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
     "campaign_id": null,
     "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-14 00:56:45",
+    "phone": "5561982132603",
+    "message": "oi",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139968345', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-14 00:58:26",
+    "phone": "5561982132603",
+    "message": "Pedro, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/c208b930",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139968393', 'number': '5561982132603', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
+  },
+  {
+    "timestamp": "2024-11-14 00:59:45",
+    "phone": "5594992366198",
+    "message": "Welverson, efetue o pagamento do seu pedido: http://9ab6ddee-570b-458c-9447-bf06b0fdec95-00-296te8pt15ppq.riker.replit.dev/cdaa9191",
+    "status": "success",
+    "api_response": "{'situacao': 'OK', 'codigo': '1', 'id': '3139968435', 'number': '5594992366198', 'descricao': 'MENSAGEM NA FILA'}",
+    "campaign_id": null,
+    "event_type": "manual"
   }
 ]
