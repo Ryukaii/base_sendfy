@@ -16,18 +16,20 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # Database configuration and validation
-if not os.getenv('DATABASE_URL'):
-    raise ValueError("DATABASE_URL environment variable is not set")
+database_url = os.getenv('DATABASE_URL')
+if not database_url:
+    database_url = 'sqlite:///app.db'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db.init_app(app)
 
 # Initialize database tables and create admin user
 with app.app_context():
     db.create_all()
     
-    # Create default admin user
+    # Create default admin user if not exists
     admin = User.query.filter_by(username='admin').first()
     if not admin:
         admin = User()
@@ -565,4 +567,5 @@ def payment(transaction_id):
         return render_template('error.html', error='Error loading payment details')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.getenv('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
