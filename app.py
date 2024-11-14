@@ -9,11 +9,16 @@ from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models.users import User
+from models.database import db, User, Integration, Campaign, Transaction, SMSHistory
 from celery_worker import send_sms_task
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 # Setup login manager
 login_manager = LoginManager()
@@ -23,31 +28,6 @@ login_manager.login_view = 'login'
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Constants
-INTEGRATIONS_FILE = 'data/integrations.json'
-CAMPAIGNS_FILE = 'data/campaigns.json'
-TRANSACTIONS_FILE = 'data/transactions.json'
-SMS_HISTORY_FILE = 'data/sms_history.json'
-
-def ensure_data_files():
-    if not os.path.exists('data'):
-        os.makedirs('data')
-    for file_path in [INTEGRATIONS_FILE, CAMPAIGNS_FILE, TRANSACTIONS_FILE, SMS_HISTORY_FILE]:
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as f:
-                json.dump([], f)
-
-def calculate_success_rate():
-    try:
-        with open(SMS_HISTORY_FILE, 'r') as f:
-            history = json.load(f)
-            if not history:
-                return 0
-            success_count = sum(1 for sms in history if sms.get('status') == 'success')
-            return round((success_count / len(history)) * 100)
-    except Exception:
-        return 0
 
 def handle_api_error(message, status_code=400):
     return jsonify({
@@ -66,24 +46,33 @@ def admin_required(f):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return User.query.get(int(user_id))
 
 # Admin routes
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
     try:
-        # Get system stats
         stats = {
-            'total_users': len(User.get_all()),
-            'total_sms': len(json.load(open(SMS_HISTORY_FILE))),
-            'active_campaigns': len(json.load(open(CAMPAIGNS_FILE))),
+            'total_users': User.query.count(),
+            'total_sms': SMSHistory.query.count(),
+            'active_campaigns': Campaign.query.count(),
             'success_rate': calculate_success_rate()
         }
-        return render_template('admin/dashboard.html', stats=stats, users=User.get_all())
+        return render_template('admin/dashboard.html', stats=stats, users=User.query.all())
     except Exception as e:
         logger.error(f"Error loading admin dashboard: {str(e)}")
         return render_template('error.html', error='Error loading admin dashboard')
+
+def calculate_success_rate():
+    try:
+        total = SMSHistory.query.count()
+        if total == 0:
+            return 0
+        success_count = SMSHistory.query.filter_by(status='success').count()
+        return round((success_count / total) * 100)
+    except Exception:
+        return 0
 
 @app.route('/api/users', methods=['POST'])
 @admin_required
@@ -92,16 +81,20 @@ def create_user():
         data = request.get_json()
         if not all(k in data for k in ['username', 'password']):
             return handle_api_error('Missing required fields')
+        
+        existing_user = User.query.filter_by(username=data['username']).first()
+        if existing_user:
+            return handle_api_error('Username already exists')
             
-        user = User.create(
+        user = User(
             username=data['username'],
-            password=data['password'],
+            password_hash=generate_password_hash(data['password']),
             is_admin=data.get('is_admin', False),
             credits=int(data.get('credits', 0))
         )
         
-        if not user:
-            return handle_api_error('Username already exists')
+        db.session.add(user)
+        db.session.commit()
             
         return jsonify({
             'success': True,
@@ -119,18 +112,19 @@ def manage_credits(user_id):
         if not all(k in data for k in ['amount', 'operation']):
             return handle_api_error('Missing required fields')
             
-        user = User.get(user_id)
+        user = User.query.get(user_id)
         if not user:
             return handle_api_error('User not found')
             
         amount = int(data['amount'])
         if data['operation'] == 'add':
-            success = user.add_credits(amount)
+            user.credits += amount
         else:
-            success = user.deduct_credits(amount)
+            if user.credits < amount:
+                return handle_api_error('Insufficient credits')
+            user.credits -= amount
             
-        if not success:
-            return handle_api_error('Failed to update credits')
+        db.session.commit()
             
         return jsonify({
             'success': True,
@@ -144,15 +138,18 @@ def manage_credits(user_id):
 @admin_required
 def delete_user(user_id):
     try:
-        if current_user.id == user_id:
+        if current_user.id == int(user_id):
             return handle_api_error('Cannot delete your own account')
             
-        if User.delete(user_id):
+        user = User.query.get(user_id)
+        if user:
+            db.session.delete(user)
+            db.session.commit()
             return jsonify({
                 'success': True,
                 'message': 'User deleted successfully'
             })
-        return handle_api_error('Failed to delete user')
+        return handle_api_error('User not found')
     except Exception as e:
         logger.error(f"Error deleting user: {str(e)}")
         return handle_api_error('Failed to delete user')
@@ -169,7 +166,7 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        user = User.get_by_username(username)
+        user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
             flash('Login successful!', 'success')
@@ -184,17 +181,21 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if User.get_by_username(username):
+        if User.query.filter_by(username=username).first():
             flash('Username already exists', 'danger')
             return render_template('register.html')
             
-        user = User.create(username=username, password=password)
-        if user:
-            login_user(user)
-            flash('Account created successfully!', 'success')
-            return redirect(url_for('index'))
+        user = User(
+            username=username,
+            password_hash=generate_password_hash(password)
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        login_user(user)
+        flash('Account created successfully!', 'success')
+        return redirect(url_for('index'))
             
-        flash('Error creating user', 'danger')
     return render_template('register.html')
 
 @app.route('/logout')
@@ -238,21 +239,16 @@ def send_sms():
         )
         
         # Log SMS in history
-        with open(SMS_HISTORY_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            history = json.load(f)
-            history.append({
-                'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'phone': phone,
-                'message': data['message'],
-                'type': 'manual',
-                'status': 'pending',
-                'user_id': current_user.id
-            })
-            f.seek(0)
-            json.dump(history, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        sms_history = SMSHistory(
+            timestamp=datetime.datetime.now(),
+            phone=phone,
+            message=data['message'],
+            type='manual',
+            status='pending',
+            user_id=current_user.id
+        )
+        db.session.add(sms_history)
+        db.session.commit()
         
         return jsonify({
             'success': True,
@@ -270,14 +266,7 @@ def send_sms():
 @login_required
 def sms_history():
     # Load SMS history for current user
-    with open(SMS_HISTORY_FILE, 'r') as f:
-        all_history = json.load(f)
-        user_history = [
-            sms for sms in all_history 
-            if sms.get('user_id') == current_user.id
-        ]
-        user_history.reverse()  # Most recent first
-        
+    user_history = SMSHistory.query.filter_by(user_id=current_user.id).order_by(SMSHistory.timestamp.desc()).all()
     return render_template('sms_history.html', sms_history=user_history)
 
 @app.route('/campaigns')
@@ -295,13 +284,8 @@ def integrations():
 def get_campaigns():
     try:
         # Get only campaigns for current user
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            all_campaigns = json.load(f)
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        user_campaigns = [c for c in all_campaigns if c.get('user_id') == current_user.id]
-        return jsonify(user_campaigns)
+        user_campaigns = Campaign.query.filter_by(user_id=current_user.id).all()
+        return jsonify([c.to_dict() for c in user_campaigns])
     except Exception as e:
         logger.error(f"Error loading campaigns: {str(e)}")
         return handle_api_error('Failed to load campaigns')
@@ -315,36 +299,27 @@ def create_campaign():
             return handle_api_error('Missing required fields')
             
         # Verify integration belongs to user
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            integrations = json.load(f)
-            integration = next((i for i in integrations if i['id'] == data['integration_id']), None)
-            
-        if not integration or integration.get('user_id') != current_user.id:
+        integration = Integration.query.filter_by(id=data['integration_id'], user_id=current_user.id).first()
+        if not integration:
             return handle_api_error('Invalid integration ID')
             
-        campaign = {
-            'id': str(uuid.uuid4()),
-            'name': data['name'],
-            'integration_id': data['integration_id'],
-            'event_type': data['event_type'],
-            'message_template': data['message_template'],
-            'user_id': current_user.id,
-            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
+        campaign = Campaign(
+            id=str(uuid.uuid4()),
+            name=data['name'],
+            integration_id=data['integration_id'],
+            event_type=data['event_type'],
+            message_template=data['message_template'],
+            user_id=current_user.id,
+            created_at=datetime.datetime.now()
+        )
         
-        with open(CAMPAIGNS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            campaigns.append(campaign)
-            f.seek(0)
-            json.dump(campaigns, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        db.session.add(campaign)
+        db.session.commit()
             
         return jsonify({
             'success': True,
             'message': 'Campaign created successfully',
-            'campaign': campaign
+            'campaign': campaign.to_dict()
         })
     except Exception as e:
         logger.error(f"Error creating campaign: {str(e)}")
@@ -354,20 +329,15 @@ def create_campaign():
 @login_required
 def delete_campaign(campaign_id):
     try:
-        with open(CAMPAIGNS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            campaigns = json.load(f)
-            # Only delete if campaign belongs to current user
-            campaigns = [c for c in campaigns if c['id'] != campaign_id or c.get('user_id') != current_user.id]
-            f.seek(0)
-            json.dump(campaigns, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({
-            'success': True,
-            'message': 'Campaign deleted successfully'
-        })
+        campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
+        if campaign:
+            db.session.delete(campaign)
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'message': 'Campaign deleted successfully'
+            })
+        return handle_api_error('Campaign not found')
     except Exception as e:
         logger.error(f"Error deleting campaign: {str(e)}")
         return handle_api_error('Failed to delete campaign')
@@ -377,13 +347,8 @@ def delete_campaign(campaign_id):
 def get_integrations():
     try:
         # Get only integrations for current user
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            all_integrations = json.load(f)
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        user_integrations = [i for i in all_integrations if i.get('user_id') == current_user.id]
-        return jsonify(user_integrations)
+        user_integrations = Integration.query.filter_by(user_id=current_user.id).all()
+        return jsonify([i.to_dict() for i in user_integrations])
     except Exception as e:
         logger.error(f"Error loading integrations: {str(e)}")
         return handle_api_error('Failed to load integrations')
@@ -396,27 +361,21 @@ def create_integration():
         if not data or 'name' not in data:
             return handle_api_error('Integration name is required')
             
-        integration = {
-            'id': str(uuid.uuid4()),
-            'name': data['name'],
-            'webhook_url': f"/webhook/{str(uuid.uuid4())}",
-            'user_id': current_user.id,
-            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
+        integration = Integration(
+            id=str(uuid.uuid4()),
+            name=data['name'],
+            webhook_url=f"/webhook/{str(uuid.uuid4())}",
+            user_id=current_user.id,
+            created_at=datetime.datetime.now()
+        )
         
-        with open(INTEGRATIONS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            integrations = json.load(f)
-            integrations.append(integration)
-            f.seek(0)
-            json.dump(integrations, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        db.session.add(integration)
+        db.session.commit()
             
         return jsonify({
             'success': True,
             'message': 'Integration created successfully',
-            'integration': integration
+            'integration': integration.to_dict()
         })
     except Exception as e:
         logger.error(f"Error creating integration: {str(e)}")
@@ -426,20 +385,15 @@ def create_integration():
 @login_required
 def delete_integration(integration_id):
     try:
-        with open(INTEGRATIONS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            integrations = json.load(f)
-            # Only delete if integration belongs to current user
-            integrations = [i for i in integrations if i['id'] != integration_id or i.get('user_id') != current_user.id]
-            f.seek(0)
-            json.dump(integrations, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-            
-        return jsonify({
-            'success': True,
-            'message': 'Integration deleted successfully'
-        })
+        integration = Integration.query.filter_by(id=integration_id, user_id=current_user.id).first()
+        if integration:
+            db.session.delete(integration)
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'message': 'Integration deleted successfully'
+            })
+        return handle_api_error('Integration not found')
     except Exception as e:
         logger.error(f"Error deleting integration: {str(e)}")
         return handle_api_error('Failed to delete integration')
@@ -451,37 +405,31 @@ def webhook_handler(webhook_path):
         logger.debug(f"Received webhook data: {webhook_data}")
         
         # Find integration with matching webhook URL
-        with open(INTEGRATIONS_FILE, 'r') as f:
-            integrations = json.load(f)
-            integration = next((i for i in integrations if webhook_path in i['webhook_url']), None)
-        
+        integration = Integration.query.filter(Integration.webhook_url.like(f"%{webhook_path}%")).first()
         if not integration:
             logger.error(f"No integration found for webhook path: {webhook_path}")
             return handle_api_error('Integration not found', 404)
             
         # Get user who owns the integration
-        user = User.get(integration['user_id'])
+        user = User.query.get(integration.user_id)
         if not user:
-            logger.error(f"User not found for integration {integration['id']}")
+            logger.error(f"User not found for integration {integration.id}")
             return handle_api_error('Integration owner not found', 404)
             
         # Load campaigns for this integration
-        with open(CAMPAIGNS_FILE, 'r') as f:
-            campaigns = json.load(f)
-            
+        campaigns = Campaign.query.filter_by(integration_id=integration.id, user_id=user.id).all()
+        
         # Get status from webhook data
         status = webhook_data.get('status', 'pending').lower()
         
         # Find matching campaigns for this status
         matching_campaigns = [
             c for c in campaigns 
-            if c['integration_id'] == integration['id'] 
-            and c['event_type'].lower() == status
-            and c['user_id'] == user.id
+            if c.event_type.lower() == status
         ]
         
         if not matching_campaigns:
-            logger.warning(f"No campaigns found for integration {integration['id']} and status {status}")
+            logger.warning(f"No campaigns found for integration {integration.id} and status {status}")
             return jsonify({
                 'success': True,
                 'message': 'No matching campaigns found for this event type'
@@ -491,34 +439,28 @@ def webhook_handler(webhook_path):
         transaction_id = str(uuid.uuid4())[:8]
         customer_data = webhook_data.get('customer', {})
         
-        transaction = {
-            'transaction_id': transaction_id,
-            'customer_name': customer_data.get('name', ''),
-            'customer_phone': customer_data.get('phone', ''),
-            'customer_email': customer_data.get('email', ''),
-            'product_name': webhook_data.get('product_name', ''),
-            'total_price': webhook_data.get('total_price', '0.00'),
-            'pix_code': webhook_data.get('pix_code', ''),
-            'status': status,
-            'created_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
+        transaction = Transaction(
+            transaction_id=transaction_id,
+            customer_name=customer_data.get('name', ''),
+            customer_phone=customer_data.get('phone', ''),
+            customer_email=customer_data.get('email', ''),
+            product_name=webhook_data.get('product_name', ''),
+            total_price=webhook_data.get('total_price', '0.00'),
+            pix_code=webhook_data.get('pix_code', ''),
+            status=status,
+            created_at=datetime.datetime.now()
+        )
         
         # Save transaction
-        with open(TRANSACTIONS_FILE, 'r+') as f:
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-            transactions = json.load(f)
-            transactions.append(transaction)
-            f.seek(0)
-            json.dump(transactions, f, indent=2)
-            f.truncate()
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+        db.session.add(transaction)
+        db.session.commit()
 
         success_count = 0
         # Send SMS for each matching campaign
         for campaign in matching_campaigns:
             try:
                 if not user.has_sufficient_credits(1):
-                    logger.warning(f"User {user.id} has insufficient credits for campaign {campaign['id']}")
+                    logger.warning(f"User {user.id} has insufficient credits for campaign {campaign.id}")
                     continue
                     
                 # Get first name
@@ -531,7 +473,7 @@ def webhook_handler(webhook_path):
                     phone = f'+55{phone}'
                 
                 # Format message
-                message = campaign['message_template']
+                message = campaign.message_template
                 message = message.replace('{customer.first_name}', first_name)
                 message = message.replace('{total_price}', webhook_data.get('total_price', ''))
                 
@@ -547,13 +489,13 @@ def webhook_handler(webhook_path):
                     send_sms_task.delay(
                         phone=phone,
                         message=message,
-                        event_type=campaign['event_type']
+                        event_type=campaign.event_type
                     )
                     success_count += 1
-                    logger.info(f"SMS queued for campaign {campaign['id']}")
+                    logger.info(f"SMS queued for campaign {campaign.id}")
                 
             except Exception as e:
-                logger.error(f"Error sending SMS for campaign {campaign['id']}: {str(e)}")
+                logger.error(f"Error sending SMS for campaign {campaign.id}: {str(e)}")
                 # Refund credit if SMS failed to queue
                 user.add_credits(1)
 
@@ -570,21 +512,19 @@ def webhook_handler(webhook_path):
 @app.route('/payment/<customer_name>/<transaction_id>')
 def payment(customer_name, transaction_id):
     try:
-        with open(TRANSACTIONS_FILE, 'r') as f:
-            transactions = json.load(f)
-            transaction = next((t for t in transactions if t['transaction_id'] == transaction_id), None)
-            
+        transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
         if not transaction:
             return render_template('error.html', error='Transaction not found')
             
         return render_template('payment.html',
-            customer_name=transaction['customer_name'],
-            pix_code=transaction['pix_code']
+            customer_name=transaction.customer_name,
+            pix_code=transaction.pix_code
         )
     except Exception as e:
         logger.error(f"Error loading payment page: {str(e)}")
         return render_template('error.html', error='Error loading payment page')
 
 if __name__ == '__main__':
-    ensure_data_files()
+    with app.app_context():
+        db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
