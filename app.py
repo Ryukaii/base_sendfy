@@ -15,10 +15,18 @@ from celery_worker import send_sms_task
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# Database configuration
+# Database configuration and validation
+if not os.getenv('DATABASE_URL'):
+    raise ValueError("DATABASE_URL environment variable is not set")
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+
+# Initialize database tables
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully")
 
 # Setup login manager
 login_manager = LoginManager()
@@ -525,6 +533,4 @@ def payment(customer_name, transaction_id):
         return render_template('error.html', error='Error loading payment page')
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
