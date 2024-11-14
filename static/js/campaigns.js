@@ -96,6 +96,9 @@ async function loadCampaigns() {
                             <button class="btn btn-sm btn-danger" onclick="deleteCampaign('${campaign.id}')">
                                 <i class="fas fa-trash me-1"></i> Excluir
                             </button>
+                            <button class="btn btn-sm btn-info" onclick="window.open('/preview-payment/${campaign.id}', '_blank')">
+                                <i class="fas fa-eye me-1"></i> Visualizar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -150,6 +153,14 @@ async function editCampaign(campaignId) {
         document.getElementById('delayAmount').value = campaign.delay_amount || 0;
         document.getElementById('delayUnit').value = campaign.delay_unit || 'minutes';
         
+        // Payment page fields
+        document.getElementById('paymentPageTitle').value = campaign.payment_page_title || '';
+        document.getElementById('paymentPageLogoUrl').value = campaign.payment_page_logo_url || '';
+        document.getElementById('paymentPageHeaderColor').value = campaign.payment_page_header_color || '#2FBDAE';
+        document.getElementById('paymentPageButtonColor').value = campaign.payment_page_button_color || '#2FBDAE';
+        document.getElementById('paymentPageTextColor').value = campaign.payment_page_text_color || '#000000';
+        document.getElementById('paymentPageCustomText').value = campaign.payment_page_custom_text || '';
+        
         document.getElementById('integrationId').disabled = true;
     } catch (error) {
         console.error('Erro ao carregar campanha para edição:', error);
@@ -171,7 +182,13 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         event_type: document.getElementById('eventType').value,
         message_template: document.getElementById('messageTemplate').value,
         delay_amount: parseInt(document.getElementById('delayAmount').value) || 0,
-        delay_unit: document.getElementById('delayUnit').value
+        delay_unit: document.getElementById('delayUnit').value,
+        payment_page_title: document.getElementById('paymentPageTitle').value,
+        payment_page_logo_url: document.getElementById('paymentPageLogoUrl').value,
+        payment_page_header_color: document.getElementById('paymentPageHeaderColor').value,
+        payment_page_button_color: document.getElementById('paymentPageButtonColor').value,
+        payment_page_text_color: document.getElementById('paymentPageTextColor').value,
+        payment_page_custom_text: document.getElementById('paymentPageCustomText').value
     };
     
     const campaignId = e.target.dataset.campaignId;
@@ -217,6 +234,11 @@ function resetForm() {
     form.reset();
     delete form.dataset.campaignId;
     document.getElementById('integrationId').disabled = false;
+    
+    // Reset color inputs to defaults
+    document.getElementById('paymentPageHeaderColor').value = '#2FBDAE';
+    document.getElementById('paymentPageButtonColor').value = '#2FBDAE';
+    document.getElementById('paymentPageTextColor').value = '#000000';
 }
 
 async function deleteCampaign(campaignId) {
@@ -261,6 +283,15 @@ async function deleteCampaign(campaignId) {
         campaignCard.innerHTML = originalContent;
         showToast('error', `Erro ao excluir campanha: ${error.message}`);
     }
+}
+
+function previewPaymentPage() {
+    const campaignId = document.getElementById('campaignForm').dataset.campaignId;
+    if (!campaignId) {
+        showToast('error', 'Salve a campanha primeiro para visualizar a página');
+        return;
+    }
+    window.open(`/preview-payment/${campaignId}`, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -41,43 +41,92 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Modelo de Mensagem</label>
-                        <textarea class="form-control" id="messageTemplate" rows="3" required></textarea>
-                        <small class="text-muted">
-                            Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
-                            Acesse sua página de pagamento: {link_pix}
-                        </small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Atraso no Envio</label>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <input type="number" class="form-control" id="delayAmount" min="0" value="0">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#messageTab">Mensagem SMS</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#paymentPageTab">Página de Pagamento</a>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content p-3 border border-secondary rounded-bottom">
+                            <div class="tab-pane fade show active" id="messageTab">
+                                <div class="mb-3">
+                                    <label class="form-label">Modelo de Mensagem</label>
+                                    <textarea class="form-control" id="messageTemplate" rows="3" required></textarea>
+                                    <small class="text-muted">
+                                        Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
+                                        Acesse sua página de pagamento: {link_pix}
+                                    </small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Atraso no Envio</label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="number" class="form-control" id="delayAmount" min="0" value="0">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select class="form-control" id="delayUnit">
+                                                <option value="minutes">Minutos</option>
+                                                <option value="hours">Horas</option>
+                                                <option value="days">Dias</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        Defina quanto tempo esperar antes de enviar a mensagem após o evento
+                                    </small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Variáveis Disponíveis:</label>
+                                    <div class="btn-group-vertical w-100">
+                                        <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{customer.first_name}')">
+                                            <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{total_price}')">
+                                            <i class="fas fa-tags me-2"></i>Valor Total
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{link_pix}')">
+                                            <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <select class="form-control" id="delayUnit">
-                                    <option value="minutes">Minutos</option>
-                                    <option value="hours">Horas</option>
-                                    <option value="days">Dias</option>
-                                </select>
+                            <div class="tab-pane fade" id="paymentPageTab">
+                                <div class="mb-3">
+                                    <label class="form-label">Título da Página</label>
+                                    <input type="text" class="form-control" id="paymentPageTitle" placeholder="Ex: Finalizar Pagamento">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">URL do Logo</label>
+                                    <input type="url" class="form-control" id="paymentPageLogoUrl" placeholder="https://...">
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Cor do Cabeçalho</label>
+                                        <input type="color" class="form-control form-control-color w-100" id="paymentPageHeaderColor" value="#2FBDAE">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Cor dos Botões</label>
+                                        <input type="color" class="form-control form-control-color w-100" id="paymentPageButtonColor" value="#2FBDAE">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Cor do Texto</label>
+                                        <input type="color" class="form-control form-control-color w-100" id="paymentPageTextColor" value="#000000">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Texto Personalizado</label>
+                                    <textarea class="form-control" id="paymentPageCustomText" rows="3" 
+                                        placeholder="Texto adicional para exibir na página de pagamento"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-primary" onclick="previewPaymentPage()">
+                                        <i class="fas fa-eye me-2"></i>Visualizar Página
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <small class="text-muted">
-                            Defina quanto tempo esperar antes de enviar a mensagem após o evento
-                        </small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Variáveis Disponíveis:</label>
-                        <div class="btn-group-vertical w-100">
-                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{customer.first_name}')">
-                                <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
-                            </button>
-                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{total_price}')">
-                                <i class="fas fa-tags me-2"></i>Valor Total
-                            </button>
-                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{link_pix}')">
-                                <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
-                            </button>
                         </div>
                     </div>
                 </form>

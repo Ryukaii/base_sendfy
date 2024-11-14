@@ -472,6 +472,20 @@ def delete_integration(integration_id):
         logger.error(f"Error deleting integration: {str(e)}")
         return handle_api_error('Failed to delete integration')
 
+@app.route('/preview-payment/<campaign_id>')
+@login_required
+def preview_payment(campaign_id):
+    campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
+    if not campaign:
+        return render_template('error.html', error='Campaign not found')
+        
+    return render_template('payment.html',
+        campaign=campaign,
+        customer_name='Example Customer',
+        pix_code='EXAMPLE_PIX_CODE_12345',
+        default_logo_url='/static/images/default_logo.png'
+    )
+
 @app.route('/webhook/<path:webhook_path>', methods=['POST'])
 def webhook_handler(webhook_path):
     try:

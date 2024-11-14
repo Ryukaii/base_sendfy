@@ -68,6 +68,12 @@ class Campaign(db.Model):
     integration_id = db.Column(db.Integer, db.ForeignKey('integrations.id'), nullable=False)
     event_type = db.Column(db.String(50), nullable=False)
     message_template = db.Column(db.Text, nullable=False)
+    payment_page_title = db.Column(db.String(200), nullable=True)
+    payment_page_logo_url = db.Column(db.String(500), nullable=True)
+    payment_page_header_color = db.Column(db.String(50), nullable=True, default='#2FBDAE')
+    payment_page_button_color = db.Column(db.String(50), nullable=True, default='#2FBDAE')
+    payment_page_text_color = db.Column(db.String(50), nullable=True, default='#000000')
+    payment_page_custom_text = db.Column(db.Text, nullable=True)
     delay_amount = db.Column(db.Integer, nullable=True)
     delay_unit = db.Column(db.String(10), nullable=True)  # 'minutes', 'hours', 'days'
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -76,7 +82,7 @@ class Campaign(db.Model):
     integration = db.relationship('Integration', backref=db.backref('campaigns', lazy=True))
 
     def to_dict(self):
-        return {
+        data = {
             'id': self.id,
             'name': self.name,
             'integration_id': self.integration_id,
@@ -85,8 +91,15 @@ class Campaign(db.Model):
             'delay_amount': self.delay_amount,
             'delay_unit': self.delay_unit,
             'user_id': self.user_id,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'payment_page_title': self.payment_page_title,
+            'payment_page_logo_url': self.payment_page_logo_url,
+            'payment_page_header_color': self.payment_page_header_color,
+            'payment_page_button_color': self.payment_page_button_color,
+            'payment_page_text_color': self.payment_page_text_color,
+            'payment_page_custom_text': self.payment_page_custom_text
         }
+        return data
 
 class Transaction(db.Model):
     __tablename__ = 'transactions'
