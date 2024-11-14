@@ -62,7 +62,7 @@ async function loadCampaigns() {
             list.innerHTML = `
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle me-2"></i>
-                    Nenhuma campanha encontrada. Crie sua primeira campanha usando o formulário acima.
+                    Nenhuma campanha encontrada. Crie sua primeira campanha usando o botão acima.
                 </div>
             `;
             return;
@@ -90,7 +90,7 @@ async function loadCampaigns() {
                             <p class="card-text"><small class="text-muted">Criada em: ${campaign.created_at}</small></p>
                         </div>
                         <div class="d-flex flex-column gap-2">
-                            <button class="btn btn-sm btn-primary" onclick="editCampaign('${campaign.id}')">
+                            <button class="btn btn-sm btn-primary" onclick="openCampaignModal('${campaign.id}')">
                                 <i class="fas fa-edit me-1"></i> Editar
                             </button>
                             <button class="btn btn-sm btn-danger" onclick="deleteCampaign('${campaign.id}')">
@@ -116,12 +116,55 @@ async function loadCampaigns() {
     }
 }
 
+function openCampaignModal(campaignId = null) {
+    const modal = new bootstrap.Modal(document.getElementById('campaignModal'));
+    if (campaignId) {
+        editCampaign(campaignId);
+    } else {
+        resetForm();
+    }
+    modal.show();
+}
+
+function saveCampaign() {
+    document.getElementById('campaignForm').dispatchEvent(new Event('submit'));
+}
+
+async function editCampaign(campaignId) {
+    try {
+        const response = await fetch('/api/campaigns');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const campaigns = await response.json();
+        const campaign = campaigns.find(c => c.id === campaignId);
+        
+        if (!campaign) {
+            throw new Error('Campanha não encontrada');
+        }
+        
+        const form = document.getElementById('campaignForm');
+        form.dataset.campaignId = campaignId;
+        
+        document.getElementById('campaignName').value = campaign.name;
+        document.getElementById('integrationId').value = campaign.integration_id;
+        document.getElementById('integrationId').disabled = true;
+        document.getElementById('eventType').value = campaign.event_type;
+        document.getElementById('messageTemplate').value = campaign.message_template;
+        document.getElementById('delayAmount').value = campaign.delay_amount || 0;
+        document.getElementById('delayUnit').value = campaign.delay_unit || 'minutes';
+    } catch (error) {
+        console.error('Erro ao carregar campanha para edição:', error);
+        showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);
+    }
+}
+
 document.getElementById('campaignForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const submitButton = e.target.querySelector('button[type="submit"]');
+    const submitButton = document.querySelector('.modal-footer .btn-primary');
     const originalText = submitButton.innerHTML;
     submitButton.disabled = true;
+    submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Salvando...`;
     
     const formData = {
         name: document.getElementById('campaignName').value,
@@ -158,6 +201,7 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         }
         
         showToast('success', `Campanha ${campaignId ? 'atualizada' : 'criada'} com sucesso!`);
+        bootstrap.Modal.getInstance(document.getElementById('campaignModal')).hide();
         resetForm();
         loadCampaigns();
     } catch (error) {
@@ -174,45 +218,6 @@ function resetForm() {
     form.reset();
     delete form.dataset.campaignId;
     document.getElementById('integrationId').disabled = false;
-    document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
-    
-    const errorDivs = form.querySelectorAll('.alert-danger');
-    errorDivs.forEach(div => div.remove());
-}
-
-async function editCampaign(campaignId) {
-    try {
-        const response = await fetch('/api/campaigns');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const campaigns = await response.json();
-        const campaign = campaigns.find(c => c.id === campaignId);
-        
-        if (!campaign) {
-            throw new Error('Campanha não encontrada');
-        }
-        
-        const form = document.getElementById('campaignForm');
-        form.dataset.campaignId = campaignId;
-        
-        document.getElementById('campaignName').value = campaign.name;
-        document.getElementById('integrationId').value = campaign.integration_id;
-        document.getElementById('integrationId').disabled = true;
-        document.getElementById('eventType').value = campaign.event_type;
-        document.getElementById('messageTemplate').value = campaign.message_template;
-        document.getElementById('delayAmount').value = campaign.delay_amount || 0;
-        document.getElementById('delayUnit').value = campaign.delay_unit || 'minutes';
-        
-        document.querySelector('button[type="submit"]').innerHTML = `
-            <i class="fas fa-save me-1"></i>
-            Atualizar Campanha
-        `;
-        
-        form.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-        console.error('Erro ao carregar campanha para edição:', error);
-        showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);
-    }
 }
 
 async function deleteCampaign(campaignId) {
@@ -248,9 +253,10 @@ async function deleteCampaign(campaignId) {
         
         setTimeout(() => {
             campaignCard.remove();
-            resetForm();
             loadCampaigns();
         }, 300);
+        
+        showToast('success', 'Campanha excluída com sucesso!');
     } catch (error) {
         console.error('Erro ao excluir campanha:', error);
         campaignCard.innerHTML = originalContent;
@@ -260,14 +266,4 @@ async function deleteCampaign(campaignId) {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadCampaigns();
-    
-    const cancelButton = document.createElement('button');
-    cancelButton.type = 'button';
-    cancelButton.className = 'btn btn-secondary ms-2';
-    cancelButton.innerHTML = '<i class="fas fa-times me-1"></i> Cancelar';
-    cancelButton.onclick = resetForm;
-    
-    const submitButton = document.querySelector('button[type="submit"]');
-    submitButton.innerHTML = '<i class="fas fa-plus me-1"></i> Criar Campanha';
-    submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
 });

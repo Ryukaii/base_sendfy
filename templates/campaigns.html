@@ -2,79 +2,91 @@
 
 {% block content %}
 <div class="card mb-4">
-    <div class="card-header">
-        <h2>Criar Campanha</h2>
-    </div>
-    <div class="card-body">
-        <form id="campaignForm">
-            <div class="mb-3">
-                <label class="form-label">Nome da Campanha</label>
-                <input type="text" class="form-control" id="campaignName" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Integração</label>
-                <select class="form-control" id="integrationId" required>
-                    <!-- Será preenchido por JavaScript -->
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Tipo de Evento</label>
-                <select class="form-control" id="eventType" required>
-                    <option value="pending">Venda Pendente</option>
-                    <option value="approved">Venda Aprovada</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Modelo de Mensagem</label>
-                <textarea class="form-control" id="messageTemplate" rows="3" required></textarea>
-                <small class="text-muted">
-                    Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
-                    Acesse sua página de pagamento: {link_pix}
-                </small>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Atraso no Envio</label>
-                <div class="row">
-                    <div class="col-md-6">
-                        <input type="number" class="form-control" id="delayAmount" min="0" value="0">
-                    </div>
-                    <div class="col-md-6">
-                        <select class="form-control" id="delayUnit">
-                            <option value="minutes">Minutos</option>
-                            <option value="hours">Horas</option>
-                            <option value="days">Dias</option>
-                        </select>
-                    </div>
-                </div>
-                <small class="text-muted">
-                    Defina quanto tempo esperar antes de enviar a mensagem após o evento
-                </small>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Variáveis Disponíveis:</label>
-                <div class="btn-group-vertical w-100">
-                    <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{customer.first_name}')">
-                        <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
-                    </button>
-                    <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{total_price}')">
-                        <i class="fas fa-tags me-2"></i>Valor Total
-                    </button>
-                    <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{link_pix}')">
-                        <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
-                    </button>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Criar Campanha</button>
-        </form>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h2>Campanhas Existentes</h2>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Campanhas</h2>
+        <button class="btn btn-primary" onclick="openCampaignModal()">
+            <i class="fas fa-plus me-2"></i>Nova Campanha
+        </button>
     </div>
     <div class="card-body">
         <div id="campaignsList"></div>
+    </div>
+</div>
+
+<!-- Campaign Modal -->
+<div class="modal fade" id="campaignModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Criar/Editar Campanha</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="campaignForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Campanha</label>
+                        <input type="text" class="form-control" id="campaignName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Integração</label>
+                        <select class="form-control" id="integrationId" required>
+                            <!-- Será preenchido por JavaScript -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Evento</label>
+                        <select class="form-control" id="eventType" required>
+                            <option value="pending">Venda Pendente</option>
+                            <option value="approved">Venda Aprovada</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Modelo de Mensagem</label>
+                        <textarea class="form-control" id="messageTemplate" rows="3" required></textarea>
+                        <small class="text-muted">
+                            Exemplo: Olá {customer.first_name}, seu pedido no valor de R$ {total_price} foi confirmado! 
+                            Acesse sua página de pagamento: {link_pix}
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Atraso no Envio</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="number" class="form-control" id="delayAmount" min="0" value="0">
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-control" id="delayUnit">
+                                    <option value="minutes">Minutos</option>
+                                    <option value="hours">Horas</option>
+                                    <option value="days">Dias</option>
+                                </select>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            Defina quanto tempo esperar antes de enviar a mensagem após o evento
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Variáveis Disponíveis:</label>
+                        <div class="btn-group-vertical w-100">
+                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{customer.first_name}')">
+                                <i class="fas fa-user me-2"></i>Nome do Cliente (Primeiro Nome)
+                            </button>
+                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{total_price}')">
+                                <i class="fas fa-tags me-2"></i>Valor Total
+                            </button>
+                            <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{link_pix}')">
+                                <i class="fas fa-link me-2"></i>Link Página de Pagamento PIX
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveCampaign()">Salvar</button>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
