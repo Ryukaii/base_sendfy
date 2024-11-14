@@ -402,11 +402,20 @@ def update_campaign(campaign_id):
             return handle_api_error('Campaign not found')
             
         data = request.get_json()
+        # Update existing fields
         campaign.name = data.get('name', campaign.name)
         campaign.event_type = data.get('event_type', campaign.event_type)
         campaign.message_template = data.get('message_template', campaign.message_template)
         campaign.delay_amount = data.get('delay_amount', campaign.delay_amount)
         campaign.delay_unit = data.get('delay_unit', campaign.delay_unit)
+        
+        # Add payment page customization fields
+        campaign.payment_page_title = data.get('payment_page_title', campaign.payment_page_title)
+        campaign.payment_page_logo_url = data.get('payment_page_logo_url', campaign.payment_page_logo_url)
+        campaign.payment_page_header_color = data.get('payment_page_header_color', campaign.payment_page_header_color)
+        campaign.payment_page_button_color = data.get('payment_page_button_color', campaign.payment_page_button_color)
+        campaign.payment_page_text_color = data.get('payment_page_text_color', campaign.payment_page_text_color)
+        campaign.payment_page_custom_text = data.get('payment_page_custom_text', campaign.payment_page_custom_text)
         
         db.session.commit()
             
