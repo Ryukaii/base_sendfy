@@ -78,22 +78,28 @@
     </style>
 </head>
 <body class="bg-gray-50 font-['Inter',sans-serif] flex flex-col min-h-screen">
-    <header class="bg-gradient-to-r from-[#2FBDAE] to-[#2FBDAE] shadow-lg py-2">
+    <header class="bg-gradient-to-r shadow-lg py-2" style="background-color: {{ payment_page_header_color }}">
         <div class="container mx-auto px-4 flex flex-col items-center justify-center space-y-1">
-            <h2 class="text-2xl font-bold text-white mb-1">Compra Segura</h2>
+            <h2 class="text-2xl font-bold text-white mb-1">{{ payment_page_title }}</h2>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8 flex-grow">
         <div class="bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto hover:shadow-2xl transition-all duration-300">
+            {% if payment_page_logo_url %}
             <div class="flex justify-center mb-6">
-                <img alt="Logo do PIX, um sistema de pagamento instantâneo criado pelo Banco Central do Brasil" class="h-16 hover:scale-105 transition-transform duration-300" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg/2560px-Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg.png"/>
+                <img alt="Logo" class="h-16 hover:scale-105 transition-transform duration-300" 
+                     src="{{ payment_page_logo_url }}"/>
             </div>
+            {% else %}
+            <div class="flex justify-center mb-6">
+                <img alt="Logo PIX" class="h-16" 
+                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg/2560px-Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg.png"/>
+            </div>
+            {% endif %}
 
             <div class="space-y-4">
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold text-black mb-1">NÃO PERCA ESSA OPORTUNIDADE!</h2>
-                    <br>
                     <p class="text-black">
                         Prezado <span class="text-black"><b>{{ customer_name }}</b>, finalize sua compra agora mesmo. Efetue o pagamento via PIX e garanta seu produto.</span>
                     </p>
@@ -113,15 +119,18 @@
                     </p>
                 </div>
 
-                <button class="w-full bg-[#2FBDAE] hover:bg-[#2FBDAE] transform transition-all duration-200 ease-in-out hover:scale-[1.02] text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 shadow-md hover:shadow-lg" onclick="copiarPixCode()">
+                <button class="w-full transform transition-all duration-200 ease-in-out hover:scale-[1.02] text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 shadow-md hover:shadow-lg" 
+                        style="background-color: {{ payment_page_button_color }}"
+                        onclick="copiarPixCode()">
                     <i class="fas fa-copy"></i>
                     <span>Copiar Código PIX</span>
                 </button>
-                <br>
 
-                <div class="flex justify-center mt-4">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg/1200px-Logo%E2%80%94pix_powered_by_Banco_Central_%28Brazil%2C_2020%29.svg.png" alt="Logo PIX" class="h-8"/>
+                {% if payment_page_custom_text %}
+                <div class="mt-4 text-center" style="color: {{ payment_page_text_color }}">
+                    {{ payment_page_custom_text }}
                 </div>
+                {% endif %}
 
                 <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg p-6 space-y-4 shadow-sm">
                     <div class="space-y-3 w-full">

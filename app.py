@@ -1,633 +1,173 @@
-import os
-import json
-import uuid
-import fcntl
-import logging
-import datetime
-import re
-from functools import wraps
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from models.database import db, User, Integration, Campaign, Transaction, SMSHistory
-from celery_worker import send_sms_task
+from werkzeug.security import generate_password_hash
+import os
+import logging
+from datetime import datetime
+from celery import Celery
+import json
+from functools import wraps
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
-
-# Database configuration and validation
-database_url = os.getenv('DATABASE_URL')
-if not database_url:
-    database_url = 'sqlite:///app.db'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SECRET_KEY'] = os.urandom(24)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize extensions
 db.init_app(app)
-
-# Initialize database tables and create admin user
-with app.app_context():
-    db.create_all()
-    
-    # Create default admin user if not exists
-    admin = User.query.filter_by(username='admin').first()
-    if not admin:
-        admin = User()
-        admin.username = 'admin'
-        admin.set_password('admin123')
-        admin.is_admin = True
-        admin.credits = 100
-        db.session.add(admin)
-        db.session.commit()
-        print("Default admin user created")
-
-# Setup login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Configure Celery
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-def handle_api_error(message, status_code=400):
-    return jsonify({
-        'success': False,
-        'error': message
-    }), status_code
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
-            flash('Admin access required', 'danger')
+            flash('Acesso negado. Você precisa ser um administrador.', 'danger')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
-# Authentication routes
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-        
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
-        if not username or not password:
-            flash('Username and password are required', 'danger')
-            return render_template('login.html')
-        
-        logger.info(f"Login attempt for user: {username}")
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_password(password):
-            logger.info("Login successful")
             login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('index'))
-            
-        logger.warning("Invalid login attempt")
-        flash('Invalid username or password', 'danger')
-        
+            flash('Login realizado com sucesso!', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Usuário ou senha inválidos.', 'danger')
+    
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-        
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if not username or not password:
-            flash('Username and password are required', 'danger')
-            return render_template('register.html')
-            
         if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'danger')
-            return render_template('register.html')
-            
-        user = User()
-        user.username = username
-        user.set_password(password)
+            flash('Nome de usuário já existe.', 'danger')
+            return redirect(url_for('register'))
         
+        user = User(username=username)
+        user.set_password(password)
         db.session.add(user)
         db.session.commit()
         
-        login_user(user)
-        flash('Account created successfully!', 'success')
-        return redirect(url_for('index'))
-            
+        flash('Conta criada com sucesso! Faça login para continuar.', 'success')
+        return redirect(url_for('login'))
+    
     return render_template('register.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out', 'success')
+    flash('Logout realizado com sucesso!', 'success')
     return redirect(url_for('login'))
 
-# Admin routes
 @app.route('/admin')
+@login_required
 @admin_required
 def admin_dashboard():
-    try:
-        stats = {
-            'total_users': User.query.count(),
-            'total_sms': SMSHistory.query.count(),
-            'active_campaigns': Campaign.query.count(),
-            'success_rate': calculate_success_rate()
-        }
-        return render_template('admin/dashboard.html', stats=stats, users=User.query.all())
-    except Exception as e:
-        logger.error(f"Error loading admin dashboard: {str(e)}")
-        return render_template('error.html', error='Error loading admin dashboard')
+    users = User.query.all()
+    stats = {
+        'total_users': User.query.count(),
+        'total_sms': SMSHistory.query.count(),
+        'active_campaigns': Campaign.query.count(),
+        'success_rate': calculate_success_rate()
+    }
+    return render_template('admin/dashboard.html', users=users, stats=stats)
 
 def calculate_success_rate():
-    try:
-        total = SMSHistory.query.count()
-        if total == 0:
-            return 0
-        success_count = SMSHistory.query.filter_by(status='success').count()
-        return round((success_count / total) * 100)
-    except Exception:
+    total = SMSHistory.query.count()
+    if total == 0:
         return 0
-
-# Main routes
-@app.route('/')
-def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-    return render_template('index.html')
+    success = SMSHistory.query.filter_by(status='success').count()
+    return round((success / total) * 100)
 
 @app.route('/api/users', methods=['POST'])
+@login_required
 @admin_required
 def create_user():
-    try:
-        data = request.get_json()
-        if not all(k in data for k in ['username', 'password']):
-            return handle_api_error('Missing required fields')
+    data = request.get_json()
+    
+    if User.query.filter_by(username=data['username']).first():
+        return jsonify({'message': 'Username already exists'}), 400
         
-        existing_user = User.query.filter_by(username=data['username']).first()
-        if existing_user:
-            return handle_api_error('Username already exists')
-            
-        user = User()
-        user.username = data['username']
-        user.set_password(str(data['password']))
-        user.is_admin = data.get('is_admin', False)
-        user.credits = int(data.get('credits', 0))
-        
-        db.session.add(user)
-        db.session.commit()
-            
-        return jsonify({
-            'success': True,
-            'message': 'User created successfully'
-        })
-    except Exception as e:
-        logger.error(f"Error creating user: {str(e)}")
-        return handle_api_error('Failed to create user')
+    user = User(
+        username=data['username'],
+        is_admin=data.get('is_admin', False),
+        credits=data.get('credits', 0)
+    )
+    user.set_password(data['password'])
+    
+    db.session.add(user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User created successfully'}), 201
 
-@app.route('/api/users/<user_id>/credits', methods=['POST'])
-@admin_required
-def manage_credits(user_id):
-    try:
-        data = request.get_json()
-        if not all(k in data for k in ['amount', 'operation']):
-            return handle_api_error('Missing required fields')
-            
-        user = User.query.get(user_id)
-        if not user:
-            return handle_api_error('User not found')
-            
-        amount = int(data['amount'])
-        if data['operation'] == 'add':
-            success = user.add_credits(amount)
-        else:
-            success = user.deduct_credits(amount)
-            
-        if not success:
-            return handle_api_error('Failed to update credits')
-            
-        return jsonify({
-            'success': True,
-            'message': 'Credits updated successfully'
-        })
-    except Exception as e:
-        logger.error(f"Error managing credits: {str(e)}")
-        return handle_api_error('Failed to update credits')
-
-@app.route('/api/users/<user_id>', methods=['DELETE'])
+@app.route('/api/users/<int:user_id>', methods=['DELETE'])
+@login_required
 @admin_required
 def delete_user(user_id):
-    try:
-        if current_user.id == int(user_id):
-            return handle_api_error('Cannot delete your own account')
-            
-        user = User.query.get(user_id)
-        if user:
-            db.session.delete(user)
-            db.session.commit()
-            return jsonify({
-                'success': True,
-                'message': 'User deleted successfully'
-            })
-        return handle_api_error('User not found')
-    except Exception as e:
-        logger.error(f"Error deleting user: {str(e)}")
-        return handle_api_error('Failed to delete user')
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        return jsonify({'message': 'Cannot delete yourself'}), 400
+        
+    db.session.delete(user)
+    db.session.commit()
+    
+    return jsonify({'message': 'User deleted successfully'})
 
-@app.route('/sms')
+@app.route('/api/users/<int:user_id>/credits', methods=['POST'])
 @login_required
-def sms():
-    return render_template('sms.html')
+@admin_required
+def manage_credits(user_id):
+    user = User.query.get_or_404(user_id)
+    data = request.get_json()
+    
+    amount = int(data['amount'])
+    operation = data['operation']
+    
+    if operation == 'add':
+        user.credits += amount
+    elif operation == 'remove':
+        if user.credits < amount:
+            return jsonify({'message': 'Insufficient credits'}), 400
+        user.credits -= amount
+    
+    db.session.commit()
+    return jsonify({'message': 'Credits updated successfully'})
 
-@app.route('/api/send-sms', methods=['POST'])
+@app.route('/')
 @login_required
-def send_sms():
-    try:
-        # Check if user has enough credits
-        if not current_user.has_sufficient_credits(1):
-            return handle_api_error('Créditos insuficientes para enviar SMS')
-            
-        data = request.get_json()
-        if not data or not all(k in data for k in ['phone', 'message']):
-            return handle_api_error('Número de telefone e mensagem são obrigatórios')
-        
-        # Format phone number
-        phone = data['phone']
-        if not phone.startswith('+55'):
-            phone = f'+55{phone}'
-        
-        # Deduct credits before sending
-        if not current_user.deduct_credits(1):
-            return handle_api_error('Falha ao deduzir créditos')
-            
-        # Queue SMS task
-        task = send_sms_task.delay(
-            phone=phone,
-            message=data['message'],
-            event_type='manual'
-        )
-        
-        # Log SMS in history
-        sms_history = SMSHistory(
-            phone=phone,
-            message=data['message'],
-            type='manual',
-            status='pending',
-            user_id=current_user.id
-        )
-        db.session.add(sms_history)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': 'SMS enviado com sucesso',
-            'credits_remaining': current_user.credits
-        })
-        
-    except Exception as e:
-        logger.error(f"Error sending SMS: {str(e)}")
-        # Refund credit if SMS failed to queue
-        current_user.add_credits(1)
-        return handle_api_error('Erro ao enviar SMS. Por favor, tente novamente.')
+def dashboard():
+    return redirect(url_for('campaigns'))
 
-@app.route('/sms-history')
-@login_required
-def sms_history():
-    # Load SMS history for current user
-    user_history = SMSHistory.query.filter_by(user_id=current_user.id).order_by(SMSHistory.created_at.desc()).all()
-    return render_template('sms_history.html', sms_history=user_history)
-
-@app.route('/campaigns')
-@login_required
-def campaigns():
-    return render_template('campaigns.html')
-
-@app.route('/integrations')
-@login_required
-def integrations():
-    return render_template('integrations.html')
-
-@app.route('/api/campaigns', methods=['GET'])
-@login_required
-def get_campaigns():
-    try:
-        # Get only campaigns for current user
-        user_campaigns = Campaign.query.filter_by(user_id=current_user.id).all()
-        return jsonify([c.to_dict() for c in user_campaigns])
-    except Exception as e:
-        logger.error(f"Error loading campaigns: {str(e)}")
-        return handle_api_error('Failed to load campaigns')
-
-@app.route('/api/campaigns', methods=['POST'])
-@login_required
-def create_campaign():
-    try:
-        data = request.get_json()
-        if not data or not all(k in data for k in ['name', 'integration_id', 'event_type', 'message_template']):
-            return handle_api_error('Missing required fields')
-            
-        # Verify integration belongs to user
-        integration = Integration.query.filter_by(id=data['integration_id'], user_id=current_user.id).first()
-        if not integration:
-            return handle_api_error('Invalid integration ID')
-            
-        campaign = Campaign()
-        campaign.name = data['name']
-        campaign.integration_id = data['integration_id']
-        campaign.event_type = data['event_type']
-        campaign.message_template = data['message_template']
-        campaign.delay_amount = data.get('delay_amount', 0)
-        campaign.delay_unit = data.get('delay_unit', 'minutes')
-        campaign.user_id = current_user.id
-        
-        db.session.add(campaign)
-        db.session.commit()
-            
-        return jsonify({
-            'success': True,
-            'message': 'Campaign created successfully',
-            'campaign': campaign.to_dict()
-        })
-    except Exception as e:
-        logger.error(f"Error creating campaign: {str(e)}")
-        return handle_api_error('Failed to create campaign')
-
-@app.route('/api/campaigns/<campaign_id>', methods=['DELETE'])
-@login_required
-def delete_campaign(campaign_id):
-    try:
-        campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
-        if campaign:
-            db.session.delete(campaign)
-            db.session.commit()
-            return jsonify({
-                'success': True,
-                'message': 'Campaign deleted successfully'
-            })
-        return handle_api_error('Campaign not found')
-    except Exception as e:
-        logger.error(f"Error deleting campaign: {str(e)}")
-        return handle_api_error('Failed to delete campaign')
-
-@app.route('/api/campaigns/<campaign_id>', methods=['GET'])
-@login_required
-def get_campaign(campaign_id):
-    try:
-        campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
-        if not campaign:
-            return handle_api_error('Campaign not found')
-            
-        return jsonify(campaign.to_dict())
-    except Exception as e:
-        logger.error(f"Error loading campaign: {str(e)}")
-        return handle_api_error('Failed to load campaign')
-
-@app.route('/api/campaigns/<campaign_id>', methods=['PUT'])
-@login_required
-def update_campaign(campaign_id):
-    try:
-        campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
-        if not campaign:
-            return handle_api_error('Campaign not found')
-            
-        data = request.get_json()
-        # Update existing fields
-        campaign.name = data.get('name', campaign.name)
-        campaign.event_type = data.get('event_type', campaign.event_type)
-        campaign.message_template = data.get('message_template', campaign.message_template)
-        campaign.delay_amount = data.get('delay_amount', campaign.delay_amount)
-        campaign.delay_unit = data.get('delay_unit', campaign.delay_unit)
-        
-        # Add payment page customization fields
-        campaign.payment_page_title = data.get('payment_page_title', campaign.payment_page_title)
-        campaign.payment_page_logo_url = data.get('payment_page_logo_url', campaign.payment_page_logo_url)
-        campaign.payment_page_header_color = data.get('payment_page_header_color', campaign.payment_page_header_color)
-        campaign.payment_page_button_color = data.get('payment_page_button_color', campaign.payment_page_button_color)
-        campaign.payment_page_text_color = data.get('payment_page_text_color', campaign.payment_page_text_color)
-        campaign.payment_page_custom_text = data.get('payment_page_custom_text', campaign.payment_page_custom_text)
-        
-        db.session.commit()
-            
-        return jsonify({
-            'success': True,
-            'message': 'Campaign updated successfully',
-            'campaign': campaign.to_dict()
-        })
-    except Exception as e:
-        logger.error(f"Error updating campaign: {str(e)}")
-        return handle_api_error('Failed to update campaign')
-
-@app.route('/api/integrations', methods=['GET'])
-@login_required
-def get_integrations():
-    try:
-        # Get only integrations for current user
-        user_integrations = Integration.query.filter_by(user_id=current_user.id).all()
-        return jsonify([i.to_dict() for i in user_integrations])
-    except Exception as e:
-        logger.error(f"Error loading integrations: {str(e)}")
-        return handle_api_error('Failed to load integrations')
-
-@app.route('/api/integrations', methods=['POST'])
-@login_required
-def create_integration():
-    try:
-        data = request.get_json()
-        if not data or 'name' not in data:
-            return handle_api_error('Integration name is required')
-            
-        integration = Integration()
-        integration.name = data['name']
-        integration.webhook_url = f"/webhook/{str(uuid.uuid4())}"
-        integration.user_id = current_user.id
-        
-        db.session.add(integration)
-        db.session.commit()
-            
-        return jsonify({
-            'success': True,
-            'message': 'Integration created successfully',
-            'integration': integration.to_dict()
-        })
-    except Exception as e:
-        logger.error(f"Error creating integration: {str(e)}")
-        return handle_api_error('Failed to create integration')
-
-@app.route('/api/integrations/<integration_id>', methods=['DELETE'])
-@login_required
-def delete_integration(integration_id):
-    try:
-        integration = Integration.query.filter_by(id=integration_id, user_id=current_user.id).first()
-        if integration:
-            db.session.delete(integration)
-            db.session.commit()
-            return jsonify({
-                'success': True,
-                'message': 'Integration deleted successfully'
-            })
-        return handle_api_error('Integration not found')
-    except Exception as e:
-        logger.error(f"Error deleting integration: {str(e)}")
-        return handle_api_error('Failed to delete integration')
-
-@app.route('/preview-payment/<campaign_id>')
-@login_required
-def preview_payment(campaign_id):
-    campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
-    if not campaign:
-        return render_template('error.html', error='Campaign not found')
-        
-    return render_template('payment.html',
-        campaign=campaign,
-        customer_name='Example Customer',
-        pix_code='EXAMPLE_PIX_CODE_12345',
-        default_logo_url='/static/images/default_logo.png'
-    )
-
-@app.route('/webhook/<path:webhook_path>', methods=['POST'])
-def webhook_handler(webhook_path):
-    try:
-        webhook_data = request.get_json()
-        logger.debug(f"Received webhook data: {webhook_data}")
-        
-        # Find integration with matching webhook URL
-        integration = Integration.query.filter(Integration.webhook_url.like(f"%{webhook_path}%")).first()
-        if not integration:
-            logger.error(f"No integration found for webhook path: {webhook_path}")
-            return handle_api_error('Integration not found', 404)
-            
-        # Get user who owns the integration
-        user = User.query.get(integration.user_id)
-        if not user:
-            logger.error(f"User not found for integration {integration.id}")
-            return handle_api_error('Integration owner not found', 404)
-            
-        # Load campaigns for this integration
-        campaigns = Campaign.query.filter_by(integration_id=integration.id, user_id=user.id).all()
-        
-        # Get status from webhook data
-        status = webhook_data.get('status', 'pending').lower()
-        
-        # Find matching campaigns for this status
-        matching_campaigns = [
-            c for c in campaigns 
-            if c.event_type.lower() == status
-        ]
-        
-        if not matching_campaigns:
-            logger.warning(f"No campaigns found for integration {integration.id} and status {status}")
-            return jsonify({
-                'success': True,
-                'message': 'No matching campaigns found for this event type'
-            })
-        
-        # Create transaction record
-        transaction_id = str(uuid.uuid4())[:8]
-        customer_data = webhook_data.get('customer', {})
-        transaction = Transaction(
-            transaction_id=transaction_id,
-            customer_name=customer_data.get('name', ''),
-            customer_phone=customer_data.get('phone', ''),
-            customer_email=customer_data.get('email', ''),
-            product_name=webhook_data.get('product_name', ''),
-            total_price=webhook_data.get('total_price', '0.00'),
-            pix_code=webhook_data.get('pix_code', ''),  # Ensure this is being passed
-            status=status
-        )
-        db.session.add(transaction)
-        
-        success_count = 0
-        
-        # Calculate delay in seconds based on campaign settings
-        for campaign in matching_campaigns:
-            try:
-                if not user.has_sufficient_credits(1):
-                    logger.warning(f"User {user.id} has insufficient credits for campaign {campaign.id}")
-                    continue
-                    
-                # Calculate delay in seconds
-                delay_seconds = 0
-                if campaign.delay_amount and campaign.delay_unit:
-                    if campaign.delay_unit == 'minutes':
-                        delay_seconds = campaign.delay_amount * 60
-                    elif campaign.delay_unit == 'hours':
-                        delay_seconds = campaign.delay_amount * 3600
-                    elif campaign.delay_unit == 'days':
-                        delay_seconds = campaign.delay_amount * 86400
-                
-                # Format message and phone number
-                full_name = customer_data.get('name', '')
-                first_name = full_name.split()[0] if full_name else ''
-                
-                phone = customer_data.get('phone', '')
-                if not phone.startswith('+55'):
-                    phone = f'+55{phone}'
-                
-                message = campaign.message_template
-                message = message.replace('{customer.first_name}', first_name)
-                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
-                
-                if status == 'pending':
-                    payment_url = f"{request.host_url}{transaction_id}"
-                    message = message.replace('{link_pix}', payment_url)
-                
-                # Deduct credit and queue SMS with delay
-                if user.deduct_credits(1):
-                    send_sms_task.apply_async(
-                        args=[phone, message, campaign.event_type],
-                        countdown=delay_seconds
-                    )
-                    success_count += 1
-                    logger.info(f"SMS queued for campaign {campaign.id} with {delay_seconds}s delay")
-                    
-            except Exception as e:
-                logger.error(f"Error processing campaign {campaign.id}: {str(e)}")
-                continue
-        
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': f'Processed {success_count} campaigns successfully'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error processing webhook: {str(e)}")
-        db.session.rollback()
-        return handle_api_error('Error processing webhook')
-
-@app.route('/<transaction_id>')
-def payment(transaction_id):
-    try:
-        # Get transaction from database
-        transaction = Transaction.query.filter_by(transaction_id=transaction_id).first()
-        
-        if not transaction:
-            return render_template('error.html', error='Transaction not found')
-        
-        # Ensure pix_code exists
-        if not transaction.pix_code:
-            return render_template('error.html', error='PIX code not available')
-            
-        return render_template('payment.html',
-            customer_name=transaction.customer_name,
-            pix_code=transaction.pix_code
-        )
-    except Exception as e:
-        logger.error(f"Error loading payment page: {str(e)}")
-        return render_template('error.html', error='Error loading payment details')
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 8080))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=80, debug=False)
