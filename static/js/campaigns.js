@@ -132,26 +132,25 @@ function saveCampaign() {
 
 async function editCampaign(campaignId) {
     try {
-        const response = await fetch('/api/campaigns');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const campaigns = await response.json();
-        const campaign = campaigns.find(c => c.id === campaignId);
-        
-        if (!campaign) {
-            throw new Error('Campanha não encontrada');
+        const response = await fetch(`/api/campaigns/${campaignId}`);
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Campaign not found');
         }
+        
+        const campaign = await response.json();
         
         const form = document.getElementById('campaignForm');
         form.dataset.campaignId = campaignId;
         
         document.getElementById('campaignName').value = campaign.name;
         document.getElementById('integrationId').value = campaign.integration_id;
-        document.getElementById('integrationId').disabled = true;
         document.getElementById('eventType').value = campaign.event_type;
         document.getElementById('messageTemplate').value = campaign.message_template;
         document.getElementById('delayAmount').value = campaign.delay_amount || 0;
         document.getElementById('delayUnit').value = campaign.delay_unit || 'minutes';
+        
+        document.getElementById('integrationId').disabled = true;
     } catch (error) {
         console.error('Erro ao carregar campanha para edição:', error);
         showToast('error', `Erro ao carregar dados da campanha: ${error.message}`);

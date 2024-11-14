@@ -380,6 +380,45 @@ def delete_campaign(campaign_id):
         logger.error(f"Error deleting campaign: {str(e)}")
         return handle_api_error('Failed to delete campaign')
 
+@app.route('/api/campaigns/<campaign_id>', methods=['GET'])
+@login_required
+def get_campaign(campaign_id):
+    try:
+        campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
+        if not campaign:
+            return handle_api_error('Campaign not found')
+            
+        return jsonify(campaign.to_dict())
+    except Exception as e:
+        logger.error(f"Error loading campaign: {str(e)}")
+        return handle_api_error('Failed to load campaign')
+
+@app.route('/api/campaigns/<campaign_id>', methods=['PUT'])
+@login_required
+def update_campaign(campaign_id):
+    try:
+        campaign = Campaign.query.filter_by(id=campaign_id, user_id=current_user.id).first()
+        if not campaign:
+            return handle_api_error('Campaign not found')
+            
+        data = request.get_json()
+        campaign.name = data.get('name', campaign.name)
+        campaign.event_type = data.get('event_type', campaign.event_type)
+        campaign.message_template = data.get('message_template', campaign.message_template)
+        campaign.delay_amount = data.get('delay_amount', campaign.delay_amount)
+        campaign.delay_unit = data.get('delay_unit', campaign.delay_unit)
+        
+        db.session.commit()
+            
+        return jsonify({
+            'success': True,
+            'message': 'Campaign updated successfully',
+            'campaign': campaign.to_dict()
+        })
+    except Exception as e:
+        logger.error(f"Error updating campaign: {str(e)}")
+        return handle_api_error('Failed to update campaign')
+
 @app.route('/api/integrations', methods=['GET'])
 @login_required
 def get_integrations():
