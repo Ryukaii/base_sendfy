@@ -33,6 +33,24 @@
                 </small>
             </div>
             <div class="mb-3">
+                <label class="form-label">Atraso no Envio</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="number" class="form-control" id="delayAmount" min="0" value="0">
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-control" id="delayUnit">
+                            <option value="minutes">Minutos</option>
+                            <option value="hours">Horas</option>
+                            <option value="days">Dias</option>
+                        </select>
+                    </div>
+                </div>
+                <small class="text-muted">
+                    Defina quanto tempo esperar antes de enviar a mensagem após o evento
+                </small>
+            </div>
+            <div class="mb-3">
                 <label class="form-label">Variáveis Disponíveis:</label>
                 <div class="btn-group-vertical w-100">
                     <button type="button" class="btn btn-outline-primary mb-2" onclick="insertVariable('{customer.first_name}')">

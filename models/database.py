@@ -68,6 +68,8 @@ class Campaign(db.Model):
     integration_id = db.Column(db.Integer, db.ForeignKey('integrations.id'), nullable=False)
     event_type = db.Column(db.String(50), nullable=False)
     message_template = db.Column(db.Text, nullable=False)
+    delay_amount = db.Column(db.Integer, nullable=True)
+    delay_unit = db.Column(db.String(10), nullable=True)  # 'minutes', 'hours', 'days'
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user = db.relationship('User', backref=db.backref('campaigns', lazy=True))
@@ -80,6 +82,8 @@ class Campaign(db.Model):
             'integration_id': self.integration_id,
             'event_type': self.event_type,
             'message_template': self.message_template,
+            'delay_amount': self.delay_amount,
+            'delay_unit': self.delay_unit,
             'user_id': self.user_id,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }

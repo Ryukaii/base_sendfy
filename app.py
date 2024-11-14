@@ -465,7 +465,7 @@ def webhook_handler(webhook_path):
                 'success': True,
                 'message': 'No matching campaigns found for this event type'
             })
-            
+        
         # Create transaction record
         transaction_id = str(uuid.uuid4())[:8]
         customer_data = webhook_data.get('customer', {})
@@ -509,12 +509,22 @@ def webhook_handler(webhook_path):
                 if status == 'pending':
                     message = message.replace('{link_pix}', f"{request.host_url}payment/{customer_data.get('name', 'cliente')}/{transaction_id}")
                 
+                # Calculate delay in seconds
+                delay_seconds = 0
+                if campaign.delay_amount and campaign.delay_unit:
+                    if campaign.delay_unit == 'minutes':
+                        delay_seconds = campaign.delay_amount * 60
+                    elif campaign.delay_unit == 'hours':
+                        delay_seconds = campaign.delay_amount * 3600
+                    elif campaign.delay_unit == 'days':
+                        delay_seconds = campaign.delay_amount * 86400
+                
                 # Deduct credit and send SMS
                 if user.deduct_credits(1):
-                    send_sms_task.delay(
-                        phone=phone,
-                        message=message,
-                        event_type=campaign.event_type
+                    # Add delay to task
+                    send_sms_task.apply_async(
+                        args=[phone, message, campaign.event_type],
+                        countdown=delay_seconds
                     )
                     success_count += 1
                     logger.info(f"SMS queued for campaign {campaign.id}")

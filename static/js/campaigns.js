@@ -19,7 +19,6 @@ function showToast(type, message) {
     });
     toast.show();
     
-    // Remove toast element after it's hidden
     toastDiv.addEventListener('hidden.bs.toast', () => {
         toastDiv.remove();
     });
@@ -71,6 +70,9 @@ async function loadCampaigns() {
         
         campaignsResponse.forEach(campaign => {
             const integration = integrationsResponse.find(i => i.id === campaign.integration_id);
+            const delayText = campaign.delay_amount ? 
+                `Atraso: ${campaign.delay_amount} ${campaign.delay_unit}` : 
+                'Sem atraso';
             const div = document.createElement('div');
             div.className = 'card mb-3';
             div.innerHTML = `
@@ -81,6 +83,7 @@ async function loadCampaigns() {
                             <p class="card-text">
                                 <strong>Integração:</strong> ${integration ? integration.name : 'Desconhecida'}<br>
                                 <strong>Tipo de Evento:</strong> ${campaign.event_type}<br>
+                                <strong>Atraso:</strong> ${delayText}<br>
                                 <strong>Modelo de Mensagem:</strong><br>
                                 <code class="d-block p-2 bg-dark rounded mt-2">${campaign.message_template}</code>
                             </p>
@@ -124,7 +127,9 @@ document.getElementById('campaignForm').addEventListener('submit', async (e) => 
         name: document.getElementById('campaignName').value,
         integration_id: document.getElementById('integrationId').value,
         event_type: document.getElementById('eventType').value,
-        message_template: document.getElementById('messageTemplate').value
+        message_template: document.getElementById('messageTemplate').value,
+        delay_amount: parseInt(document.getElementById('delayAmount').value) || 0,
+        delay_unit: document.getElementById('delayUnit').value
     };
     
     const campaignId = e.target.dataset.campaignId;
@@ -195,6 +200,8 @@ async function editCampaign(campaignId) {
         document.getElementById('integrationId').disabled = true;
         document.getElementById('eventType').value = campaign.event_type;
         document.getElementById('messageTemplate').value = campaign.message_template;
+        document.getElementById('delayAmount').value = campaign.delay_amount || 0;
+        document.getElementById('delayUnit').value = campaign.delay_unit || 'minutes';
         
         document.querySelector('button[type="submit"]').innerHTML = `
             <i class="fas fa-save me-1"></i>
