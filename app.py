@@ -466,74 +466,73 @@ def webhook_handler(webhook_path):
                 'message': 'No matching campaigns found for this event type'
             })
             
-        # Process each matching campaign
+        # Create transaction record
+        transaction_id = str(uuid.uuid4())[:8]
+        customer_data = webhook_data.get('customer', {})
+        
+        transaction = Transaction(
+            transaction_id=transaction_id,
+            customer_name=customer_data.get('name', ''),
+            customer_phone=customer_data.get('phone', ''),
+            customer_email=customer_data.get('email', ''),
+            product_name=webhook_data.get('product_name', ''),
+            total_price=webhook_data.get('total_price', '0.00'),
+            pix_code=webhook_data.get('pix_code', ''),
+            status=status
+        )
+        db.session.add(transaction)
+        db.session.commit()
+
+        success_count = 0
+        # Send SMS for each matching campaign
         for campaign in matching_campaigns:
-            # Skip if user has insufficient credits
-            if not user.has_sufficient_credits(1):
-                logger.warning(f"Insufficient credits for user {user.id} to send campaign SMS")
-                continue
-                
             try:
-                # Format message with variables from webhook data
-                message = campaign.message_template
-                
-                # Extract customer info
-                customer_info = webhook_data.get('customer', {})
-                if isinstance(customer_info, str):
-                    # Handle case where customer is a string
-                    message = message.replace('{customer.first_name}', customer_info)
-                else:
-                    # Replace all possible variables
-                    for key in customer_info:
-                        message = message.replace(f'{{customer.{key}}}', str(customer_info[key]))
-                
-                # Replace any other template variables
-                for key, value in webhook_data.items():
-                    if isinstance(value, (str, int, float)):
-                        message = message.replace(f'{{{key}}}', str(value))
+                if not user.has_sufficient_credits(1):
+                    logger.warning(f"User {user.id} has insufficient credits for campaign {campaign.id}")
+                    continue
+                    
+                # Get first name
+                full_name = customer_data.get('name', '')
+                first_name = full_name.split()[0] if full_name else ''
                 
                 # Format phone number
-                phone = webhook_data.get('customer_phone', '')
+                phone = customer_data.get('phone', '')
                 if not phone.startswith('+55'):
                     phone = f'+55{phone}'
                 
-                # Deduct credit and queue SMS
+                # Format message
+                message = campaign.message_template
+                message = message.replace('{customer.first_name}', first_name)
+                message = message.replace('{total_price}', webhook_data.get('total_price', ''))
+                
+                # Add PIX link only for pending status
+                if status == 'pending':
+                    message = message.replace('{link_pix}', f"{request.host_url}payment/{customer_data.get('name', 'cliente')}/{transaction_id}")
+                
+                # Deduct credit and send SMS
                 if user.deduct_credits(1):
-                    task = send_sms_task.delay(
+                    send_sms_task.delay(
                         phone=phone,
                         message=message,
-                        event_type='campaign'
+                        event_type=campaign.event_type
                     )
-                    
-                    # Log SMS
-                    sms_history = SMSHistory(
-                        phone=phone,
-                        message=message,
-                        type='campaign',
-                        status='pending',
-                        user_id=user.id
-                    )
-                    db.session.add(sms_history)
-                    db.session.commit()
-                    
-                    logger.info(f"Campaign SMS queued for integration {integration.id}")
-                else:
-                    logger.warning(f"Failed to deduct credits for user {user.id}")
-                    
+                    success_count += 1
+                    logger.info(f"SMS queued for campaign {campaign.id}")
+                
             except Exception as e:
-                logger.error(f"Error processing campaign {campaign.id}: {str(e)}")
-                # Refund credit if processing failed
+                logger.error(f"Error sending SMS for campaign {campaign.id}: {str(e)}")
+                # Refund credit if SMS failed to queue
                 user.add_credits(1)
-                continue
-        
+
         return jsonify({
             'success': True,
-            'message': f"Processed {len(matching_campaigns)} matching campaigns"
+            'message': f'Webhook processed successfully. Sent {success_count} messages',
+            'transaction_id': transaction_id
         })
         
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
-        return handle_api_error('Internal server error', 500)
+        return handle_api_error('Error processing webhook')
 
 @app.route('/payment/<transaction_id>')
 def payment_page(transaction_id):
